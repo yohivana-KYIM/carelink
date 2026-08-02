@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
 import { motion } from "motion/react";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowUp, CheckCircle2, Loader2 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { FooterSignature } from "@/components/ui/FooterSignature";
 import {
@@ -50,6 +50,15 @@ export function Footer() {
       className="relative overflow-hidden bg-[#0a1120] text-[#f5f7fc]"
     >
       <FooterSignature text={siteConfig.name} triggerRef={footerRef} />
+
+      <button
+        type="button"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        aria-label="Retour en haut de page"
+        className="absolute left-1/2 top-0 z-20 flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-[#0f192e] text-white/70 shadow-card transition-colors hover:border-brand-400 hover:text-brand-300"
+      >
+        <ArrowUp size={18} />
+      </button>
 
       <Container className="relative z-10 py-16">
         <div className="flex flex-col gap-10 border-b border-white/10 pb-12 lg:flex-row lg:items-end lg:justify-between">

@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { AnimatePresence, motion } from "motion/react";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
+import { gsap, prefersReducedMotion } from "@/lib/gsap";
 import { navLinks } from "@/lib/site-config";
 import { Button } from "@/components/ui/Button";
 
@@ -13,67 +15,128 @@ export function MobileMenu({
   open: boolean;
   onClose: () => void;
 }) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const linkRefs = useRef<Array<HTMLLIElement | null>>([]);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (panelRef.current) {
+      gsap.set(panelRef.current, { yPercent: -100, autoAlpha: 0 });
+    }
+  }, []);
+
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    if (open) {
+      document.body.style.overflow = "hidden";
+
+      const handleKeydown = (event: KeyboardEvent) => {
+        if (event.key === "Escape") onClose();
+      };
+      window.addEventListener("keydown", handleKeydown);
+
+      let ctx: ReturnType<typeof gsap.context> | undefined;
+
+      if (prefersReducedMotion()) {
+        gsap.set(panel, { yPercent: 0, autoAlpha: 1 });
+      } else {
+        ctx = gsap.context(() => {
+          gsap.fromTo(
+            panel,
+            { yPercent: -100, autoAlpha: 1 },
+            { yPercent: 0, duration: 0.45, ease: "expo.out" }
+          );
+          gsap.fromTo(
+            linkRefs.current.filter(Boolean),
+            { y: 18, autoAlpha: 0 },
+            {
+              y: 0,
+              autoAlpha: 1,
+              duration: 0.4,
+              stagger: 0.06,
+              delay: 0.12,
+              ease: "power2.out",
+            }
+          );
+        }, panel);
+      }
+
+      return () => {
+        document.body.style.overflow = "";
+        window.removeEventListener("keydown", handleKeydown);
+        ctx?.revert();
+      };
+    }
+
+    if (prefersReducedMotion()) {
+      gsap.set(panel, { yPercent: -100, autoAlpha: 0 });
+    } else {
+      gsap.to(panel, {
+        yPercent: -100,
+        duration: 0.3,
+        ease: "power2.in",
+        onComplete: () => gsap.set(panel, { autoAlpha: 0 }),
+      });
+    }
+  }, [open, onClose]);
+
   return (
-    <AnimatePresence>
-      {open ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-sm lg:hidden"
+    <div
+      ref={panelRef}
+      className="fixed inset-0 z-[60] flex flex-col gap-8 bg-background p-6 pt-8 lg:hidden"
+      style={{ visibility: "hidden" }}
+    >
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-semibold uppercase tracking-widest text-ink-soft">
+          Menu
+        </span>
+        <button
+          type="button"
           onClick={onClose}
+          aria-label="Fermer le menu"
+          className="flex size-10 items-center justify-center rounded-full border border-border text-ink-muted"
         >
-          <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="ml-auto flex h-full w-full max-w-sm flex-col gap-8 bg-background p-6 shadow-float"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold uppercase tracking-widest text-ink-soft">
-                Menu
-              </span>
-              <button
-                type="button"
-                onClick={onClose}
-                aria-label="Fermer le menu"
-                className="flex size-10 items-center justify-center rounded-full border border-border text-ink-muted"
+          <X size={18} />
+        </button>
+      </div>
+
+      <nav className="flex flex-col gap-1">
+        <ul className="flex flex-col">
+          {navLinks.map((link, index) => {
+            const isActive = !link.href.includes("#") && pathname === link.href;
+            return (
+              <li
+                key={link.href}
+                ref={(el) => {
+                  linkRefs.current[index] = el;
+                }}
+                className="border-b border-border"
               >
-                <X size={18} />
-              </button>
-            </div>
-            <nav className="flex flex-col gap-1">
-              {navLinks.map((link, index) => (
-                <motion.div
-                  key={link.href}
-                  initial={{ opacity: 0, x: 24 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 + index * 0.05 }}
+                <Link
+                  href={link.href}
+                  onClick={onClose}
+                  className={`block py-4 text-lg font-medium ${
+                    isActive ? "text-brand-600 dark:text-brand-400" : "text-ink"
+                  }`}
                 >
-                  <Link
-                    href={link.href}
-                    onClick={onClose}
-                    className="block border-b border-border py-4 text-lg font-medium text-ink"
-                  >
-                    {link.label}
-                  </Link>
-                </motion.div>
-              ))}
-            </nav>
-            <div className="mt-auto flex flex-col gap-3">
-              <Button href="/contact" variant="secondary" onClick={onClose}>
-                Se connecter
-              </Button>
-              <Button href="/contact" onClick={onClose}>
-                Demander une démo
-              </Button>
-            </div>
-          </motion.div>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
+                  {link.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      <div className="mt-auto flex flex-col gap-3">
+        <Button href="/login" variant="secondary" onClick={onClose}>
+          Connexion
+        </Button>
+        <Button href="/contact" onClick={onClose}>
+          Demander une démo
+        </Button>
+      </div>
+    </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import { HoverLink } from "@/components/ui/HoverLink";
@@ -13,25 +14,22 @@ import { navLinks, siteConfig } from "@/lib/site-config";
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
+    const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
-    <header
-      className={`sticky top-0 z-40 px-4 transition-[padding] duration-300 sm:px-6 lg:px-8 ${
-        scrolled ? "pt-2" : "pt-4"
-      }`}
-    >
+    <header className="fixed inset-x-0 top-4 z-50 px-4 sm:px-6 lg:px-8">
       <div
-        className={`mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-full border bg-surface-raised/95 py-2.5 pl-3 pr-3 backdrop-blur-md transition-all duration-300 sm:pl-4 sm:pr-4 ${
+        className={`mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 rounded-full border pl-3 pr-3 backdrop-blur-2xl transition-all duration-300 sm:pl-4 sm:pr-4 ${
           scrolled
-            ? "border-border shadow-[0_8px_30px_-12px_rgba(16,23,40,0.25)] dark:shadow-[0_8px_30px_-12px_rgba(0,0,0,0.6)]"
-            : "border-border/60 shadow-card"
+            ? "border-border bg-surface-raised/95 shadow-[0_8px_30px_-12px_rgba(16,23,40,0.25)] dark:shadow-[0_8px_30px_-12px_rgba(0,0,0,0.6)]"
+            : "border-border/50 bg-surface-raised/70 shadow-card"
         }`}
       >
         <Link
@@ -42,8 +40,8 @@ export function Header() {
           <Image
             src="/images/carelink-icon.png"
             alt={`Logo ${siteConfig.name}`}
-            width={34}
-            height={34}
+            width={32}
+            height={32}
             className="rounded-[9px]"
             priority
           />
@@ -53,18 +51,35 @@ export function Header() {
         </Link>
 
         <nav
-          className="hidden flex-1 items-center justify-center gap-7 lg:flex"
+          className="hidden flex-1 items-center justify-center gap-1 lg:flex"
           aria-label="Navigation principale"
         >
-          {navLinks.map((link) => (
-            <HoverLink key={link.href} href={link.href}>
-              {link.label}
-            </HoverLink>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = !link.href.includes("#") && pathname === link.href;
+            return (
+              <HoverLink
+                key={link.href}
+                href={link.href}
+                className={
+                  isActive
+                    ? "rounded-full bg-brand-50 px-3 !text-brand-700 dark:bg-brand-500/15 dark:!text-brand-300"
+                    : "px-3"
+                }
+              >
+                {link.label}
+              </HoverLink>
+            );
+          })}
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
           <ThemeToggle />
+          <Link
+            href="/login"
+            className="inline-flex items-center justify-center rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-red-600 active:scale-[0.97]"
+          >
+            Connexion
+          </Link>
           <Button href="/contact">Demander une démo</Button>
         </div>
 
