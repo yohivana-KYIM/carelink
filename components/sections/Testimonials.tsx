@@ -36,7 +36,7 @@ export function Testimonials() {
         <div className="flex flex-col items-start gap-5">
           <Reveal>
             <h2 className="text-balance text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-4xl lg:text-[2.75rem]">
-              Pensé avec des professionnels dentaires
+              Conçu en collaboration avec des professionnels dentaires
             </h2>
           </Reveal>
           <Reveal delay={0.06}>

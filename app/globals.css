@@ -80,7 +80,7 @@
     transform: translateY(0);
   }
   to {
-    transform: translateY(-50%);
+    transform: translateY(calc(-50% - 0.625rem));
   }
 }
 
@@ -91,6 +91,10 @@
 }
 
 .testimonial-track:hover {
+  animation-play-state: paused;
+}
+
+.testimonial-track:focus-within {
   animation-play-state: paused;
 }
 
