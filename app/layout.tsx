@@ -121,6 +121,7 @@ export default function RootLayout({
               {children}
             </main>
             <Footer />
+            <BackToTopButton />
           </MotionProvider>
         </ThemeProvider>
       </body>
