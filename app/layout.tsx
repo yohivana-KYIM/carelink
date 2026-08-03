@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { MotionProvider } from "@/components/providers/MotionProvider";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { BackToTopButton } from "@/components/ui/BackToTopButton";
 import { siteConfig } from "@/lib/site-config";
 
 const figtree = Figtree({
