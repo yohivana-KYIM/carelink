@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { AlertCircle, Loader2, Lock, Mail } from "lucide-react";
-import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/lib/site-config";
 
@@ -31,11 +30,45 @@ export function LoginForm() {
   }
 
   return (
-    <section className="flex min-h-[calc(100vh-6rem)] items-center py-16">
-      <Container className="flex justify-center">
+    <section className="grid min-h-[calc(100vh-6rem)] lg:grid-cols-2">
+      <div className="relative hidden overflow-hidden lg:block">
+        <Image
+          src="/images/hero-dashboard-app.jpeg"
+          alt="Main tenant un smartphone affichant le tableau de bord Carelink"
+          fill
+          priority
+          sizes="50vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/20 to-brand-950/40" />
+
+        <div className="absolute inset-x-0 top-0 flex items-center gap-2.5 p-10">
+          <Image
+            src="/images/carelink-icon.png"
+            alt={`Logo ${siteConfig.name}`}
+            width={36}
+            height={36}
+            className="rounded-[9px]"
+          />
+          <span className="text-lg font-bold tracking-tight text-white">
+            {siteConfig.name}
+          </span>
+        </div>
+
+        <div className="absolute inset-x-0 bottom-0 p-10">
+          <Reveal>
+            <p className="max-w-sm text-balance text-2xl font-semibold leading-snug text-white">
+              Vos rendez-vous et relances patients, suivis en un coup
+              d&apos;œil.
+            </p>
+          </Reveal>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-center px-4 py-16 sm:px-6 lg:px-12">
         <Reveal className="w-full max-w-md">
-          <div className="rounded-[2rem] border border-border bg-surface-raised p-8 shadow-card sm:p-10">
-            <div className="flex flex-col items-center gap-3 text-center">
+          <div>
+            <div className="flex flex-col items-center gap-3 text-center lg:hidden">
               <Image
                 src="/images/carelink-icon.png"
                 alt={`Logo ${siteConfig.name}`}
@@ -43,6 +76,8 @@ export function LoginForm() {
                 height={44}
                 className="rounded-xl"
               />
+            </div>
+            <div className="flex flex-col items-center gap-2 text-center">
               <h1 className="text-2xl font-semibold tracking-tight text-ink">
                 Connexion à votre espace
               </h1>
@@ -149,7 +184,7 @@ export function LoginForm() {
             </p>
           </div>
         </Reveal>
-      </Container>
+      </div>
     </section>
   );
 }
