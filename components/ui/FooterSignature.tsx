@@ -21,7 +21,7 @@ export function FooterSignature({
     const ctx = gsap.context(() => {
       gsap.fromTo(
         wordRef.current,
-        { yPercent: 45, opacity: 0 },
+        { yPercent: 35, opacity: 0 },
         {
           yPercent: 0,
           opacity: 1,
@@ -42,16 +42,15 @@ export function FooterSignature({
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-0 select-none overflow-hidden"
+      className="relative z-0 flex h-28 select-none items-center justify-center overflow-hidden sm:h-44 lg:h-64"
     >
       <span
         ref={wordRef}
-        className="block text-center font-extrabold"
+        className="block text-center font-extrabold leading-none"
         style={{
-          fontSize: "clamp(5rem, 27vw, 26rem)",
-          lineHeight: 0.78,
+          fontSize: "clamp(4rem, 16vw, 14rem)",
           color: "transparent",
-          WebkitTextStroke: "1px rgba(90, 149, 222, 0.16)",
+          WebkitTextStroke: "1.5px rgba(90, 149, 222, 0.28)",
         }}
       >
         {text}

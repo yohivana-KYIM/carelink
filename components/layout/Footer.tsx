@@ -49,8 +49,6 @@ export function Footer() {
         id="contact-footer"
         className="relative mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] bg-[#0a1120] text-[#f5f7fc]"
       >
-        <FooterSignature text={siteConfig.name} triggerRef={footerRef} />
-
         <div className="relative z-10 px-6 py-14 sm:px-10 sm:py-16 lg:px-14">
           <div className="flex flex-col gap-10 border-b border-white/10 pb-12 lg:flex-row lg:items-end lg:justify-between">
             <div>
@@ -169,6 +167,8 @@ export function Footer() {
             </p>
           </div>
         </div>
+
+        <FooterSignature text={siteConfig.name} triggerRef={footerRef} />
       </footer>
     </div>
   );
