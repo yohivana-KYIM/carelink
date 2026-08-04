@@ -82,16 +82,26 @@ export function Hero() {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
           className="relative min-h-[520px] overflow-hidden rounded-[2rem] bg-gradient-to-br from-brand-600 via-brand-800 to-brand-950 sm:min-h-[600px] lg:min-h-[680px]"
         >
-          <div className="absolute inset-0 animate-float">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(255,255,255,0.2),transparent_38%)]" />
+          <motion.div
+            initial={{ opacity: 0, y: 28, rotate: 1.5 }}
+            animate={{ opacity: 1, y: [0, -12, 0], rotate: [0, -0.6, 0] }}
+            transition={{
+              opacity: { duration: 0.55, delay: 0.25 },
+              y: { duration: 5.5, delay: 0.8, repeat: Infinity, ease: "easeInOut" },
+              rotate: { duration: 5.5, delay: 0.8, repeat: Infinity, ease: "easeInOut" },
+            }}
+            className="absolute inset-0 p-4 sm:p-6 lg:p-8"
+          >
             <Image
               src="/images/hero-dashboard-app.jpeg"
               alt="Main tenant un smartphone affichant le tableau de bord Carelink : rendez-vous du jour, taux de confirmation et liste des patients"
               fill
-              priority
+              preload
               sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover object-[center_18%]"
+              className="object-contain"
             />
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>
