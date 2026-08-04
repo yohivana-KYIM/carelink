@@ -80,9 +80,19 @@ export function Hero() {
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          className="relative min-h-[520px] overflow-hidden rounded-[2rem] bg-gradient-to-br from-brand-600 via-brand-800 to-brand-950 sm:min-h-[600px] lg:min-h-[680px]"
+          className="relative min-h-[520px] overflow-hidden rounded-[2rem] bg-brand-800 sm:min-h-[600px] lg:min-h-[680px]"
         >
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(255,255,255,0.2),transparent_38%)]" />
+          {/* Fond flouté issu de la même image : garantit une couleur
+              parfaitement homogène entre le cadre et la photo, sans coupe. */}
+          <Image
+            src="/images/hero-dashboard-app.jpeg"
+            alt=""
+            aria-hidden
+            fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className="scale-125 object-cover object-center opacity-90 blur-3xl"
+          />
+          <div className="pointer-events-none absolute inset-0 bg-brand-950/25" />
           <motion.div
             initial={{ opacity: 0, y: 28, rotate: 1.5, scale: 0.98 }}
             animate={{
