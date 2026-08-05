@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import { HoverLink } from "@/components/ui/HoverLink";
 import { Button } from "@/components/ui/Button";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ThemeToggle } from "./ThemeToggle";
 import { MobileMenu } from "./MobileMenu";
 import { navLinks, siteConfig } from "@/lib/site-config";
@@ -17,6 +18,7 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<SafeUser | null>(null);
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -84,13 +86,14 @@ export function Header() {
 
           {user ? (
             <div className="ml-2 flex items-center gap-4">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3 rounded-full border border-border bg-surface px-3 py-2">
                 <div className="flex size-8 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
                   {user.fullName.charAt(0).toUpperCase()}
                 </div>
-                <span className="text-sm font-medium text-ink">
-                  Salut, {user.fullName.split(" ")[0]}
-                </span>
+                <div className="flex flex-col text-sm">
+                  <span className="font-semibold text-ink">{user.fullName.split(" ")[0]}</span>
+                  <span className="text-xs text-ink-soft">{user.role === "SUPERADMIN" ? "Super admin" : user.role === "ADMIN" ? "Administrateur" : "Secrétariat"}</span>
+                </div>
               </div>
               <div className="h-4 w-px bg-border" />
               <Link
@@ -101,13 +104,7 @@ export function Header() {
               </Link>
               <button
                 type="button"
-                onClick={() => {
-                  if (confirm("Voulez-vous vraiment vous déconnecter ?")) {
-                    clearSession();
-                    setUser(null);
-                    window.location.reload();
-                  }
-                }}
+                onClick={() => setConfirmLogoutOpen(true)}
                 className="inline-flex items-center justify-center rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink transition-colors duration-300 hover:bg-surface-raised active:scale-[0.97]"
               >
                 Déconnexion
@@ -137,6 +134,22 @@ export function Header() {
             <Menu size={18} />
           </button>
         </div>
+      </div>
+
+      <ConfirmDialog
+        open={confirmLogoutOpen}
+        title="Se déconnecter"
+        description="Voulez-vous vraiment fermer votre session Carelink ? Vous devrez vous reconnecter pour accéder à votre espace."
+        confirmLabel="Déconnexion"
+        cancelLabel="Annuler"
+        onConfirm={() => {
+          clearSession();
+          setUser(null);
+          setConfirmLogoutOpen(false);
+          window.location.reload();
+        }}
+        onClose={() => setConfirmLogoutOpen(false)}
+      />
       </div>
 
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
