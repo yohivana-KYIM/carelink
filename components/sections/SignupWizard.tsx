@@ -121,7 +121,17 @@ export function SignupWizard() {
   }
 
   return (
-    <section className="flex min-h-[calc(100vh-6rem)] items-center py-16">
+    <section className="grid min-h-[calc(100vh-6rem)] items-center py-16 lg:grid-cols-2">
+      <Reveal className="relative hidden overflow-hidden lg:block">
+        <Image
+          src="/images/hero-dashboard-app.jpeg"
+          alt="Main tenant un smartphone affichant le tableau de bord Carelink"
+          fill
+          sizes="50vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/20 to-brand-950/40" />
+      </Reveal>
       <Container className="flex justify-center">
         <Reveal className="w-full max-w-lg">
           <div className="rounded-[2rem] border border-border bg-surface-raised p-8 shadow-card sm:p-10">

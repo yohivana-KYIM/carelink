@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
-import { motion } from "motion/react";
+import { useEffect, useState, type FormEvent } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { AlertCircle, Loader2, Lock, Mail } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/lib/site-config";
@@ -45,14 +45,7 @@ export function LoginForm() {
   return (
     <section className="grid min-h-[calc(100vh-6rem)] lg:grid-cols-2">
       <div className="relative hidden overflow-hidden lg:block">
-        <Image
-          src="/images/hero-dashboard-app.jpeg"
-          alt="Main tenant un smartphone affichant le tableau de bord Carelink"
-          fill
-          priority
-          sizes="50vw"
-          className="object-cover"
-        />
+        <LoginImageCarousel />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/20 to-brand-950/40" />
 
         <div className="absolute inset-x-0 top-0 flex items-center gap-2.5 p-10">
@@ -202,5 +195,51 @@ export function LoginForm() {
         </Reveal>
       </div>
     </section>
+  );
+}
+
+function LoginImageCarousel() {
+  const images = [
+    {
+      src: "/images/hero-dashboard-app.jpeg",
+      alt: "Main tenant un smartphone affichant le tableau de bord Carelink",
+    },
+    { src: "/images/login.jpeg", alt: "Illustration connexion Carelink" },
+  ];
+
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(() => setIndex((i) => (i + 1) % images.length), 4200);
+    return () => clearInterval(t);
+  }, []);
+
+  return (
+    <div className="relative w-full h-full">
+      <AnimatePresence>
+        {images.map(
+          (img, i) =>
+            i === index && (
+              <motion.div
+                key={img.src}
+                initial={{ opacity: 0, x: 60 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -60 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  fill
+                  priority
+                  sizes="50vw"
+                  className="object-cover"
+                />
+              </motion.div>
+            )
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
