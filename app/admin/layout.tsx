@@ -2,12 +2,13 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, Loader2, Bell } from "lucide-react";
+import { Building2, Loader2, Bell, MessageCircle } from "lucide-react";
 import { SessionProvider, useSession } from "@/lib/session";
 import { DashboardShell, type DashboardNavItem } from "@/components/dashboard/DashboardShell";
 
 const navItems: DashboardNavItem[] = [
   { label: "Cabinets", href: "/admin", icon: Building2 },
+  { label: "Contacts", href: "/admin/contacts", icon: MessageCircle },
   { label: "Notifications", href: "/admin/notifications", icon: Bell },
 ];
 

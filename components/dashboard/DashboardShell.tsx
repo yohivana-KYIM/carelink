@@ -142,7 +142,7 @@ export function DashboardShell({
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label="Ouvrir le menu"
-            className="flex size-9 items-center justify-center rounded-full border border-border text-ink-muted lg:hidden"
+            className="flex size-9 items-center justify-center rounded-full border border-border text-ink-muted"
           >
             <Menu size={16} />
           </button>

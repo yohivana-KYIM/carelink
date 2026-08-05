@@ -35,6 +35,7 @@ export function ContactForm() {
     email: "",
     clinic: "",
     phone: "",
+    subject: "",
     message: "",
   });
 
@@ -65,7 +66,7 @@ export function ContactForm() {
         message: values.message.trim(),
       });
       setStatus("success");
-      setValues({ name: "", email: "", clinic: "", phone: "", message: "" });
+      setValues({ name: "", email: "", clinic: "", phone: "", subject: "", message: "" });
     } catch {
       setStatus("error");
     }
@@ -155,6 +156,14 @@ export function ContactForm() {
                 placeholder="06 12 34 56 78"
               />
             </div>
+
+            <Field
+              id="subject"
+              label="Objet"
+              value={values.subject}
+              onChange={updateField("subject")}
+              placeholder="Demande de démo, question produit..."
+            />
 
             <div className="flex flex-col gap-2">
               <label htmlFor="message" className="text-sm font-medium text-ink">
