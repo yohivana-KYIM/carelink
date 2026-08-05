@@ -6,6 +6,7 @@ import { Loader2, CalendarCheck, Clock, User, Phone, Stethoscope } from "lucide-
 import { toast } from "react-hot-toast";
 import { api } from "@/lib/api";
 import Image from "next/image";
+import { motion } from "motion/react";
 import { PhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
 
@@ -103,8 +104,9 @@ export default function PublicBookingPage() {
   const minDateTime = now.toISOString().slice(0, 16);
 
   return (
-    <div className="min-h-screen bg-surface-raised py-12 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-xl">
+    <div className="relative min-h-screen bg-surface-raised py-12 px-4 sm:px-6 lg:px-8 overflow-hidden z-0">
+      <GeometricDecorations />
+      <div className="relative z-10 mx-auto max-w-xl">
         <div className="text-center mb-8">
           <Image src="/images/carelink-icon.png" alt="Carelink" width={48} height={48} className="mx-auto rounded-xl mb-4 shadow-sm" />
           <h1 className="text-3xl font-bold tracking-tight text-ink">{cabinet.name}</h1>
@@ -161,6 +163,27 @@ export default function PublicBookingPage() {
           </form>
         </div>
       </div>
+    </div>
+  );
+}
+
+function GeometricDecorations() {
+  return (
+    <div className="absolute inset-0 pointer-events-none z-[-1] overflow-hidden">
+      <motion.div
+        animate={{ y: [0, -30, 0], rotate: [0, 8, 0], scale: [1, 1.05, 1] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute -top-32 -left-32 w-[500px] opacity-[0.15] dark:opacity-10 mix-blend-multiply dark:mix-blend-screen blur-xl"
+      >
+        <Image src="/images/shape-1.png" alt="" width={600} height={600} className="w-full h-auto object-contain" />
+      </motion.div>
+      <motion.div
+        animate={{ y: [0, 40, 0], x: [0, -20, 0], rotate: [0, -5, 0] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute bottom-10 right-0 w-[400px] opacity-[0.12] dark:opacity-5 mix-blend-multiply dark:mix-blend-screen blur-lg"
+      >
+        <Image src="/images/shape-2.png" alt="" width={500} height={500} className="w-full h-auto object-contain" />
+      </motion.div>
     </div>
   );
 }

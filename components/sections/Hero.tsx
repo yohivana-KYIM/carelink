@@ -9,9 +9,10 @@ import { heroChecklist, siteConfig } from "@/lib/site-config";
 
 export function Hero() {
   return (
-    <section className="px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-8 lg:px-8">
-      <div className="mx-auto grid max-w-7xl gap-3 lg:grid-cols-2">
-        <div className="flex flex-col justify-center gap-7 rounded-[2rem] bg-surface-raised p-8 shadow-card sm:p-12 lg:p-14">
+    <section className="relative px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-8 lg:px-8">
+      <GeometricDecorations />
+      <div className="relative z-10 mx-auto grid max-w-7xl gap-3 lg:grid-cols-2">
+        <div className="flex flex-col justify-center gap-7 rounded-[2rem] bg-surface-raised/90 backdrop-blur-sm p-8 shadow-card sm:p-12 lg:p-14">
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
@@ -139,6 +140,27 @@ function HeroImageCarousel() {
         )}
       </AnimatePresence>
       <div className="pointer-events-none absolute inset-0 bg-brand-950/25" />
+    </div>
+  );
+}
+
+function GeometricDecorations() {
+  return (
+    <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+      <motion.div
+        animate={{ y: [0, -30, 0], rotate: [0, 8, 0], scale: [1, 1.05, 1] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute -top-32 -left-32 w-[500px] opacity-[0.15] dark:opacity-10 mix-blend-multiply dark:mix-blend-screen blur-xl"
+      >
+        <Image src="/images/shape-1.png" alt="" width={600} height={600} className="w-full h-auto object-contain" />
+      </motion.div>
+      <motion.div
+        animate={{ y: [0, 40, 0], x: [0, -20, 0], rotate: [0, -5, 0] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute -bottom-20 right-10 lg:right-1/4 w-[400px] opacity-[0.12] dark:opacity-5 mix-blend-multiply dark:mix-blend-screen blur-lg"
+      >
+        <Image src="/images/shape-2.png" alt="" width={500} height={500} className="w-full h-auto object-contain" />
+      </motion.div>
     </div>
   );
 }

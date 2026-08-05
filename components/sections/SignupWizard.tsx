@@ -134,9 +134,10 @@ export function SignupWizard() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/20 to-brand-950/40" />
       </Reveal>
-      <Container className="flex justify-center">
-        <Reveal className="w-full max-w-lg">
-          <div className="rounded-[2rem] border border-border bg-surface-raised p-8 shadow-card sm:p-10">
+      <div className="relative flex w-full items-center justify-center px-4 overflow-hidden bg-brand-50/30 dark:bg-brand-950/20">
+        <GeometricDecorations />
+        <Reveal className="relative z-10 w-full max-w-lg">
+          <div className="rounded-[2rem] border border-border bg-surface-raised/80 backdrop-blur-md p-8 shadow-xl sm:p-10">
             <div className="flex flex-col items-center gap-3 text-center">
               <Image
                 src="/images/carelink-icon.png"
@@ -363,8 +364,29 @@ export function SignupWizard() {
             ) : null}
           </div>
         </Reveal>
-      </Container>
+      </div>
     </section>
+  );
+}
+
+function GeometricDecorations() {
+  return (
+    <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+      <motion.div
+        animate={{ y: [0, -30, 0], rotate: [0, 8, 0], scale: [1, 1.05, 1] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute -top-32 -right-32 w-[500px] opacity-[0.2] dark:opacity-10 mix-blend-multiply dark:mix-blend-screen blur-xl"
+      >
+        <Image src="/images/shape-1.png" alt="" width={600} height={600} className="w-full h-auto object-contain" />
+      </motion.div>
+      <motion.div
+        animate={{ y: [0, 40, 0], x: [0, -20, 0], rotate: [0, -5, 0] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute -bottom-20 -left-20 w-[400px] opacity-[0.15] dark:opacity-5 mix-blend-multiply dark:mix-blend-screen blur-lg"
+      >
+        <Image src="/images/shape-2.png" alt="" width={500} height={500} className="w-full h-auto object-contain" />
+      </motion.div>
+    </div>
   );
 }
 
