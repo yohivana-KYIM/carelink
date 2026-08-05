@@ -82,7 +82,7 @@ export function Hero2({
               className="flex flex-col gap-3 sm:flex-row sm:items-center"
             >
               {primaryCta ? (
-                <Button href={primaryCta.href}>{primaryCta.label}</Button>
+                <Button href={primaryCta.href} className="dark:bg-white dark:text-brand-900 dark:hover:bg-white/90">{primaryCta.label}</Button>
               ) : null}
               {secondaryCta ? (
                 <Button
