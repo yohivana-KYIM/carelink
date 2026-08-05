@@ -10,6 +10,7 @@ import {
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { RevealGroup, RevealItem } from "@/components/ui/RevealGroup";
+import { ArcRing, DotGrid, SoftOrb } from "@/components/ui/GeometricDecor";
 import { features } from "@/lib/site-config";
 
 const iconMap: Record<string, LucideIcon> = {
@@ -23,8 +24,12 @@ const iconMap: Record<string, LucideIcon> = {
 
 export function Features() {
   return (
-    <section id="fonctionnalites" className="scroll-mt-24 py-20 sm:py-28">
-      <Container className="flex flex-col gap-14">
+    <section id="fonctionnalites" className="relative scroll-mt-24 overflow-hidden py-20 sm:py-28">
+      <SoftOrb className="absolute -left-24 top-10 hidden h-72 w-72 bg-brand-200/40 dark:bg-brand-800/20 lg:block" />
+      <ArcRing className="absolute -right-16 top-24 hidden h-56 w-56 text-brand-300/50 dark:text-brand-700/40 lg:block" />
+      <DotGrid className="absolute bottom-10 right-[8%] hidden h-28 w-28 text-brand-300/40 dark:text-brand-700/40 xl:block" />
+
+      <Container className="relative flex flex-col gap-14">
         <SectionHeading
           eyebrow="Fonctionnalités"
           title="Un outil pensé pour votre cabinet"

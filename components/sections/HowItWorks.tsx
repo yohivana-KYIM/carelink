@@ -2,12 +2,16 @@ import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
+import { HalfArc, RingDot } from "@/components/ui/GeometricDecor";
 import { howItWorksSteps } from "@/lib/site-config";
 
 export function HowItWorks() {
   return (
-    <section id="comment-ca-marche" className="scroll-mt-24 py-20 sm:py-28">
-      <Container className="flex flex-col gap-14">
+    <section id="comment-ca-marche" className="relative scroll-mt-24 overflow-hidden py-20 sm:py-28">
+      <HalfArc className="absolute -top-10 left-1/2 hidden h-64 w-64 -translate-x-1/2 -scale-y-100 text-brand-200/60 dark:text-brand-800/50 sm:block" />
+      <RingDot className="absolute right-[10%] top-16 hidden h-16 w-16 text-brand-400/50 dark:text-brand-600/50 lg:block" />
+
+      <Container className="relative flex flex-col gap-14">
         <SectionHeading
           eyebrow="Mise en route"
           title="Comment ça marche ?"

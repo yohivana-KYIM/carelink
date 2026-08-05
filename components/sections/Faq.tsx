@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
+import { DotGrid, QuarterArc } from "@/components/ui/GeometricDecor";
 import { faqItems } from "@/lib/site-config";
 
 export function Faq() {
