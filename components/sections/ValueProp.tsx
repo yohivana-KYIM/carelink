@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { MessageSquareText, PhoneOff, TimerReset } from "lucide-react";
 import { useEffect, useState } from "react";

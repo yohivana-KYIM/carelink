@@ -33,7 +33,7 @@ export function LoginForm() {
       const { token, user } = await api.login({ email, password });
       saveSession(token, user);
       setStatus("success");
-      router.push("/");
+      router.push(user.role === "SUPERADMIN" ? "/admin" : "/dashboard");
     } catch (err) {
       setErrorMessage(
         err instanceof ApiError ? err.message : "Impossible de se connecter au serveur Carelink."

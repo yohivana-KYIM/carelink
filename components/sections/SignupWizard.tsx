@@ -335,10 +335,10 @@ export function SignupWizard() {
                   présent vous connecter à votre espace.
                 </p>
                 <Link
-                  href="/"
+                  href="/dashboard"
                   className="mt-2 text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
                 >
-                  Accéder à l&apos;accueil
+                  Accéder à mon espace
                 </Link>
               </motion.div>
             )}
