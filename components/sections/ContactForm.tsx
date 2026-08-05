@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { CheckCircle2, Loader2, Mail, MapPin, MessageCircle } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
+import { api } from "@/lib/api";
 import { siteConfig } from "@/lib/site-config";
 
 type Status = "idle" | "loading" | "success" | "error";
@@ -54,11 +55,20 @@ export function ContactForm() {
     }
 
     setStatus("loading");
-    // Le backend Carelink (Node.js/Express) n'est pas encore branché.
-    // Prêt à pointer vers NEXT_PUBLIC_API_URL une fois l'API disponible.
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setStatus("success");
-    setValues({ name: "", email: "", clinic: "", phone: "", message: "" });
+    try {
+      await api.submitContactMessage({
+        fullName: values.name.trim(),
+        email: values.email.trim(),
+        clinic: values.clinic.trim() || undefined,
+        phone: values.phone.trim() || undefined,
+        subject: values.clinic.trim() ? `Demande de contact — ${values.clinic.trim()}` : undefined,
+        message: values.message.trim(),
+      });
+      setStatus("success");
+      setValues({ name: "", email: "", clinic: "", phone: "", message: "" });
+    } catch {
+      setStatus("error");
+    }
   }
 
   return (

@@ -194,6 +194,43 @@ export const api = {
   forgotPassword: (input: { email: string }) =>
     request<{ message: string }>("/api/auth/forgot-password", { method: "POST", body: input }),
 
+  submitContactMessage: (input: {
+    fullName: string;
+    email: string;
+    clinic?: string;
+    phone?: string;
+    subject?: string;
+    message: string;
+  }) => request<{ contact: unknown }>("/api/contact/messages", { method: "POST", body: input }),
+
+  listContactMessages: (
+    token: string,
+    params: { page?: number; pageSize?: number; search?: string; sort?: "newest" | "oldest" } = {}
+  ) => {
+    const query = new URLSearchParams();
+    if (params.page) query.set("page", String(params.page));
+    if (params.pageSize) query.set("pageSize", String(params.pageSize));
+    if (params.search) query.set("search", params.search);
+    if (params.sort) query.set("sort", params.sort);
+    const qs = query.toString();
+    return authed<{
+      messages: Array<{
+        id: string;
+        fullName: string;
+        email: string;
+        clinic?: string | null;
+        phone?: string | null;
+        subject?: string | null;
+        message: string;
+        createdAt: string;
+      }>;
+      total: number;
+      page: number;
+      pageSize: number;
+      totalPages: number;
+    }>(token, `/api/contact/messages${qs ? `?${qs}` : ""}`);
+  },
+
   resetPassword: (input: { token: string; password: string }) =>
     request<{ message: string }>("/api/auth/reset-password", { method: "POST", body: input }),
 
