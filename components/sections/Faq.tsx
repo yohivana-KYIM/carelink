@@ -13,8 +13,11 @@ export function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="scroll-mt-24 py-20 sm:py-28">
-      <Container className="flex flex-col gap-14">
+    <section id="faq" className="relative scroll-mt-24 overflow-hidden py-20 sm:py-28">
+      <QuarterArc className="absolute -left-4 -top-4 hidden h-24 w-24 -scale-x-100 text-brand-300/60 dark:text-brand-700/50 sm:block" />
+      <DotGrid className="absolute bottom-6 left-[6%] hidden h-24 w-24 text-brand-300/40 dark:text-brand-700/40 lg:block" />
+
+      <Container className="relative flex flex-col gap-14">
         <SectionHeading
           eyebrow="Questions fréquentes"
           title="Ce que les cabinets nous demandent le plus"

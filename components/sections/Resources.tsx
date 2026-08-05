@@ -2,12 +2,16 @@ import { ArrowUpRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { RevealGroup, RevealItem } from "@/components/ui/RevealGroup";
+import { ArcRing, SoftOrb } from "@/components/ui/GeometricDecor";
 import { resources } from "@/lib/site-config";
 
 export function Resources() {
   return (
-    <section id="ressources" className="scroll-mt-24 py-20 sm:py-28">
-      <Container className="flex flex-col gap-14">
+    <section id="ressources" className="relative scroll-mt-24 overflow-hidden py-20 sm:py-28">
+      <SoftOrb className="absolute -right-20 bottom-0 hidden h-64 w-64 bg-brand-200/40 dark:bg-brand-800/20 lg:block" />
+      <ArcRing className="absolute -bottom-16 left-[4%] hidden h-40 w-40 text-brand-300/50 dark:text-brand-700/40 lg:block" />
+
+      <Container className="relative flex flex-col gap-14">
         <SectionHeading
           eyebrow="Ressources"
           title="Pour aller plus loin"
