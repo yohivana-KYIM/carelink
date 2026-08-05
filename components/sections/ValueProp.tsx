@@ -64,7 +64,7 @@ function ImageCarousel() {
                   alt={img.alt}
                   fill
                   sizes="(min-width: 1024px) 420px, 340px"
-                  className="object-cover"
+                  className="object-contain bg-brand-950/10"
                 />
               </motion.div>
             )
@@ -78,7 +78,7 @@ export function ValueProp() {
   return (
     <section className="py-20 sm:py-28">
       <Container className="grid items-center gap-14 lg:grid-cols-2 lg:gap-16">
-        <Reveal className="relative mx-auto aspect-[768/1376] w-full max-w-sm overflow-hidden rounded-[2rem] shadow-card lg:order-2">
+        <Reveal className="relative mx-auto aspect-[4/3] w-full max-w-xl overflow-hidden rounded-[2rem] shadow-card lg:order-2">
           <ImageCarousel />
         </Reveal>
 

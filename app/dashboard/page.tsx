@@ -13,6 +13,7 @@ export default function DashboardOverviewPage() {
 
   useEffect(() => {
     if (!token || cabinet?.status !== "ACTIVE") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- no fetch needed, resolve loading state synchronously
       setLoading(false);
       return;
     }
