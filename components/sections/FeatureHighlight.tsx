@@ -33,7 +33,10 @@ export function FeatureHighlight() {
           </ul>
         </div>
 
-        <Reveal className="relative mx-auto aspect-[768/1376] w-full max-w-sm overflow-hidden rounded-[2rem] shadow-card">
+        <Reveal
+          delay={0.35}
+          className="relative mx-auto aspect-[768/1376] w-full max-w-sm overflow-hidden rounded-[2rem] shadow-card"
+        >
           <Image
             src="/images/reminder-illustration.jpeg"
             alt="Illustration d'un smartphone avec bulles de messages, cloche de notification et calendrier de rendez-vous confirmé"

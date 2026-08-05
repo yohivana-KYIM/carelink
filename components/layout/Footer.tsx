@@ -43,13 +43,13 @@ export function Footer() {
   }
 
   return (
-    <div className="px-4 pb-6 pt-2 sm:px-6 sm:pb-8 lg:px-8">
+    <div className="px-2 pb-6 pt-2 sm:px-4 sm:pb-8 lg:px-6">
       <footer
         ref={footerRef}
         id="contact-footer"
-        className="relative mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] bg-[#0a1120] text-[#f5f7fc]"
+        className="relative mx-auto max-w-8xl overflow-hidden rounded-[2.5rem] bg-[#0a1120] text-[#f5f7fc]"
       >
-        <div className="relative z-10 px-6 py-14 sm:px-10 sm:py-16 lg:px-14">
+        <div className="relative z-10 px-5 py-14 sm:px-8 sm:py-16 lg:px-10">
           <div className="flex flex-col gap-10 border-b border-white/10 pb-12 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
