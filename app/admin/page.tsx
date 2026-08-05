@@ -54,6 +54,7 @@ export default function AdminCabinetsPage() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on mount/filter change
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, status, page]);

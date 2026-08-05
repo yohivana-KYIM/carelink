@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
+import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { heroChecklist, siteConfig } from "@/lib/site-config";
@@ -82,46 +83,62 @@ export function Hero() {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
           className="relative min-h-[520px] overflow-hidden rounded-[2rem] bg-brand-800 sm:min-h-[600px] lg:min-h-[680px]"
         >
-          {/* Fond flouté issu de la même image : garantit une couleur
-              parfaitement homogène entre le cadre et la photo, sans coupe. */}
-          <Image
-            src="/images/rappelpatint.png"
-            alt=""
-            aria-hidden
-            fill
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            className="scale-125 object-cover object-center opacity-90 blur-3xl"
-          />
-          <div className="pointer-events-none absolute inset-0 bg-brand-950/25" />
-          <motion.div
-            initial={{ opacity: 0, x: 80, y: 28, rotate: 1.5, scale: 0.98 }}
-            animate={{
-              opacity: 1,
-              x: [0, -10, 0],
-              y: [0, -10, 0],
-              rotate: [0, -1, 0],
-              scale: [1, 1.01, 1],
-            }}
-            transition={{
-              opacity: { duration: 0.55, delay: 0.25 },
-              x: { duration: 5, delay: 0.9, repeat: Infinity, ease: "easeInOut" },
-              y: { duration: 6, delay: 0.8, repeat: Infinity, ease: "easeInOut" },
-              rotate: { duration: 6, delay: 0.8, repeat: Infinity, ease: "easeInOut" },
-              scale: { duration: 6, delay: 0.8, repeat: Infinity, ease: "easeInOut" },
-            }}
-            className="absolute inset-0 p-4 sm:p-6 lg:p-8"
-          >
-            <Image
-              src="/images/rappelpatint.png"
-              alt="Aperçu de l'interface Carelink - rappel patient"
-              fill
-              priority
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-contain drop-shadow-2xl"
-            />
-          </motion.div>
+          <HeroImageCarousel />
         </motion.div>
       </div>
     </section>
+  );
+}
+
+function HeroImageCarousel() {
+  const images = [
+    {
+      src: "/images/hero-dashboard-app.jpeg",
+      alt: "Main tenant un smartphone affichant le tableau de bord Carelink",
+    },
+    {
+      src: "/images/rappelpatint.png",
+      alt: "Aperçu de l'interface Carelink - rappel patient",
+    },
+  ];
+
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((current) => (current + 1) % images.length);
+    }, 4200);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="relative w-full h-full">
+      <AnimatePresence>
+        {images.map(
+          (image, index) =>
+            index === activeIndex && (
+              <motion.div
+                key={image.src}
+                initial={{ opacity: 0, x: 60 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -60 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover"
+                />
+              </motion.div>
+            )
+        )}
+      </AnimatePresence>
+      <div className="pointer-events-none absolute inset-0 bg-brand-950/25" />
+    </div>
   );
 }
