@@ -10,11 +10,18 @@ import { Button } from "@/components/ui/Button";
 import { ThemeToggle } from "./ThemeToggle";
 import { MobileMenu } from "./MobileMenu";
 import { navLinks, siteConfig } from "@/lib/site-config";
+import { getStoredUser, clearSession } from "@/lib/auth-storage";
+import type { SafeUser } from "@/lib/api";
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<SafeUser | null>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    setUser(getStoredUser());
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -74,13 +81,46 @@ export function Header() {
 
         <div className="hidden items-center gap-2 lg:flex">
           <ThemeToggle />
-          <Link
-            href="/login"
-            className="inline-flex items-center justify-center rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-red-600 active:scale-[0.97]"
-          >
-            Connexion
-          </Link>
-          <Button href="/contact">Demander une démo</Button>
+          {user ? (
+            <div className="ml-2 flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="flex size-8 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
+                  {user.fullName.charAt(0).toUpperCase()}
+                </div>
+                <span className="text-sm font-medium text-ink">
+                  Salut, {user.fullName.split(" ")[0]}
+                </span>
+              </div>
+              <div className="h-4 w-px bg-border" />
+              <Link
+                href={user.role === "SUPERADMIN" ? "/admin" : "/dashboard"}
+                className="inline-flex items-center justify-center rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-brand-700 active:scale-[0.97]"
+              >
+                Mon Espace
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  clearSession();
+                  setUser(null);
+                  window.location.reload();
+                }}
+                className="inline-flex items-center justify-center rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink transition-colors duration-300 hover:bg-surface-raised active:scale-[0.97]"
+              >
+                Déconnexion
+              </button>
+            </div>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-brand-700 active:scale-[0.97]"
+              >
+                Connexion
+              </Link>
+              <Button href="/contact">Demander une démo</Button>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">

@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { AlertCircle, Loader2, Lock, Mail } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/lib/site-config";
+import { toast } from "react-hot-toast";
 import { api, ApiError } from "@/lib/api";
 import { saveSession } from "@/lib/auth-storage";
 
@@ -33,12 +34,13 @@ export function LoginForm() {
       const { token, user } = await api.login({ email, password });
       saveSession(token, user);
       setStatus("success");
+      toast.success("Connexion réussie !");
       router.push(user.role === "SUPERADMIN" ? "/admin" : "/dashboard");
     } catch (err) {
-      setErrorMessage(
-        err instanceof ApiError ? err.message : "Impossible de se connecter au serveur Carelink."
-      );
+      const msg = err instanceof ApiError ? err.message : "Impossible de se connecter au serveur Carelink.";
+      setErrorMessage(msg);
       setStatus("error");
+      toast.error(msg);
     }
   }
 

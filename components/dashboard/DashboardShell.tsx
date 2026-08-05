@@ -9,6 +9,7 @@ import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { useSession } from "@/lib/session";
 import { api } from "@/lib/api";
 import { siteConfig } from "@/lib/site-config";
+import { toast } from "react-hot-toast";
 
 export type DashboardNavItem = {
   label: string;
@@ -32,11 +33,40 @@ export function DashboardShell({
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      if (Notification.permission === "default") {
+        Notification.requestPermission();
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     if (!token) return;
-    api
-      .listNotifications(token, { unreadOnly: true, page: 1 })
-      .then((res) => setUnreadCount(res.unreadCount))
-      .catch(() => undefined);
+    
+    let prevCount = unreadCount;
+    
+    const checkNotifications = async () => {
+      try {
+        const res = await api.listNotifications(token, { unreadOnly: true, page: 1 });
+        setUnreadCount(res.unreadCount);
+        
+        if (res.unreadCount > prevCount) {
+          if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+            new Notification("Nouvelle notification", {
+              body: "Vous avez des notifications non lues sur Carelink.",
+              icon: "/images/carelink-icon.png",
+            });
+          }
+          toast("Vous avez une nouvelle notification.", { icon: "🔔" });
+        }
+        prevCount = res.unreadCount;
+      } catch (err) {}
+    };
+
+    void checkNotifications();
+    
+    const interval = setInterval(checkNotifications, 30000);
+    return () => clearInterval(interval);
   }, [token, pathname]);
 
   function handleLogout() {
@@ -139,21 +169,21 @@ function SidebarContent({
 }) {
   return (
     <>
-      <div className="flex items-center gap-2.5 px-5 py-5">
+      <Link href="/" className="flex items-center gap-2.5 px-6 py-6 transition-opacity hover:opacity-80">
         <Image
           src="/images/carelink-icon.png"
           alt={`Logo ${siteConfig.name}`}
-          width={32}
-          height={32}
-          className="rounded-[9px]"
+          width={36}
+          height={36}
+          className="rounded-xl shadow-sm"
         />
         <div className="leading-tight">
-          <p className="text-sm font-bold text-ink">{siteConfig.name}</p>
-          <p className="text-xs text-ink-soft">{roleLabel}</p>
+          <p className="text-base font-bold text-ink">{siteConfig.name}</p>
+          <p className="text-xs font-medium text-ink-soft">{roleLabel}</p>
         </div>
-      </div>
+      </Link>
 
-      <nav className="flex flex-col gap-1 px-3">
+      <nav className="flex flex-col gap-1 px-4">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -175,8 +205,16 @@ function SidebarContent({
       </nav>
 
       {userFullName ? (
-        <div className="mt-auto border-t border-border p-4">
-          <p className="truncate text-sm font-medium text-ink">{userFullName}</p>
+        <div className="mt-auto border-t border-border bg-surface/50 p-5">
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
+              {userFullName.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-ink">{userFullName}</p>
+              <p className="truncate text-xs text-ink-soft">Connecté</p>
+            </div>
+          </div>
         </div>
       ) : null}
     </>

@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { Loader2, Trash2, UserPlus } from "lucide-react";
+import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
 import { api, type TeamMember } from "@/lib/api";
 import { PendingGate } from "@/components/dashboard/PendingGate";
@@ -12,7 +13,7 @@ export default function TeamPage() {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
-  const [form, setForm] = useState({ fullName: "", email: "", password: "" });
+  const [form, setForm] = useState<{ fullName: string; email: string; password: string; role: "STANDARD" | "ADMIN" }>({ fullName: "", email: "", password: "", role: "STANDARD" });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -43,11 +44,14 @@ export default function TeamPage() {
     setSubmitting(true);
     try {
       await api.createTeamMember(token, form);
-      setForm({ fullName: "", email: "", password: "" });
+      toast.success("Membre de l'équipe ajouté");
+      setForm({ fullName: "", email: "", password: "", role: "STANDARD" });
       setFormOpen(false);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Impossible de créer ce compte.");
+      const msg = err instanceof Error ? err.message : "Impossible de créer ce compte.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -55,8 +59,13 @@ export default function TeamPage() {
 
   async function handleDelete(id: string) {
     if (!token) return;
-    await api.deleteTeamMember(token, id);
-    await load();
+    try {
+      await api.deleteTeamMember(token, id);
+      toast.success("Membre supprimé avec succès");
+      await load();
+    } catch (err) {
+      toast.error("Erreur lors de la suppression du membre");
+    }
   }
 
   return (
@@ -85,7 +94,7 @@ export default function TeamPage() {
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           onSubmit={handleCreate}
-          className="grid gap-4 rounded-2xl border border-border bg-surface-raised p-6 sm:grid-cols-3"
+          className="grid gap-4 rounded-2xl border border-border bg-surface-raised p-6 sm:grid-cols-4"
         >
           <input
             required
@@ -110,7 +119,15 @@ export default function TeamPage() {
             onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
             className="rounded-full border border-border bg-background px-4 py-2.5 text-sm text-ink placeholder:text-ink-soft focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800"
           />
-          <div className="sm:col-span-3 flex items-center gap-3">
+          <select
+            value={form.role}
+            onChange={(e) => setForm((f) => ({ ...f, role: e.target.value as "STANDARD" | "ADMIN" }))}
+            className="rounded-full border border-border bg-background px-4 py-2.5 text-sm text-ink focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800"
+          >
+            <option value="STANDARD">Secrétaire / Assistant(e)</option>
+            <option value="ADMIN">Docteur (Admin)</option>
+          </select>
+          <div className="sm:col-span-4 flex items-center gap-3">
             <button
               type="submit"
               disabled={submitting}

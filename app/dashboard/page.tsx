@@ -67,11 +67,41 @@ export default function DashboardOverviewPage() {
         </div>
       )}
 
-      <div className="rounded-2xl border border-border bg-surface-raised p-6 text-sm text-ink-muted">
-        La gestion des rendez-vous et des patients arrive bientôt dans ce tableau de bord. L&apos;API
-        est déjà disponible (
-        <code className="rounded bg-surface px-1.5 py-0.5 text-xs">/api/patients</code>,{" "}
-        <code className="rounded bg-surface px-1.5 py-0.5 text-xs">/api/appointments</code>).
+      <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="rounded-2xl border border-border bg-surface-raised p-6">
+          <h2 className="text-lg font-semibold text-ink mb-4">Actions Rapides</h2>
+          <div className="grid grid-cols-2 gap-3">
+            <a href="/dashboard/appointments" className="flex items-center justify-center gap-2 rounded-xl bg-brand-50 p-4 font-medium text-brand-700 transition hover:bg-brand-100 dark:bg-brand-500/10 dark:text-brand-300 dark:hover:bg-brand-500/20">
+              <CalendarCheck size={18} /> Gérer les RDV
+            </a>
+            <a href="/dashboard/patients" className="flex items-center justify-center gap-2 rounded-xl bg-emerald-50 p-4 font-medium text-emerald-700 transition hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 dark:hover:bg-emerald-500/20">
+              <Users size={18} /> Liste Patients
+            </a>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-border bg-surface-raised p-6">
+          <h2 className="text-lg font-semibold text-ink mb-4">Statut Automatisations</h2>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between rounded-xl border border-border p-3">
+              <div className="flex items-center gap-3 text-sm font-medium text-ink">
+                <span className="flex size-8 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
+                  <CalendarClock size={16} />
+                </span>
+                Rappels de rendez-vous (J-2, J-1)
+              </div>
+              <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400">Actif</span>
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-border p-3">
+              <div className="flex items-center gap-3 text-sm font-medium text-ink">
+                <span className="flex size-8 items-center justify-center rounded-full bg-purple-100 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400">
+                  <TrendingUp size={16} />
+                </span>
+                Relances patients inactifs
+              </div>
+              <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400">Actif</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

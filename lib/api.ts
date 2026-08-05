@@ -101,6 +101,50 @@ export type TeamMember = {
   createdAt: string;
 };
 
+export type MessageLog = {
+  id: string;
+  type: string;
+  body: string;
+  status: string;
+  createdAt: string;
+};
+
+export type Practitioner = {
+  id: string;
+  cabinetId: string;
+  fullName: string;
+  createdAt: string;
+};
+
+export type Patient = {
+  id: string;
+  cabinetId: string;
+  fullName: string;
+  phoneNumber: string;
+  whatsappOptIn: boolean;
+  whatsappOptInAt: string | null;
+  lastVisitAt: string | null;
+  relanceMonths: number | null;
+  createdAt: string;
+  appointments?: Appointment[];
+  messageLogs?: MessageLog[];
+};
+
+export type AppointmentStatus = "PENDING" | "CONFIRMED" | "RESCHEDULE_REQUESTED" | "NO_RESPONSE" | "CANCELLED" | "COMPLETED";
+
+export type Appointment = {
+  id: string;
+  cabinetId: string;
+  patientId: string;
+  patient?: Patient;
+  practitionerId: string | null;
+  scheduledAt: string;
+  status: AppointmentStatus;
+  careType: string | null;
+  notes: string | null;
+  createdAt: string;
+};
+
 export type DashboardSummary = {
   todayCount: number;
   weekCount: number;
@@ -123,6 +167,12 @@ export type PlatformStats = {
   activeCabinets: number;
   rejectedCabinets: number;
   totalUsers: number;
+};
+
+export type CabinetSettings = {
+  templateReminder48h: string | null;
+  templateReminder24h: string | null;
+  templateRelance: string | null;
 };
 
 function authed<T>(token: string, path: string, options: { method?: string; body?: unknown } = {}) {
@@ -157,7 +207,7 @@ export const api = {
 
   createTeamMember: (
     token: string,
-    input: { fullName: string; email: string; password: string }
+    input: { fullName: string; email: string; password: string; role?: UserRole }
   ) => authed<{ member: TeamMember }>(token, "/api/team", { method: "POST", body: input }),
 
   deleteTeamMember: (token: string, id: string) =>
@@ -213,4 +263,48 @@ export const api = {
     }),
 
   adminStats: (token: string) => authed<{ stats: PlatformStats }>(token, "/api/admin/stats"),
+
+  listPatients: (token: string, search?: string) => {
+    const qs = search ? `?search=${encodeURIComponent(search)}` : "";
+    return authed<{ patients: Patient[] }>(token, `/api/patients${qs}`);
+  },
+
+  getPatient: (token: string, id: string) =>
+    authed<{ patient: Patient }>(token, `/api/patients/${id}`),
+
+  createPatient: (token: string, input: Partial<Patient>) =>
+    authed<{ patient: Patient }>(token, "/api/patients", { method: "POST", body: input }),
+
+  bulkCreatePatients: (token: string, patients: Partial<Patient>[]) =>
+    authed<{ count: number }>(token, "/api/patients/bulk", { method: "POST", body: { patients } }),
+
+  updatePatient: (token: string, id: string, input: Partial<Patient>) =>
+    authed<{ patient: Patient }>(token, `/api/patients/${id}`, { method: "PUT", body: input }),
+
+  listAppointments: (token: string, range: "today" | "week" | "all" = "all") =>
+    authed<{ appointments: Appointment[] }>(token, `/api/appointments?range=${range}`),
+
+  createAppointment: (token: string, input: Partial<Appointment>) =>
+    authed<{ appointment: Appointment }>(token, "/api/appointments", { method: "POST", body: input }),
+
+  updateAppointment: (token: string, id: string, input: Partial<Appointment>) =>
+    authed<{ appointment: Appointment }>(token, `/api/appointments/${id}`, { method: "PUT", body: input }),
+
+  cancelAppointment: (token: string, id: string) =>
+    authed<{ appointment: Appointment }>(token, `/api/appointments/${id}/cancel`, { method: "POST" }),
+
+  getSettings: (token: string) =>
+    authed<{ settings: CabinetSettings }>(token, "/api/settings"),
+
+  updateSettings: (token: string, input: Partial<CabinetSettings>) =>
+    authed<{ settings: CabinetSettings }>(token, "/api/settings", { method: "PUT", body: input }),
+
+  listPractitioners: (token: string) =>
+    authed<{ practitioners: Practitioner[] }>(token, "/api/practitioners"),
+
+  createPractitioner: (token: string, input: { fullName: string }) =>
+    authed<{ practitioner: Practitioner }>(token, "/api/practitioners", { method: "POST", body: input }),
+
+  deletePractitioner: (token: string, id: string) =>
+    authed<void>(token, `/api/practitioners/${id}`, { method: "DELETE" }),
 };

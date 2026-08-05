@@ -13,6 +13,7 @@ import {
   X,
   XCircle,
 } from "lucide-react";
+import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
 import { api, type Cabinet, type CabinetStatus, type PlatformStats } from "@/lib/api";
 
@@ -68,26 +69,43 @@ export default function AdminCabinetsPage() {
   async function approve(id: string) {
     if (!token) return;
     setBusyId(id);
-    await api.adminApproveCabinet(token, id);
-    await load();
-    setBusyId(null);
+    try {
+      await api.adminApproveCabinet(token, id);
+      toast.success("Cabinet approuvé avec succès");
+      await load();
+    } catch (err) {
+      toast.error("Erreur lors de l'approbation du cabinet");
+    } finally {
+      setBusyId(null);
+    }
   }
 
   async function reject(id: string) {
     if (!token) return;
     setBusyId(id);
-    await api.adminRejectCabinet(token, id);
-    await load();
-    setBusyId(null);
+    try {
+      await api.adminRejectCabinet(token, id);
+      toast.success("Cabinet refusé");
+      await load();
+    } catch (err) {
+      toast.error("Erreur lors du refus du cabinet");
+    } finally {
+      setBusyId(null);
+    }
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-ink">Cabinets</h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          Validez les nouvelles inscriptions et suivez l&apos;ensemble des cabinets Carelink.
-        </p>
+    <div className="flex flex-col gap-8 p-4 lg:p-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-ink">Tableau de bord Admin</h1>
+          <p className="mt-1 text-sm text-ink-muted">
+            Gérez les inscriptions et suivez l&apos;ensemble de l&apos;écosystème Carelink.
+          </p>
+        </div>
+        <a href="/" className="inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400">
+          Retour à l'accueil
+        </a>
       </div>
 
       {stats ? (
@@ -176,28 +194,32 @@ export default function AdminCabinetsPage() {
                   </td>
                   <td className="px-5 py-3.5 text-ink-muted">{cabinet._count?.patients ?? 0}</td>
                   <td className="px-5 py-3.5">
-                    {cabinet.status === "PENDING" ? (
-                      <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end gap-2">
+                      {cabinet.status !== "ACTIVE" && (
                         <button
                           type="button"
                           onClick={() => approve(cabinet.id)}
                           disabled={busyId === cabinet.id}
                           aria-label="Valider"
+                          title="Valider ce cabinet"
                           className="flex size-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 transition-colors hover:bg-emerald-200 disabled:opacity-50 dark:bg-emerald-500/15 dark:text-emerald-400"
                         >
                           <Check size={15} />
                         </button>
+                      )}
+                      {cabinet.status !== "REJECTED" && (
                         <button
                           type="button"
                           onClick={() => reject(cabinet.id)}
                           disabled={busyId === cabinet.id}
                           aria-label="Refuser"
+                          title="Refuser ce cabinet"
                           className="flex size-8 items-center justify-center rounded-full bg-red-100 text-red-600 transition-colors hover:bg-red-200 disabled:opacity-50 dark:bg-red-500/15 dark:text-red-400"
                         >
                           <X size={15} />
                         </button>
-                      </div>
-                    ) : null}
+                      )}
+                    </div>
                   </td>
                 </motion.tr>
               ))}
