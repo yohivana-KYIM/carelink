@@ -145,7 +145,9 @@ export function SignupWizard() {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} noValidate className="mt-8">
+            {status !== "success" ? (
+              <>
+                <form onSubmit={handleSubmit} noValidate className="mt-8">
               <AnimatePresence mode="wait">
               <motion.div
                 key={step}
