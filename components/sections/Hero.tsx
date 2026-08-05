@@ -17,7 +17,7 @@ export function Hero() {
             transition={{ duration: 0.5 }}
             className="flex flex-wrap items-center gap-3"
           >
-            <span className="rounded-full bg-ink px-3.5 py-1.5 text-xs font-semibold text-white dark:bg-white dark:text-ink">
+            <span className="rounded-full px-3.5 py-1.5 text-xs font-semibold bg-white text-brand-900 dark:bg-white/10 dark:text-white">
               Nouveau
             </span>
             <span className="text-sm font-medium text-ink-muted">

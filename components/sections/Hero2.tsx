@@ -48,7 +48,7 @@ export function Hero2({
             transition={{ duration: 0.5 }}
             className="flex flex-wrap items-center justify-center gap-3"
           >
-            <span className="rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-brand-900">
+            <span className="rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-brand-900 dark:bg-white/10 dark:text-white">
               {badgeLabel}
             </span>
             <span className="text-sm font-medium text-white/70">
