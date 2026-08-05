@@ -94,15 +94,17 @@ export function Hero() {
           />
           <div className="pointer-events-none absolute inset-0 bg-brand-950/25" />
           <motion.div
-            initial={{ opacity: 0, y: 28, rotate: 1.5, scale: 0.98 }}
+            initial={{ opacity: 0, x: 80, y: 28, rotate: 1.5, scale: 0.98 }}
             animate={{
               opacity: 1,
+              x: [80, 0, 0],
               y: [0, -16, 0],
               rotate: [0, -1, 0],
               scale: [1, 1.015, 1],
             }}
             transition={{
               opacity: { duration: 0.55, delay: 0.25 },
+              x: { duration: 0.8, delay: 0.25, ease: "easeOut" },
               y: { duration: 6, delay: 0.8, repeat: Infinity, ease: "easeInOut" },
               rotate: { duration: 6, delay: 0.8, repeat: Infinity, ease: "easeInOut" },
               scale: { duration: 6, delay: 0.8, repeat: Infinity, ease: "easeInOut" },
@@ -110,8 +112,8 @@ export function Hero() {
             className="absolute inset-0 p-4 sm:p-6 lg:p-8"
           >
             <Image
-              src="/images/hero-dashboard-app.jpeg"
-              alt="Main tenant un smartphone affichant le tableau de bord Carelink : rendez-vous du jour, taux de confirmation et liste des patients"
+              src="/images/rappelpatint.png"
+              alt="Aperçu de l'interface Carelink - rappel patient"
               fill
               priority
               sizes="(min-width: 1024px) 50vw, 100vw"

@@ -8,6 +8,8 @@ import { Check, CheckCircle2, ChevronLeft, Loader2 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/lib/site-config";
+import { api, ApiError } from "@/lib/api";
+import { saveSession } from "@/lib/auth-storage";
 
 type FormData = {
   cabinetName: string;
@@ -100,10 +102,22 @@ export function SignupWizard() {
     }
 
     setStatus("loading");
-    // Le backend Carelink (Node.js/Express) n'est pas encore branché.
-    // Prêt à pointer vers NEXT_PUBLIC_API_URL une fois l'API disponible.
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    setStatus("success");
+    try {
+      const { token, user } = await api.registerCabinet({
+        cabinetName: data.cabinetName,
+        city: data.city,
+        fullName: data.fullName,
+        email: data.email,
+        password: data.password,
+      });
+      saveSession(token, user);
+      setStatus("success");
+    } catch (err) {
+      setError(
+        err instanceof ApiError ? err.message : "Impossible de créer le compte pour le moment."
+      );
+      setStatus("idle");
+    }
   }
 
   return (
@@ -303,19 +317,18 @@ export function SignupWizard() {
                   <CheckCircle2 size={28} />
                 </span>
                 <h2 className="text-xl font-semibold text-ink">
-                  Demande envoyée !
+                  Compte créé !
                 </h2>
                 <p className="max-w-sm text-sm leading-relaxed text-ink-muted">
-                  Merci {data.fullName || "à vous"} — l&apos;espace du{" "}
-                  {data.cabinetName || "cabinet"} est en cours de préparation.
-                  Notre équipe vous recontacte sous 24h ouvrées pour finaliser
-                  l&apos;activation.
+                  Merci {data.fullName || "à vous"} — le compte du{" "}
+                  {data.cabinetName || "cabinet"} est prêt. Vous pouvez dès à
+                  présent vous connecter à votre espace.
                 </p>
                 <Link
-                  href="/login"
+                  href="/"
                   className="mt-2 text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
                 >
-                  Retour à la connexion
+                  Accéder à l&apos;accueil
                 </Link>
               </motion.div>
             )}

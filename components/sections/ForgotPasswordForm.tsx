@@ -8,25 +8,33 @@ import { ArrowLeft, CheckCircle2, Loader2, Mail } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/lib/site-config";
+import { api } from "@/lib/api";
 
 type Status = "idle" | "loading" | "success" | "error";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState("Merci de renseigner un email valide.");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!email.includes("@")) {
+      setErrorMessage("Merci de renseigner un email valide.");
       setStatus("error");
       return;
     }
 
     setStatus("loading");
-    // Le backend Carelink (Node.js/Express) n'est pas encore branché.
-    // Prêt à pointer vers NEXT_PUBLIC_API_URL une fois l'API disponible.
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setStatus("success");
+    try {
+      // L'API répond toujours avec le même message générique, que l'email
+      // soit enregistré ou non (aucune fuite d'information sur les comptes existants).
+      await api.forgotPassword({ email });
+      setStatus("success");
+    } catch {
+      setErrorMessage("Impossible de contacter le serveur Carelink. Réessayez dans un instant.");
+      setStatus("error");
+    }
   }
 
   return (
@@ -111,7 +119,7 @@ export function ForgotPasswordForm() {
 
                 {status === "error" ? (
                   <p className="text-center text-sm font-medium text-red-600 dark:text-red-400">
-                    Merci de renseigner un email valide.
+                    {errorMessage}
                   </p>
                 ) : null}
               </form>

@@ -2,16 +2,21 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
-import { CheckCircle2, Loader2, Lock } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Loader2, Lock } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/lib/site-config";
+import { api, ApiError } from "@/lib/api";
 
 type Status = "idle" | "loading" | "success" | "error";
 
 export function ResetPasswordForm() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [status, setStatus] = useState<Status>("idle");
@@ -19,6 +24,12 @@ export function ResetPasswordForm() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!token) {
+      setError("Ce lien de réinitialisation est invalide. Redemandez un email depuis la page précédente.");
+      setStatus("error");
+      return;
+    }
     if (password.length < 8) {
       setError("Le mot de passe doit contenir au moins 8 caractères.");
       setStatus("error");
@@ -31,10 +42,17 @@ export function ResetPasswordForm() {
     }
 
     setStatus("loading");
-    // Le backend Carelink (Node.js/Express) n'est pas encore branché.
-    // Prêt à pointer vers NEXT_PUBLIC_API_URL une fois l'API disponible.
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setStatus("success");
+    try {
+      await api.resetPassword({ token, password });
+      setStatus("success");
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : "Impossible de contacter le serveur Carelink. Réessayez dans un instant."
+      );
+      setStatus("error");
+    }
   }
 
   return (
@@ -58,7 +76,26 @@ export function ResetPasswordForm() {
               </p>
             </div>
 
-            {status === "success" ? (
+            {!token && status !== "success" ? (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-8 flex flex-col items-center gap-3 text-center"
+              >
+                <span className="flex size-12 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400">
+                  <AlertTriangle size={24} />
+                </span>
+                <p className="text-sm text-ink-muted">
+                  Ce lien de réinitialisation est invalide ou incomplet.
+                </p>
+                <Link
+                  href="/forgot-password"
+                  className="mt-2 text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
+                >
+                  Redemander un email
+                </Link>
+              </motion.div>
+            ) : status === "success" ? (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}

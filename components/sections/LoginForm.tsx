@@ -2,31 +2,44 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { AlertCircle, Loader2, Lock, Mail } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/lib/site-config";
+import { api, ApiError } from "@/lib/api";
+import { saveSession } from "@/lib/auth-storage";
 
-type Status = "idle" | "loading" | "error";
+type Status = "idle" | "loading" | "error" | "success";
 
 export function LoginForm() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!email.includes("@") || password.length < 1) {
+      setErrorMessage("Merci de renseigner un email valide et votre mot de passe.");
       setStatus("error");
       return;
     }
 
     setStatus("loading");
-    // Le backend Carelink (Node.js/Express) n'est pas encore branché.
-    // Prêt à pointer vers NEXT_PUBLIC_API_URL une fois l'API disponible.
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setStatus("error");
+    try {
+      const { token, user } = await api.login({ email, password });
+      saveSession(token, user);
+      setStatus("success");
+      router.push("/");
+    } catch (err) {
+      setErrorMessage(
+        err instanceof ApiError ? err.message : "Impossible de se connecter au serveur Carelink."
+      );
+      setStatus("error");
+    }
   }
 
   return (
@@ -145,7 +158,7 @@ export function LoginForm() {
 
               <button
                 type="submit"
-                disabled={status === "loading"}
+                disabled={status === "loading" || status === "success"}
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700 active:scale-[0.97] disabled:opacity-70"
               >
                 {status === "loading" ? (
@@ -157,7 +170,11 @@ export function LoginForm() {
                     <Loader2 size={16} />
                   </motion.span>
                 ) : null}
-                {status === "loading" ? "Connexion..." : "Se connecter"}
+                {status === "loading"
+                  ? "Connexion..."
+                  : status === "success"
+                    ? "Connecté !"
+                    : "Se connecter"}
               </button>
 
               {status === "error" ? (
@@ -167,8 +184,7 @@ export function LoginForm() {
                   className="flex items-center justify-center gap-1.5 text-center text-sm font-medium text-red-600 dark:text-red-400"
                 >
                   <AlertCircle size={15} />
-                  L&apos;espace cabinet n&apos;est pas encore disponible — cette
-                  page est une maquette.
+                  {errorMessage}
                 </motion.p>
               ) : null}
             </form>
