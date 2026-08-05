@@ -85,7 +85,7 @@ export function Hero() {
           {/* Fond flouté issu de la même image : garantit une couleur
               parfaitement homogène entre le cadre et la photo, sans coupe. */}
           <Image
-            src="/images/hero-dashboard-app.jpeg"
+            src="/images/rappelpatint.png"
             alt=""
             aria-hidden
             fill
@@ -97,14 +97,14 @@ export function Hero() {
             initial={{ opacity: 0, x: 80, y: 28, rotate: 1.5, scale: 0.98 }}
             animate={{
               opacity: 1,
-              x: [80, 0, 0],
-              y: [0, -16, 0],
+              x: [0, -10, 0],
+              y: [0, -10, 0],
               rotate: [0, -1, 0],
-              scale: [1, 1.015, 1],
+              scale: [1, 1.01, 1],
             }}
             transition={{
               opacity: { duration: 0.55, delay: 0.25 },
-              x: { duration: 0.8, delay: 0.25, ease: "easeOut" },
+              x: { duration: 5, delay: 0.9, repeat: Infinity, ease: "easeInOut" },
               y: { duration: 6, delay: 0.8, repeat: Infinity, ease: "easeInOut" },
               rotate: { duration: 6, delay: 0.8, repeat: Infinity, ease: "easeInOut" },
               scale: { duration: 6, delay: 0.8, repeat: Infinity, ease: "easeInOut" },
