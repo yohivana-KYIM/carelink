@@ -33,7 +33,11 @@ export function CtaBanner() {
             </Reveal>
             <Reveal delay={0.16}>
               <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-                <Button href="mailto:contact@carelink.app" variant="primary" className="bg-white text-brand-800 hover:bg-brand-50 hover:text-brand-900">
+                <Button
+                  href="mailto:contact@carelink.app"
+                  variant="primary"
+                  className="bg-white text-brand-800 hover:bg-brand-50 hover:text-brand-900 dark:bg-white dark:text-brand-900 dark:hover:bg-white/90"
+                >
                   Demander une démo
                 </Button>
                 <Button
