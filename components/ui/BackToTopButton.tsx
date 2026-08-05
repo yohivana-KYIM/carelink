@@ -1,12 +1,21 @@
 "use client";
 
-import { ArrowUp, MessageSquare } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowUp } from "lucide-react";
+import { type SVGProps, useEffect, useState } from "react";
 
 const SIZE = 44;
 const STROKE = 3;
 const RADIUS = (SIZE - STROKE) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+function WhatsappIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+      <path d="M16.88 11.71c-.26-.13-1.53-.76-1.77-.84-.24-.08-.42-.13-.6.13-.18.26-.7.84-.86 1.01-.16.17-.32.19-.59.07-.26-.13-1.1-.4-2.09-1.29-.77-.69-1.29-1.53-1.44-1.79-.15-.26-.02-.4.12-.53.13-.13.28-.32.42-.48.14-.16.19-.26.28-.43.09-.17.05-.32-.02-.45-.08-.13-.6-1.43-.82-1.96-.22-.53-.44-.46-.6-.47-.15-.01-.33-.01-.51-.01-.18 0-.46.07-.7.32-.24.24-.94.92-.94 2.25 0 1.32.96 2.6 1.1 2.78.13.17 1.9 2.91 4.61 4.08.64.28 1.14.45 1.53.58.64.22 1.22.19 1.68.12.51-.08 1.53-.62 1.73-1.22.2-.6.2-1.12.14-1.22-.06-.1-.24-.16-.5-.29z" />
+      <path d="M12 2C6.48 2 2 6.48 2 12c0 1.9.56 3.66 1.52 5.17L2 22l4.98-1.51A9.953 9.953 0 0022 12c0-5.52-4.48-10-10-10zm0 18c-1.53 0-3.02-.37-4.32-1.01l-.31-.17-2.95.9.99-2.71-.2-.35A7.965 7.965 0 014 12c0-4.41 3.59-8 8-8 4.41 0 8 3.59 8 8s-3.59 8-8 8z" />
+    </svg>
+  );
+}
 
 export function BackToTopButton() {
   const [visible, setVisible] = useState(false);
@@ -79,7 +88,7 @@ export function BackToTopButton() {
         rel="noreferrer"
         className="flex h-11 items-center gap-2 rounded-full bg-emerald-50 px-3 text-sm font-semibold text-emerald-700 transition-colors duration-300 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-100 dark:hover:bg-emerald-500/20"
       >
-        <MessageSquare size={16} />
+        <WhatsappIcon className="h-5 w-5" />
         WhatsApp
       </a>
     </div>
