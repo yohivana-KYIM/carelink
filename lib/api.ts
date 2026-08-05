@@ -197,6 +197,9 @@ export const api = {
   resetPassword: (input: { token: string; password: string }) =>
     request<{ message: string }>("/api/auth/reset-password", { method: "POST", body: input }),
 
+  logout: (token: string) =>
+    request<void>("/api/auth/logout", { method: "POST", token }),
+
   me: (token: string) =>
     request<{ user: SafeUser; cabinet: Cabinet | null }>("/api/auth/me", { token }),
 

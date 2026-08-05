@@ -9,7 +9,7 @@ import { api, type Appointment, type Patient, type Practitioner } from "@/lib/ap
 
 import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
-import fr from 'date-fns/locale/fr';
+import { fr } from 'date-fns/locale/fr';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './calendar-custom.css';
 

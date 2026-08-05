@@ -5,8 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { Bell, LogOut, Menu, X } from "lucide-react";
-import { ThemeToggle } from "@/components/layout/ThemeToggle";
-import { useSession } from "@/lib/session";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";import { ConfirmDialog } from "@/components/ui/ConfirmDialog";import { useSession } from "@/lib/session";
 import { api } from "@/lib/api";
 import { siteConfig } from "@/lib/site-config";
 import { toast } from "react-hot-toast";
@@ -31,6 +30,8 @@ export function DashboardShell({
   const { user, token, logout } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
@@ -69,9 +70,32 @@ export function DashboardShell({
     return () => clearInterval(interval);
   }, [token, pathname]);
 
-  function handleLogout() {
-    logout();
-    router.push("/login");
+  function startLogout() {
+    setConfirmLogoutOpen(true);
+  }
+
+  async function handleLogout() {
+    if (!token) {
+      logout();
+      router.push("/login");
+      setConfirmLogoutOpen(false);
+      return;
+    }
+
+    setLogoutLoading(true);
+    try {
+      await api.logout(token);
+      logout();
+      router.push("/login");
+      toast.success("Vous êtes bien déconnecté.");
+    } catch (error) {
+      logout();
+      router.push("/login");
+      toast.success("Vous êtes bien déconnecté.");
+    } finally {
+      setLogoutLoading(false);
+      setConfirmLogoutOpen(false);
+    }
   }
 
   return (
@@ -139,7 +163,7 @@ export function DashboardShell({
             <ThemeToggle />
             <button
               type="button"
-              onClick={handleLogout}
+              onClick={startLogout}
               aria-label="Se déconnecter"
               className="flex size-9 items-center justify-center rounded-full border border-border text-ink-muted hover:text-red-600 dark:hover:text-red-400"
             >
@@ -150,6 +174,16 @@ export function DashboardShell({
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
+      <ConfirmDialog
+        open={confirmLogoutOpen}
+        title="Se déconnecter"
+        description="Voulez-vous vraiment fermer votre session Carelink ? Vous devrez vous reconnecter pour accéder à votre tableau de bord."
+        confirmLabel="Déconnexion"
+        cancelLabel="Annuler"
+        onConfirm={handleLogout}
+        onClose={() => setConfirmLogoutOpen(false)}
+        loading={logoutLoading}
+      />
     </div>
   );
 }
