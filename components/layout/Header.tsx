@@ -129,7 +129,8 @@ export function Header() {
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label="Ouvrir le menu"
-            className="flex size-10 items-center justify-center rounded-full border border-border text-ink-muted"
+            aria-expanded={menuOpen}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-ink-muted shadow-sm transition-colors duration-200 hover:bg-surface-raised focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
           >
             <Menu size={18} />
           </button>
