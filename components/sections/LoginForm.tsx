@@ -215,7 +215,7 @@ function LoginImageCarousel() {
   }, []);
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full overflow-hidden bg-brand-950/10">
       <AnimatePresence>
         {images.map(
           (img, i) =>
@@ -234,7 +234,7 @@ function LoginImageCarousel() {
                   fill
                   priority
                   sizes="50vw"
-                  className="object-cover"
+                  className="object-contain"
                 />
               </motion.div>
             )

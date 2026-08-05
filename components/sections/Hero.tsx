@@ -113,7 +113,7 @@ function HeroImageCarousel() {
   }, []);
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full overflow-hidden bg-brand-950/10">
       <AnimatePresence>
         {images.map(
           (image, index) =>
@@ -132,7 +132,7 @@ function HeroImageCarousel() {
                   fill
                   priority
                   sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="object-cover"
+                  className="object-contain"
                 />
               </motion.div>
             )

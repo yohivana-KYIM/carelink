@@ -45,6 +45,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const storedUser = getStoredUser();
     if (storedUser) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- optimistic hydration from localStorage before the /me refresh resolves
       setUser(storedUser);
       setToken(getStoredToken());
     }
