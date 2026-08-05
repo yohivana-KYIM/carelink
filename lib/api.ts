@@ -307,4 +307,10 @@ export const api = {
 
   deletePractitioner: (token: string, id: string) =>
     authed<void>(token, `/api/practitioners/${id}`, { method: "DELETE" }),
+
+  getPublicCabinetInfo: (cabinetId: string) =>
+    request<{ cabinet: { id: string, name: string, city: string | null, practitioners: { id: string, fullName: string }[] } }>(`/api/public/cabinets/${cabinetId}`),
+
+  requestPublicAppointment: (cabinetId: string, input: { fullName: string; phoneNumber: string; scheduledAt: string; practitionerId?: string; careType?: string; notes?: string }) =>
+    request<{ appointment: Appointment }>(`/api/public/cabinets/${cabinetId}/book`, { method: "POST", body: input }),
 };

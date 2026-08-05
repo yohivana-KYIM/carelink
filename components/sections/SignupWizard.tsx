@@ -10,6 +10,8 @@ import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/lib/site-config";
 import { api, ApiError } from "@/lib/api";
 import { saveSession } from "@/lib/auth-storage";
+import { PhoneInput } from 'react-international-phone';
+import 'react-international-phone/style.css';
 
 type FormData = {
   cabinetName: string;
@@ -223,14 +225,19 @@ export function SignupWizard() {
                             placeholder="vous@cabinet-dentaire.fr"
                             required
                           />
-                          <Field
-                            id="phone"
-                            label="Téléphone (optionnel)"
-                            type="tel"
-                            value={data.phone}
-                            onChange={(v) => update("phone", v)}
-                            placeholder="06 12 34 56 78"
-                          />
+                          <div className="flex flex-col gap-2">
+                            <label className="text-sm font-medium text-ink">Téléphone (WhatsApp)</label>
+                            <div className="phone-input-container">
+                              <PhoneInput
+                                defaultCountry="fr"
+                                value={data.phone}
+                                onChange={(phone) => update("phone", phone)}
+                                style={{ width: '100%' }}
+                                inputStyle={{ width: '100%', borderRadius: '9999px', borderTopLeftRadius: '0', borderBottomLeftRadius: '0', border: '1px solid var(--border)', background: 'var(--background)', padding: '0.6rem 1rem', fontSize: '0.875rem', color: 'var(--ink)' }}
+                                countrySelectorStyleProps={{ buttonStyle: { borderTopLeftRadius: '9999px', borderBottomLeftRadius: '9999px', border: '1px solid var(--border)', background: 'var(--background)', padding: '0 0.75rem' } }}
+                              />
+                            </div>
+                          </div>
                         </>
                       ) : null}
 

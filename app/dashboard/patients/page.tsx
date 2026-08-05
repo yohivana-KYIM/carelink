@@ -2,10 +2,12 @@
 
 import { useEffect, useState, FormEvent, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Loader2, Plus, Search, Edit, X, Download, Upload } from "lucide-react";
+import { Loader2, Plus, Search, Edit, X, Download, Upload, Share2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
 import { api, type Patient } from "@/lib/api";
+import { PhoneInput } from 'react-international-phone';
+import 'react-international-phone/style.css';
 
 function Modal({ isOpen, onClose, title, children }: { isOpen: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
   if (!isOpen) return null;
@@ -23,7 +25,7 @@ function Modal({ isOpen, onClose, title, children }: { isOpen: boolean; onClose:
 }
 
 export default function PatientsPage() {
-  const { token } = useSession();
+  const { token, user } = useSession();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -130,6 +132,13 @@ export default function PatientsPage() {
     reader.readAsText(file);
   }
 
+  function copyBookingLink() {
+    if (!user?.cabinetId) return;
+    const url = `${window.location.origin}/book/${user.cabinetId}`;
+    navigator.clipboard.writeText(url);
+    toast.success("Lien de réservation copié dans le presse-papiers !");
+  }
+
   function openCreateModal() {
     setEditingPatient(null);
     setForm({ fullName: "", phoneNumber: "", whatsappOptIn: false, relanceMonths: 6 });
@@ -182,6 +191,9 @@ export default function PatientsPage() {
           </button>
           <button onClick={handleExportCSV} className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink hover:bg-surface-raised">
             <Download size={16} /> Exporter
+          </button>
+          <button onClick={copyBookingLink} className="inline-flex items-center gap-2 rounded-full border border-border bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20">
+            <Share2 size={16} /> Partager le lien
           </button>
           <button onClick={openCreateModal} className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">
             <Plus size={16} /> Ajouter
@@ -262,8 +274,18 @@ export default function PatientsPage() {
             <input required value={form.fullName} onChange={e => setForm({...form, fullName: e.target.value})} className="mt-1 w-full rounded-full border border-border bg-background px-4 py-2 text-sm text-ink focus:border-brand-400 focus:outline-none" />
           </div>
           <div>
-            <label className="text-sm font-medium text-ink">Téléphone (WhatsApp)</label>
-            <input required value={form.phoneNumber} onChange={e => setForm({...form, phoneNumber: e.target.value})} className="mt-1 w-full rounded-full border border-border bg-background px-4 py-2 text-sm text-ink focus:border-brand-400 focus:outline-none" />
+            <label className="text-sm font-medium text-ink mb-1 block">Téléphone (WhatsApp)</label>
+            <div className="phone-input-container">
+              <PhoneInput
+                defaultCountry="fr"
+                value={form.phoneNumber}
+                onChange={(phone) => setForm({ ...form, phoneNumber: phone })}
+                required
+                style={{ width: '100%' }}
+                inputStyle={{ width: '100%', borderRadius: '9999px', borderTopLeftRadius: '0', borderBottomLeftRadius: '0', border: '1px solid var(--border)', background: 'var(--background)', padding: '0.5rem 1rem', fontSize: '0.875rem', color: 'var(--ink)' }}
+                countrySelectorStyleProps={{ buttonStyle: { borderTopLeftRadius: '9999px', borderBottomLeftRadius: '9999px', border: '1px solid var(--border)', background: 'var(--background)', padding: '0 0.5rem' } }}
+              />
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <input type="checkbox" checked={form.whatsappOptIn} onChange={e => setForm({...form, whatsappOptIn: e.target.checked})} className="size-4 rounded border-border text-brand-600 focus:ring-brand-400" />
