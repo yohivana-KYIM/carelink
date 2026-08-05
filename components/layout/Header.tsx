@@ -150,7 +150,6 @@ export function Header() {
         }}
         onClose={() => setConfirmLogoutOpen(false)}
       />
-      </div>
 
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
     </header>
