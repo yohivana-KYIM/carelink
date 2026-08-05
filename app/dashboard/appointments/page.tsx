@@ -1,11 +1,28 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent, useMemo } from "react";
 import { motion } from "motion/react";
-import { Loader2, Plus, Calendar, Edit, X } from "lucide-react";
+import { Loader2, Plus, Calendar as CalendarIcon, Edit, X, List, Grid } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
 import { api, type Appointment, type Patient, type Practitioner } from "@/lib/api";
+
+import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import fr from 'date-fns/locale/fr';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import './calendar-custom.css';
+
+const locales = {
+  'fr': fr,
+};
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek: () => startOfWeek(new Date(), { weekStartsOn: 1 }),
+  getDay,
+  locales,
+});
 
 function Modal({ isOpen, onClose, title, children }: { isOpen: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
   if (!isOpen) return null;
@@ -29,7 +46,7 @@ export default function AppointmentsPage() {
   const [practitioners, setPractitioners] = useState<Practitioner[]>([]);
   const [loading, setLoading] = useState(true);
   
-  const [range, setRange] = useState<"today" | "week" | "all">("all");
+  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
   const [page, setPage] = useState(1);
   const pageSize = 10;
   
@@ -43,15 +60,15 @@ export default function AppointmentsPage() {
     if (!token) return;
     setLoading(true);
     try {
+      // Pour le calendrier, on charge tout (all)
       const [resAppts, resPats, resPracs] = await Promise.all([
-        api.listAppointments(token, range),
+        api.listAppointments(token, "all"),
         api.listPatients(token),
         api.listPractitioners(token)
       ]);
       setAppointments(resAppts.appointments);
       setPatients(resPats.patients);
       setPractitioners(resPracs.practitioners);
-      setPage(1);
     } catch (e) {
       toast.error("Erreur de chargement");
     }
@@ -60,14 +77,40 @@ export default function AppointmentsPage() {
 
   useEffect(() => {
     void load();
-  }, [token, range]);
+  }, [token]);
+
+  // Calcul des métriques
+  const { todayCount, tomorrowCount } = useMemo(() => {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().slice(0, 10);
+    
+    let tCount = 0;
+    let tmCount = 0;
+    
+    appointments.forEach(a => {
+      const dStr = new Date(a.scheduledAt).toISOString().slice(0, 10);
+      if (dStr === todayStr) tCount++;
+      if (dStr === tomorrowStr) tmCount++;
+    });
+    
+    return { todayCount: tCount, tomorrowCount: tmCount };
+  }, [appointments]);
 
   const totalPages = Math.ceil(appointments.length / pageSize);
   const paginatedAppointments = appointments.slice((page - 1) * pageSize, page * pageSize);
 
-  function openCreateModal() {
+  function openCreateModal(defaultDate?: Date) {
     setEditingId(null);
-    setForm({ patientId: "", practitionerId: "", scheduledAt: new Date().toISOString().slice(0, 16), careType: "", notes: "", status: "PENDING" });
+    let dateStr = new Date().toISOString().slice(0, 16);
+    if (defaultDate) {
+      // Ajustement fuseau horaire pour le champ datetime-local
+      const dateOffset = new Date(defaultDate.getTime() - defaultDate.getTimezoneOffset() * 60000);
+      dateStr = dateOffset.toISOString().slice(0, 16);
+    }
+    setForm({ patientId: "", practitionerId: "", scheduledAt: dateStr, careType: "", notes: "", status: "PENDING" });
     setModalOpen(true);
   }
 
@@ -127,36 +170,94 @@ export default function AppointmentsPage() {
     }
   }
 
+  // Format events for calendar
+  const events = useMemo(() => {
+    return appointments.map(a => {
+      const start = new Date(a.scheduledAt);
+      const end = new Date(start);
+      end.setHours(start.getHours() + 1); // Hypothèse: 1h de durée
+      return {
+        id: a.id,
+        title: `${a.patient?.fullName || 'Patient'} - ${a.careType || 'RDV'}`,
+        start,
+        end,
+        resource: a
+      };
+    });
+  }, [appointments]);
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* En-tête et métriques */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-ink">Rendez-vous</h1>
-          <p className="mt-1 text-sm text-ink-muted">Gérez l&apos;agenda et les rappels automatiques des patients.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">Agenda & Rendez-vous</h1>
+          <p className="mt-1 text-sm text-ink-muted">Gérez vos disponibilités et suivez le flux de patients.</p>
         </div>
-        <button onClick={openCreateModal} className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">
-          <Plus size={16} /> Nouveau rendez-vous
+        <button onClick={() => openCreateModal()} className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 w-fit">
+          <Plus size={16} /> Nouveau RDV
         </button>
       </div>
 
-      <div className="flex items-center gap-2">
-        {(["all", "today", "week"] as const).map(r => (
-          <button
-            key={r}
-            onClick={() => setRange(r)}
-            className={`rounded-full px-4 py-1.5 text-xs font-semibold ${range === r ? "bg-brand-600 text-white" : "border border-border text-ink-muted hover:border-brand-300"}`}
-          >
-            {r === "all" ? "Tous" : r === "today" ? "Aujourd'hui" : "Cette semaine"}
-          </button>
-        ))}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="rounded-2xl border border-border bg-surface-raised p-4 shadow-sm">
+          <p className="text-sm font-medium text-ink-muted">Aujourd'hui</p>
+          <p className="mt-1 text-3xl font-bold text-ink">{todayCount}</p>
+          <p className="mt-1 text-xs text-ink-soft">Patients attendus</p>
+        </div>
+        <div className="rounded-2xl border border-border bg-surface-raised p-4 shadow-sm">
+          <p className="text-sm font-medium text-ink-muted">Demain</p>
+          <p className="mt-1 text-3xl font-bold text-ink">{tomorrowCount}</p>
+          <p className="mt-1 text-xs text-ink-soft">Patients programmés</p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 border-b border-border pb-2">
+        <button
+          onClick={() => setViewMode("calendar")}
+          className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${viewMode === "calendar" ? "bg-brand-600 text-white" : "text-ink-muted hover:bg-surface-raised"}`}
+        >
+          <Grid size={16} /> Calendrier
+        </button>
+        <button
+          onClick={() => setViewMode("list")}
+          className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${viewMode === "list" ? "bg-brand-600 text-white" : "text-ink-muted hover:bg-surface-raised"}`}
+        >
+          <List size={16} /> Liste détaillée
+        </button>
       </div>
 
       {loading ? (
-        <div className="flex min-h-[30vh] items-center justify-center text-ink-soft"><Loader2 className="animate-spin" size={20} /></div>
-      ) : appointments.length === 0 ? (
-        <div className="flex min-h-[30vh] flex-col items-center justify-center text-ink-soft">
-          <Calendar size={28} className="mb-2" />
-          <p className="text-sm">Aucun rendez-vous trouvé.</p>
+        <div className="flex min-h-[30vh] items-center justify-center text-ink-soft"><Loader2 className="animate-spin" size={24} /></div>
+      ) : viewMode === "calendar" ? (
+        <div className="rounded-2xl border border-border bg-background p-4 shadow-sm">
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            culture="fr"
+            messages={{
+              next: "Suivant",
+              previous: "Précédent",
+              today: "Aujourd'hui",
+              month: "Mois",
+              week: "Semaine",
+              day: "Jour",
+              agenda: "Agenda",
+              date: "Date",
+              time: "Heure",
+              event: "Événement",
+              noEventsInRange: "Aucun rendez-vous sur cette période."
+            }}
+            defaultView={Views.WEEK}
+            views={['month', 'week', 'day']}
+            onSelectEvent={(event) => openEditModal(event.resource)}
+            onSelectSlot={(slotInfo) => openCreateModal(slotInfo.start)}
+            selectable
+            className="text-sm text-ink"
+            style={{ height: '70vh' }}
+          />
         </div>
       ) : (
         <>
@@ -172,7 +273,7 @@ export default function AppointmentsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {paginatedAppointments.map(a => (
+                {paginatedAppointments.length > 0 ? paginatedAppointments.map(a => (
                   <tr key={a.id}>
                     <td className="px-5 py-3 font-medium text-ink">{new Date(a.scheduledAt).toLocaleString("fr-FR")}</td>
                     <td className="px-5 py-3 text-ink-muted">{a.patient?.fullName || "Inconnu"}</td>
@@ -193,7 +294,11 @@ export default function AppointmentsPage() {
                       )}
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan={5} className="px-5 py-8 text-center text-ink-soft">Aucun rendez-vous trouvé.</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

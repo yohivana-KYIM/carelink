@@ -1,7 +1,9 @@
 "use client";
 
-import { ArrowUp } from "lucide-react";
-import { type SVGProps, useEffect, useState } from "react";
+import { ArrowUp, X, Send } from "lucide-react";
+import { type SVGProps, useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import Image from "next/image";
 
 const SIZE = 44;
 const STROKE = 3;
@@ -20,6 +22,9 @@ function WhatsappIcon(props: SVGProps<SVGSVGElement>) {
 export function BackToTopButton() {
   const [visible, setVisible] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const chatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -38,59 +43,144 @@ export function BackToTopButton() {
     };
   }, []);
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (chatRef.current && !chatRef.current.contains(event.target as Node)) {
+        setIsChatOpen(false);
+      }
+    }
+    if (isChatOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isChatOpen]);
+
   const dashOffset = CIRCUMFERENCE * (1 - progress);
 
-  return (
-    <div
-      className={`fixed bottom-6 right-4 z-40 flex items-center gap-3 rounded-full bg-surface-raised p-2 shadow-card transition-all duration-300 sm:right-6 lg:right-8 ${
-        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"
-      }`}
-    >
-      <button
-        type="button"
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        aria-label="Retour en haut de page"
-        className="relative flex h-11 w-11 items-center justify-center rounded-full bg-background text-ink-muted transition-colors duration-300 hover:text-brand-600 dark:hover:text-brand-400"
-      >
-        <svg
-          aria-hidden
-          width={SIZE}
-          height={SIZE}
-          viewBox={`0 0 ${SIZE} ${SIZE}`}
-          className="absolute inset-0 -rotate-90"
-        >
-          <circle
-            cx={SIZE / 2}
-            cy={SIZE / 2}
-            r={RADIUS}
-            fill="none"
-            strokeWidth={STROKE}
-            className="stroke-border"
-          />
-          <circle
-            cx={SIZE / 2}
-            cy={SIZE / 2}
-            r={RADIUS}
-            fill="none"
-            strokeWidth={STROKE}
-            strokeLinecap="round"
-            strokeDasharray={CIRCUMFERENCE}
-            strokeDashoffset={dashOffset}
-            className="stroke-brand-600 transition-[stroke-dashoffset] duration-150 ease-linear dark:stroke-brand-400"
-          />
-        </svg>
-        <ArrowUp size={18} className="relative" />
-      </button>
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+    const phone = "237659037423";
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
+    setMessage("");
+    setIsChatOpen(false);
+  };
 
-      <a
-        href="https://wa.me/237659037423?text=Bonjour%20Carelink%2C%20j%27ai%20besoin%20d%27une%20d%C3%A9mo%20et%20d%27informations.%20Pouvez-vous%20m%20aider%20%3F"
-        target="_blank"
-        rel="noreferrer"
-        className="flex h-11 items-center gap-2 rounded-full bg-emerald-50 px-3 text-sm font-semibold text-emerald-700 transition-colors duration-300 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-100 dark:hover:bg-emerald-500/20"
+  return (
+    <div className="fixed bottom-6 right-4 z-40 flex flex-col items-end gap-4 sm:right-6 lg:right-8">
+      
+      {/* Fenêtre Assistant WhatsApp */}
+      <AnimatePresence>
+        {isChatOpen && (
+          <motion.div
+            ref={chatRef}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="w-[320px] rounded-3xl bg-surface-raised shadow-2xl border border-border overflow-hidden flex flex-col mb-2 origin-bottom-right"
+          >
+            {/* Header du chat */}
+            <div className="bg-[#128C7E] px-4 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="relative size-10 rounded-full bg-white flex items-center justify-center p-1">
+                  <Image src="/images/carelink-icon.png" alt="Carelink" width={32} height={32} className="rounded-full" />
+                  <div className="absolute bottom-0 right-0 size-3 rounded-full bg-emerald-400 border-2 border-white" />
+                </div>
+                <div className="text-white">
+                  <h3 className="font-semibold text-sm">Équipe Carelink</h3>
+                  <p className="text-xs opacity-90">Répond en général vite</p>
+                </div>
+              </div>
+              <button onClick={() => setIsChatOpen(false)} className="text-white hover:bg-white/20 p-1.5 rounded-full transition-colors">
+                <X size={18} />
+              </button>
+            </div>
+            
+            {/* Corps du chat */}
+            <div className="bg-[#E5DDD5] dark:bg-brand-950/30 p-4 min-h-[200px] flex flex-col gap-3 relative">
+              {/* Message bulles */}
+              <div className="bg-white dark:bg-surface-raised rounded-2xl rounded-tl-none p-3 shadow-sm max-w-[90%] text-sm text-ink relative z-10">
+                Bonjour ! 👋<br/><br/>
+                Bienvenue sur Carelink. Avez-vous besoin d'une démo ou d'informations sur la plateforme ?
+                <span className="block text-[10px] text-ink-soft text-right mt-1">À l'instant</span>
+              </div>
+            </div>
+
+            {/* Input du chat */}
+            <div className="bg-surface p-3 border-t border-border">
+              <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Écrivez un message..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="flex-1 rounded-full border border-border bg-background px-4 py-2.5 text-sm text-ink focus:border-[#128C7E] focus:outline-none focus:ring-1 focus:ring-[#128C7E]"
+                  autoFocus
+                />
+                <button
+                  type="submit"
+                  disabled={!message.trim()}
+                  className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#128C7E] text-white transition-colors hover:bg-[#075E54] disabled:opacity-50 disabled:hover:bg-[#128C7E]"
+                >
+                  <Send size={16} className="-ml-0.5" />
+                </button>
+              </form>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div
+        className={`flex items-center gap-3 rounded-full bg-surface-raised p-2 shadow-card transition-all duration-300 ${
+          visible || isChatOpen ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"
+        }`}
       >
-        <WhatsappIcon className="h-5 w-5" />
-        WhatsApp
-      </a>
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="Retour en haut de page"
+          className="relative flex h-11 w-11 items-center justify-center rounded-full bg-background text-ink-muted transition-colors duration-300 hover:text-brand-600 dark:hover:text-brand-400"
+        >
+          <svg
+            aria-hidden
+            width={SIZE}
+            height={SIZE}
+            viewBox={`0 0 ${SIZE} ${SIZE}`}
+            className="absolute inset-0 -rotate-90"
+          >
+            <circle
+              cx={SIZE / 2}
+              cy={SIZE / 2}
+              r={RADIUS}
+              fill="none"
+              strokeWidth={STROKE}
+              className="stroke-border"
+            />
+            <circle
+              cx={SIZE / 2}
+              cy={SIZE / 2}
+              r={RADIUS}
+              fill="none"
+              strokeWidth={STROKE}
+              strokeLinecap="round"
+              strokeDasharray={CIRCUMFERENCE}
+              strokeDashoffset={dashOffset}
+              className="stroke-brand-600 transition-[stroke-dashoffset] duration-150 ease-linear dark:stroke-brand-400"
+            />
+          </svg>
+          <ArrowUp size={18} className="relative" />
+        </button>
+
+        <button
+          onClick={() => setIsChatOpen(!isChatOpen)}
+          className="flex h-11 items-center gap-2 rounded-full bg-[#25D366] px-5 text-sm font-semibold text-white transition-all duration-300 hover:bg-[#128C7E] shadow-[0_4px_14px_rgba(37,211,102,0.39)]"
+        >
+          <WhatsappIcon className="h-5 w-5" />
+          WhatsApp
+        </button>
+      </div>
     </div>
   );
 }
