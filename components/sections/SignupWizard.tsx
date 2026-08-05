@@ -123,17 +123,7 @@ export function SignupWizard() {
   }
 
   return (
-    <section className="grid min-h-[calc(100vh-6rem)] items-center py-16 lg:grid-cols-[1fr_1.2fr] lg:px-8">
-      <Reveal className="relative hidden overflow-hidden lg:block">
-        <Image
-          src="/images/hero-dashboard-app.jpeg"
-          alt="Main tenant un smartphone affichant le tableau de bord Carelink"
-          fill
-          sizes="50vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/20 to-brand-950/40" />
-      </Reveal>
+    <section className="grid min-h-[calc(100vh-6rem)] items-center py-16 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
       <div className="relative flex w-full items-center justify-center px-6 overflow-hidden bg-brand-50/30 dark:bg-brand-950/20 sm:px-10 lg:px-12">
         <GeometricDecorations />
         <Reveal className="relative z-10 w-full max-w-3xl">
@@ -153,32 +143,19 @@ export function SignupWizard() {
                 Trois étapes rapides pour préparer l&apos;espace de votre
                 cabinet.
               </p>
-              <div className="mt-4 w-full overflow-hidden rounded-[1.5rem] border border-border bg-background/80 shadow-lg sm:w-auto">
-                <Image
-                  src="/images/reprogramme.png"
-                  alt="Reprogrammation de rendez-vous Carelink"
-                  width={380}
-                  height={220}
-                  className="h-auto w-full object-cover"
-                />
-              </div>
             </div>
 
-            {status !== "success" ? (
-              <>
-                <Stepper current={step} />
-
-                <form onSubmit={handleSubmit} noValidate className="mt-8">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={step}
-                      initial={{ opacity: 0, x: 16 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -16 }}
-                      transition={{ duration: 0.25 }}
-                      className="flex flex-col gap-5"
-                    >
-                      {step === 1 ? (
+            <form onSubmit={handleSubmit} noValidate className="mt-8">
+              <AnimatePresence mode="wait">
+              <motion.div
+                key={step}
+                initial={{ opacity: 0, x: 16 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -16 }}
+                transition={{ duration: 0.25 }}
+                className="flex flex-col gap-5"
+              >
+                {step === 1 ? (
                         <>
                           <Field
                             id="cabinetName"
@@ -374,6 +351,16 @@ export function SignupWizard() {
           </div>
         </Reveal>
       </div>
+      <Reveal className="relative hidden overflow-hidden lg:block">
+        <Image
+          src="/images/reprogramme.png"
+          alt="Reprogrammation de rendez-vous Carelink"
+          fill
+          sizes="50vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/20 to-brand-950/40" />
+      </Reveal>
     </section>
   );
 }
