@@ -3,9 +3,6 @@ import { Figtree } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { MotionProvider } from "@/components/providers/MotionProvider";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { BackToTopButton } from "@/components/ui/BackToTopButton";
 import { siteConfig } from "@/lib/site-config";
 
 const figtree = Figtree({
@@ -109,20 +106,7 @@ export default function RootLayout({
           }}
         />
         <ThemeProvider>
-          <MotionProvider>
-            <a
-              href="#main-content"
-              className="sr-only z-50 rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
-            >
-              Aller au contenu
-            </a>
-            <Header />
-            <main id="main-content" className="flex-1 pt-24">
-              {children}
-            </main>
-            <Footer />
-            <BackToTopButton />
-          </MotionProvider>
+          <MotionProvider>{children}</MotionProvider>
         </ThemeProvider>
       </body>
     </html>

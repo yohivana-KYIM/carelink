@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { MessageSquareText, PhoneOff, TimerReset } from "lucide-react";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -25,18 +27,57 @@ const points = [
   },
 ];
 
+function ImageCarousel() {
+  const images = [
+    {
+      src: "/images/dental-office.jpeg",
+      alt: "Salle de soins dentaires avec pictogrammes de calendrier et de carte de rendez-vous",
+    },
+    { src: "/images/relance.jpeg", alt: "Patient recevant un rappel de rendez-vous" },
+  ];
+
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(() => setIndex((i) => (i + 1) % images.length), 4200);
+    return () => clearInterval(t);
+  }, []);
+
+  return (
+    <div className="relative w-full h-full">
+      <AnimatePresence>
+        {images.map(
+          (img, i) =>
+            i === index && (
+              <motion.div
+                key={img.src}
+                initial={{ opacity: 0, x: 60 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -60 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  fill
+                  sizes="(min-width: 1024px) 420px, 340px"
+                  className="object-cover"
+                />
+              </motion.div>
+            )
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export function ValueProp() {
   return (
     <section className="py-20 sm:py-28">
       <Container className="grid items-center gap-14 lg:grid-cols-2 lg:gap-16">
         <Reveal className="relative mx-auto aspect-[768/1376] w-full max-w-sm overflow-hidden rounded-[2rem] shadow-card lg:order-2">
-          <Image
-            src="/images/dental-office.jpeg"
-            alt="Salle de soins dentaires avec pictogrammes de calendrier et de carte de rendez-vous"
-            fill
-            sizes="(min-width: 1024px) 420px, 340px"
-            className="object-cover"
-          />
+          <ImageCarousel />
         </Reveal>
 
         <div className="flex flex-col gap-8 lg:order-1">
