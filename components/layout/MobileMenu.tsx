@@ -10,10 +10,14 @@ import { Button } from "@/components/ui/Button";
 
 export function MobileMenu({
   open,
+  user,
   onClose,
+  onLogout,
 }: {
   open: boolean;
+  user: { fullName: string; role: string } | null;
   onClose: () => void;
+  onLogout: () => void;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<Array<HTMLLIElement | null>>([]);
@@ -89,9 +93,23 @@ export function MobileMenu({
       style={{ visibility: "hidden" }}
     >
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold uppercase tracking-widest text-ink-soft">
-          Menu
-        </span>
+        <div>
+          <span className="text-sm font-semibold uppercase tracking-widest text-ink-soft">
+            Menu
+          </span>
+          {user ? (
+            <div className="mt-3 rounded-3xl border border-border bg-surface p-3">
+              <p className="text-sm font-semibold text-ink">{user.fullName.split(" ")[0]}</p>
+              <p className="text-xs text-ink-soft">
+                {user.role === "SUPERADMIN"
+                  ? "Super admin"
+                  : user.role === "ADMIN"
+                  ? "Administrateur"
+                  : "Secrétariat"}
+              </p>
+            </div>
+          ) : null}
+        </div>
         <button
           type="button"
           onClick={onClose}
@@ -130,12 +148,24 @@ export function MobileMenu({
       </nav>
 
       <div className="mt-auto flex flex-col gap-3">
-        <Button href="/login" variant="secondary" onClick={onClose}>
-          Connexion
-        </Button>
-        <Button href="/contact" onClick={onClose}>
-          Demander une démo
-        </Button>
+        {user ? (
+          <button
+            type="button"
+            onClick={onLogout}
+            className="inline-flex w-full items-center justify-center rounded-full border border-border bg-surface px-4 py-3 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-surface-raised"
+          >
+            Déconnexion
+          </button>
+        ) : (
+          <>
+            <Button href="/login" variant="secondary" onClick={onClose}>
+              Connexion
+            </Button>
+            <Button href="/contact" onClick={onClose}>
+              Demander une démo
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );

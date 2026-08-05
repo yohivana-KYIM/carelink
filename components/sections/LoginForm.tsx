@@ -47,7 +47,7 @@ export function LoginForm() {
   }
 
   return (
-    <section className="grid min-h-[calc(100vh-6rem)] lg:grid-cols-2">
+    <section className="grid min-h-[calc(100vh-6rem)] lg:grid-cols-[0.95fr_1.05fr]">
       <div className="relative hidden overflow-hidden lg:block">
         <LoginImageCarousel />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/20 to-brand-950/40" />
@@ -278,8 +278,8 @@ function LoginImageCarousel() {
                   alt={img.alt}
                   fill
                   priority
-                  sizes="50vw"
-                  className="object-contain"
+                  sizes="(min-width: 1024px) 55vw, 100vw"
+                  className="object-cover"
                 />
               </motion.div>
             )

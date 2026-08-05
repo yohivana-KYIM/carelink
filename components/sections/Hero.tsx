@@ -9,9 +9,9 @@ import { heroChecklist, siteConfig } from "@/lib/site-config";
 
 export function Hero() {
   return (
-    <section className="relative px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-8 lg:px-8">
+    <section className="relative px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-8 lg:px-10 xl:px-16">
       <GeometricDecorations />
-      <div className="relative z-10 mx-auto grid max-w-7xl gap-3 lg:grid-cols-2">
+      <div className="relative z-10 mx-auto grid max-w-7xl gap-3 lg:grid-cols-[0.95fr_1.1fr]">
         <div className="flex flex-col justify-center gap-7 rounded-[2rem] bg-surface-raised/90 backdrop-blur-sm p-8 shadow-card sm:p-12 lg:p-14">
           <motion.div
             initial={{ opacity: 0, y: 14 }}
@@ -82,7 +82,7 @@ export function Hero() {
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          className="relative min-h-[520px] overflow-hidden rounded-[2rem] bg-brand-800 sm:min-h-[600px] lg:min-h-[680px]"
+          className="relative min-h-[560px] overflow-hidden rounded-[2rem] bg-brand-800 sm:min-h-[680px] lg:min-h-[760px]"
         >
           <HeroImageCarousel />
         </motion.div>
@@ -132,8 +132,8 @@ function HeroImageCarousel() {
                   alt={image.alt}
                   fill
                   priority
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="object-contain"
+                  sizes="(min-width: 1024px) 55vw, 100vw"
+                  className="object-cover"
                 />
               </motion.div>
             )

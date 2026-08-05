@@ -152,7 +152,15 @@ export function Header() {
         onClose={() => setConfirmLogoutOpen(false)}
       />
 
-      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MobileMenu
+        open={menuOpen}
+        user={user}
+        onClose={() => setMenuOpen(false)}
+        onLogout={() => {
+          setConfirmLogoutOpen(true);
+          setMenuOpen(false);
+        }}
+      />
     </header>
   );
 }

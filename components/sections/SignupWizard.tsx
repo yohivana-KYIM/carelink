@@ -123,7 +123,7 @@ export function SignupWizard() {
   }
 
   return (
-    <section className="grid min-h-[calc(100vh-6rem)] items-center py-16 lg:grid-cols-2">
+    <section className="grid min-h-[calc(100vh-6rem)] items-center py-16 lg:grid-cols-[1fr_1.2fr] lg:px-8">
       <Reveal className="relative hidden overflow-hidden lg:block">
         <Image
           src="/images/hero-dashboard-app.jpeg"
@@ -134,10 +134,10 @@ export function SignupWizard() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/20 to-brand-950/40" />
       </Reveal>
-      <div className="relative flex w-full items-center justify-center px-4 overflow-hidden bg-brand-50/30 dark:bg-brand-950/20">
+      <div className="relative flex w-full items-center justify-center px-6 overflow-hidden bg-brand-50/30 dark:bg-brand-950/20 sm:px-10 lg:px-12">
         <GeometricDecorations />
-        <Reveal className="relative z-10 w-full max-w-lg">
-          <div className="rounded-[2rem] border border-border bg-surface-raised/80 backdrop-blur-md p-8 shadow-xl sm:p-10">
+        <Reveal className="relative z-10 w-full max-w-3xl">
+          <div className="rounded-[2rem] border border-border bg-surface-raised/80 backdrop-blur-md p-8 shadow-xl sm:p-12">
             <div className="flex flex-col items-center gap-3 text-center">
               <Image
                 src="/images/carelink-icon.png"
@@ -153,6 +153,15 @@ export function SignupWizard() {
                 Trois étapes rapides pour préparer l&apos;espace de votre
                 cabinet.
               </p>
+              <div className="mt-4 w-full overflow-hidden rounded-[1.5rem] border border-border bg-background/80 shadow-lg sm:w-auto">
+                <Image
+                  src="/images/reprogramme.png"
+                  alt="Reprogrammation de rendez-vous Carelink"
+                  width={380}
+                  height={220}
+                  className="h-auto w-full object-cover"
+                />
+              </div>
             </div>
 
             {status !== "success" ? (
