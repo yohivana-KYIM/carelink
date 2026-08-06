@@ -1,10 +1,20 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { siteConfig } from "@/lib/site-config";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+function getIconDataUri() {
+  const iconPath = join(process.cwd(), "public", "images", "ecotocare-icon.png");
+  const base64 = readFileSync(iconPath).toString("base64");
+  return `data:image/png;base64,${base64}`;
+}
+
 export default function Image() {
+  const iconDataUri = getIconDataUri();
+
   return new ImageResponse(
     (
       <div
@@ -26,22 +36,14 @@ export default function Image() {
             gap: 20,
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 84,
-              height: 84,
-              borderRadius: 22,
-              background: "#2e70be",
-              color: "white",
-              fontSize: 52,
-              fontWeight: 700,
-            }}
-          >
-            C
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element -- next/og ImageResponse requires a native <img>, not next/image */}
+          <img
+            src={iconDataUri}
+            width={84}
+            height={84}
+            style={{ borderRadius: 22 }}
+            alt=""
+          />
           <div style={{ display: "flex", fontSize: 40, fontWeight: 700, color: "white" }}>
             {siteConfig.name}
           </div>
