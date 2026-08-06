@@ -355,8 +355,8 @@ export function SignupWizard() {
       </div>
       <Reveal className="relative hidden overflow-hidden lg:block">
         <Image
-          src="/images/reprogramme.png"
-          alt="Reprogrammation de rendez-vous Carelink"
+          src="/test.png"
+          alt="Illustration inscription Carelink"
           fill
           sizes="50vw"
           className="object-cover"

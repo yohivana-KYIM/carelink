@@ -9,6 +9,7 @@ import { ThemeToggle } from "@/components/layout/ThemeToggle";import { ConfirmDi
 import { api } from "@/lib/api";
 import { siteConfig } from "@/lib/site-config";
 import { toast } from "react-hot-toast";
+import { enablePushNotifications } from "@/lib/push";
 
 export type DashboardNavItem = {
   label: string;
@@ -34,12 +35,12 @@ export function DashboardShell({
   const [logoutLoading, setLogoutLoading] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && "Notification" in window) {
-      if (Notification.permission === "default") {
-        Notification.requestPermission();
-      }
-    }
-  }, []);
+    // Notifications push activées par défaut : tentative d'abonnement
+    // automatique à chaque connexion (silencieuse si déjà abonné, ne bloque
+    // rien si l'utilisateur refuse la permission navigateur).
+    if (!token) return;
+    void enablePushNotifications(token).catch(() => {});
+  }, [token]);
 
   useEffect(() => {
     if (!token) return;

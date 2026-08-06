@@ -33,8 +33,8 @@ export function LoginForm() {
 
     setStatus("loading");
     try {
-      const { token, user } = await api.login({ email, password });
-      saveSession(token, user);
+      const { token, user } = await api.login({ email, password, rememberMe });
+      saveSession(token, user, rememberMe);
       setStatus("success");
       toast.success("Connexion réussie !");
       router.push(user.role === "SUPERADMIN" ? "/admin" : "/dashboard");

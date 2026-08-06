@@ -188,8 +188,11 @@ export const api = {
     password: string;
   }) => request<AuthResponse>("/api/auth/register-cabinet", { method: "POST", body: input }),
 
-  login: (input: { email: string; password: string }) =>
+  login: (input: { email: string; password: string; rememberMe?: boolean }) =>
     request<AuthResponse>("/api/auth/login", { method: "POST", body: input }),
+
+  changePassword: (token: string, input: { currentPassword: string; newPassword: string }) =>
+    authed<{ message: string }>(token, "/api/auth/change-password", { method: "POST", body: input }),
 
   forgotPassword: (input: { email: string }) =>
     request<{ message: string }>("/api/auth/forgot-password", { method: "POST", body: input }),
@@ -353,4 +356,13 @@ export const api = {
 
   requestPublicAppointment: (cabinetId: string, input: { fullName: string; phoneNumber: string; scheduledAt: string; practitionerId?: string; careType?: string; notes?: string }) =>
     request<{ appointment: Appointment }>(`/api/public/cabinets/${cabinetId}/book`, { method: "POST", body: input }),
+
+  getVapidPublicKey: () =>
+    request<{ publicKey: string | null }>("/api/push/vapid-public-key"),
+
+  subscribePush: (token: string, subscription: { endpoint: string; keys: { p256dh: string; auth: string } }) =>
+    authed<{ subscribed: boolean }>(token, "/api/push/subscribe", { method: "POST", body: subscription }),
+
+  unsubscribePush: (token: string, endpoint: string) =>
+    authed<void>(token, "/api/push/unsubscribe", { method: "POST", body: { endpoint } }),
 };
