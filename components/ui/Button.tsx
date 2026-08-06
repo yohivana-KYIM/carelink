@@ -21,6 +21,7 @@ export function Button({
   className = "",
   onClick,
   type = "button",
+  disabled = false,
 }: {
   href?: string;
   children: ReactNode;
@@ -28,19 +29,20 @@ export function Button({
   className?: string;
   onClick?: () => void;
   type?: "button" | "submit";
+  disabled?: boolean;
 }) {
-  const classes = `${base} ${variants[variant]} ${className}`;
+  const classes = `${base} ${variants[variant]} ${disabled ? "pointer-events-none opacity-60" : ""} ${className}`;
 
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} className={classes} aria-disabled={disabled}>
         {children}
       </Link>
     );
   }
 
   return (
-    <button type={type} onClick={onClick} className={classes}>
+    <button type={type} onClick={onClick} disabled={disabled} className={classes}>
       {children}
     </button>
   );
