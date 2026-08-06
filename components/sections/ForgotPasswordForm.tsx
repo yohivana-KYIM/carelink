@@ -32,7 +32,7 @@ export function ForgotPasswordForm() {
       await api.forgotPassword({ email });
       setStatus("success");
     } catch {
-      setErrorMessage("Impossible de contacter le serveur Carelink. Réessayez dans un instant.");
+      setErrorMessage("Impossible de contacter le serveur Ecotocare. Réessayez dans un instant.");
       setStatus("error");
     }
   }

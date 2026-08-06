@@ -62,7 +62,7 @@ const organizationJsonLd = {
   "@type": "Organization",
   name: siteConfig.name,
   url: siteConfig.url,
-  logo: `${siteConfig.url}/images/carelink-icon.png`,
+  logo: `${siteConfig.url}/images/ecotocare-icon.png`,
   description: siteConfig.description,
   email: siteConfig.contactEmail,
   sameAs: Object.values(siteConfig.social),

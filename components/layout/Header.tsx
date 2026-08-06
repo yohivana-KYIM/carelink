@@ -47,7 +47,7 @@ export function Header() {
           aria-label={`${siteConfig.name} — accueil`}
         >
           <Image
-            src="/images/carelink-icon.png"
+            src="/images/ecotocare-icon.png"
             alt={`Logo ${siteConfig.name}`}
             width={32}
             height={32}
@@ -140,7 +140,7 @@ export function Header() {
       <ConfirmDialog
         open={confirmLogoutOpen}
         title="Se déconnecter"
-        description="Voulez-vous vraiment fermer votre session Carelink ? Vous devrez vous reconnecter pour accéder à votre espace."
+        description="Voulez-vous vraiment fermer votre session Ecotocare ? Vous devrez vous reconnecter pour accéder à votre espace."
         confirmLabel="Déconnexion"
         cancelLabel="Annuler"
         onConfirm={() => {

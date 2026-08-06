@@ -95,11 +95,11 @@ function HeroImageCarousel() {
   const images = [
     {
       src: "/images/hero-dashboard-app.jpeg",
-      alt: "Main tenant un smartphone affichant le tableau de bord Carelink",
+      alt: "Main tenant un smartphone affichant le tableau de bord Ecotocare",
     },
     {
       src: "/images/rappelpatint.png",
-      alt: "Aperçu de l'interface Carelink - rappel patient",
+      alt: "Aperçu de l'interface Ecotocare - rappel patient",
     },
   ];
 

@@ -178,7 +178,7 @@ export function DashboardShell({
       <ConfirmDialog
         open={confirmLogoutOpen}
         title="Se déconnecter"
-        description="Voulez-vous vraiment fermer votre session Carelink ? Vous devrez vous reconnecter pour accéder à votre tableau de bord."
+        description="Voulez-vous vraiment fermer votre session Ecotocare ? Vous devrez vous reconnecter pour accéder à votre tableau de bord."
         confirmLabel="Déconnexion"
         cancelLabel="Annuler"
         onConfirm={handleLogout}
@@ -206,7 +206,7 @@ function SidebarContent({
     <>
       <Link href="/" className="flex items-center gap-2.5 px-6 py-6 transition-opacity hover:opacity-80">
         <Image
-          src="/images/carelink-icon.png"
+          src="/images/ecotocare-icon.png"
           alt={`Logo ${siteConfig.name}`}
           width={36}
           height={36}

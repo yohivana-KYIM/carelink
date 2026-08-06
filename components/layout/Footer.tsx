@@ -35,7 +35,7 @@ export function Footer() {
       return;
     }
     setStatus("loading");
-    // Le backend Carelink (Node.js/Express) n'est pas encore branché.
+    // Le backend Ecotocare (Node.js/Express) n'est pas encore branché.
     // Prêt à pointer vers NEXT_PUBLIC_API_URL une fois l'API disponible.
     await new Promise((resolve) => setTimeout(resolve, 700));
     setStatus("success");

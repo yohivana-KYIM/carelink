@@ -108,7 +108,7 @@ export default function PublicBookingPage() {
       <GeometricDecorations />
       <div className="relative z-10 mx-auto max-w-xl">
         <div className="text-center mb-8">
-          <Image src="/images/carelink-icon.png" alt="Carelink" width={48} height={48} className="mx-auto rounded-xl mb-4 shadow-sm" />
+          <Image src="/images/ecotocare-icon.png" alt="Ecotocare" width={48} height={48} className="mx-auto rounded-xl mb-4 shadow-sm" />
           <h1 className="text-3xl font-bold tracking-tight text-ink">{cabinet.name}</h1>
           <p className="mt-2 text-ink-muted">Prenez rendez-vous en ligne {cabinet.city ? `à ${cabinet.city}` : ""}</p>
         </div>

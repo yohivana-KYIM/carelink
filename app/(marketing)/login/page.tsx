@@ -3,7 +3,7 @@ import { LoginForm } from "@/components/sections/LoginForm";
 
 export const metadata: Metadata = {
   title: "Connexion",
-  description: "Connectez-vous à votre espace Carelink pour gérer les rendez-vous et relances de votre cabinet.",
+  description: "Connectez-vous à votre espace Ecotocare pour gérer les rendez-vous et relances de votre cabinet.",
   alternates: {
     canonical: "/login",
   },

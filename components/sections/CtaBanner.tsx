@@ -26,7 +26,7 @@ export function CtaBanner() {
             </Reveal>
             <Reveal delay={0.08}>
               <p className="max-w-xl text-balance text-base text-brand-100 sm:text-lg">
-                Demandez une démo personnalisée et découvrez comment Carelink
+                Demandez une démo personnalisée et découvrez comment Ecotocare
                 s&apos;intègre à votre agenda et à votre numéro WhatsApp
                 Business en quelques jours.
               </p>
@@ -34,7 +34,7 @@ export function CtaBanner() {
             <Reveal delay={0.16}>
               <div className="flex flex-col gap-3 pt-2 sm:flex-row">
                 <Button
-                  href="mailto:contact@carelink.app"
+                  href="mailto:contact@ecotocare.com"
                   variant="primary"
                   className="bg-white text-brand-800 hover:bg-brand-50 hover:text-brand-900 dark:bg-white dark:text-brand-900 dark:hover:bg-white/90"
                 >

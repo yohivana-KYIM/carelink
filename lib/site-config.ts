@@ -1,9 +1,9 @@
 export const siteConfig = {
-  name: "Carelink",
+  name: "Ecotocare",
   tagline: "Rappels et relances patients par WhatsApp",
   description:
-    "Carelink automatise les rappels de rendez-vous et les relances de patients inactifs par WhatsApp pour les cabinets dentaires : moins de rendez-vous manqués, un dashboard simple, sans installation.",
-  url: "https://carelink.example.com",
+    "Ecotocare automatise les rappels de rendez-vous et les relances de patients inactifs par WhatsApp pour les cabinets dentaires : moins de rendez-vous manqués, un dashboard simple, sans installation.",
+  url: "https://ecotocare.com",
   locale: "fr_FR",
   keywords: [
     "rappel rendez-vous WhatsApp",
@@ -13,7 +13,7 @@ export const siteConfig = {
     "WhatsApp Business API santé",
     "dashboard cabinet dentaire",
   ],
-  contactEmail: "contact@carelink.app",
+  contactEmail: "contact@ecotocare.com",
   social: {
     facebook: "https://www.facebook.com/",
     instagram: "https://www.instagram.com/",

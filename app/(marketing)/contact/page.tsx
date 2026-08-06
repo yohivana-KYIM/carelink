@@ -6,7 +6,7 @@ import { siteConfig } from "@/lib/site-config";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Contactez l'équipe Carelink pour planifier une démonstration ou poser vos questions sur les rappels et relances patients par WhatsApp.",
+    "Contactez l'équipe Ecotocare pour planifier une démonstration ou poser vos questions sur les rappels et relances patients par WhatsApp.",
   alternates: {
     canonical: "/contact",
   },

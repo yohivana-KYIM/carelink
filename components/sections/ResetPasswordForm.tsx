@@ -49,7 +49,7 @@ export function ResetPasswordForm() {
       setError(
         err instanceof ApiError
           ? err.message
-          : "Impossible de contacter le serveur Carelink. Réessayez dans un instant."
+          : "Impossible de contacter le serveur Ecotocare. Réessayez dans un instant."
       );
       setStatus("error");
     }
@@ -62,7 +62,7 @@ export function ResetPasswordForm() {
           <div className="rounded-[2rem] border border-border bg-surface-raised p-8 shadow-card sm:p-10">
             <div className="flex flex-col items-center gap-3 text-center">
               <Image
-                src="/images/carelink-icon.png"
+                src="/images/ecotocare-icon.png"
                 alt={`Logo ${siteConfig.name}`}
                 width={44}
                 height={44}

@@ -130,7 +130,7 @@ export function SignupWizard() {
           <div className="rounded-[2rem] border border-border bg-surface-raised/80 backdrop-blur-md p-8 shadow-xl sm:p-12">
             <div className="flex flex-col items-center gap-3 text-center">
               <Image
-                src="/images/carelink-icon.png"
+                src="/images/ecotocare-icon.png"
                 alt={`Logo ${siteConfig.name}`}
                 width={44}
                 height={44}
@@ -355,8 +355,8 @@ export function SignupWizard() {
       </div>
       <Reveal className="relative hidden overflow-hidden lg:block">
         <Image
-          src="/test.png"
-          alt="Illustration inscription Carelink"
+          src="/images/ecotocare-logo-horizontal.png"
+          alt="Illustration inscription Ecotocare"
           fill
           sizes="50vw"
           className="object-cover"

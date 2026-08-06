@@ -103,7 +103,7 @@ export function BackToTopButton() {
               {/* Message bulles */}
               <div className="bg-white dark:bg-surface-raised rounded-2xl rounded-tl-none p-3 shadow-sm max-w-[90%] text-sm text-ink relative z-10">
                 Bonjour ! 👋<br/><br/>
-                Bienvenue sur Carelink. Avez-vous besoin d'une démo ou d'informations sur la plateforme ?
+                Bienvenue sur Ecotocare. Avez-vous besoin d'une démo ou d'informations sur la plateforme ?
                 <span className="block text-[10px] text-ink-soft text-right mt-1">À l'instant</span>
               </div>
             </div>

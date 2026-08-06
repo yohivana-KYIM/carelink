@@ -39,7 +39,7 @@ export function LoginForm() {
       toast.success("Connexion réussie !");
       router.push(user.role === "SUPERADMIN" ? "/admin" : "/dashboard");
     } catch (err) {
-      const msg = err instanceof ApiError ? err.message : "Impossible de se connecter au serveur Carelink.";
+      const msg = err instanceof ApiError ? err.message : "Impossible de se connecter au serveur Ecotocare.";
       setErrorMessage(msg);
       setStatus("error");
       toast.error(msg);
@@ -54,7 +54,7 @@ export function LoginForm() {
 
         <div className="absolute inset-x-0 top-0 flex items-center gap-2.5 p-10">
           <Image
-            src="/images/carelink-icon.png"
+            src="/images/ecotocare-icon.png"
             alt={`Logo ${siteConfig.name}`}
             width={36}
             height={36}
@@ -81,7 +81,7 @@ export function LoginForm() {
           <div className="rounded-3xl bg-surface-raised/80 backdrop-blur-md p-8 sm:p-10 shadow-xl border border-border">
             <div className="flex flex-col items-center gap-3 text-center lg:hidden">
               <Image
-                src="/images/carelink-icon.png"
+                src="/images/ecotocare-icon.png"
                 alt={`Logo ${siteConfig.name}`}
                 width={44}
                 height={44}

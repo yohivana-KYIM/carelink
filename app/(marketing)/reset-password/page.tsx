@@ -4,7 +4,7 @@ import { ResetPasswordForm } from "@/components/sections/ResetPasswordForm";
 
 export const metadata: Metadata = {
   title: "Réinitialiser le mot de passe",
-  description: "Choisissez un nouveau mot de passe pour votre compte Carelink.",
+  description: "Choisissez un nouveau mot de passe pour votre compte Ecotocare.",
   alternates: {
     canonical: "/reset-password",
   },

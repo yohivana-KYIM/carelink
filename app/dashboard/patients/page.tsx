@@ -74,7 +74,7 @@ export default function PatientsPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "patients_carelink.csv";
+    link.download = "patients_ecotocare.csv";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

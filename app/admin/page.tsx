@@ -100,7 +100,7 @@ export default function AdminCabinetsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-ink">Tableau de bord Admin</h1>
           <p className="mt-1 text-sm text-ink-muted">
-            Gérez les inscriptions et suivez l&apos;ensemble de l&apos;écosystème Carelink.
+            Gérez les inscriptions et suivez l&apos;ensemble de l&apos;écosystème Ecotocare.
           </p>
         </div>
         <a href="/" className="inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400">

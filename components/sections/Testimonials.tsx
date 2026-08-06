@@ -41,7 +41,7 @@ export function Testimonials() {
           </Reveal>
           <Reveal delay={0.06}>
             <p className="text-balance text-base leading-relaxed text-ink-muted sm:text-lg">
-              Carelink est conçu à partir des retours de cabinets dentaires
+              Ecotocare est conçu à partir des retours de cabinets dentaires
               sur leur quotidien : rappels, relances et suivi patient, sans
               complexité inutile.
             </p>
