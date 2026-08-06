@@ -14,7 +14,7 @@ export function FeatureHighlight() {
             align="left"
             eyebrow="Automatisation"
             title="Des rappels qui ne dorment jamais"
-            description="Le système de tâches planifiées de Carelink déclenche les rappels et les relances au bon moment, sans intervention manuelle — et journalise chaque envoi pour la traçabilité."
+            description="Le système de tâches planifiées d'Ecotocare déclenche les rappels et les relances au bon moment, sans intervention manuelle — et journalise chaque envoi pour la traçabilité."
           />
 
           <ul className="flex flex-col gap-4">

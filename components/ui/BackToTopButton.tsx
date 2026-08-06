@@ -85,11 +85,11 @@ export function BackToTopButton() {
             <div className="bg-[#128C7E] px-4 py-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="relative size-10 rounded-full bg-white flex items-center justify-center p-1">
-                  <Image src="/images/carelink-icon.png" alt="Carelink" width={32} height={32} className="rounded-full" />
+                  <Image src="/images/ecotocare-icon.png" alt="Ecotocare" width={32} height={32} className="rounded-full" />
                   <div className="absolute bottom-0 right-0 size-3 rounded-full bg-emerald-400 border-2 border-white" />
                 </div>
                 <div className="text-white">
-                  <h3 className="font-semibold text-sm">Équipe Carelink</h3>
+                  <h3 className="font-semibold text-sm">Équipe Ecotocare</h3>
                   <p className="text-xs opacity-90">Répond en général vite</p>
                 </div>
               </div>

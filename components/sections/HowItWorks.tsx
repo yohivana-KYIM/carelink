@@ -35,7 +35,7 @@ export function HowItWorks() {
                   <div className="relative mt-2 aspect-[768/1376] w-full max-w-[220px] self-center overflow-hidden rounded-2xl shadow-card">
                     <Image
                       src={step.image}
-                      alt="Écran mobile Carelink : formulaire de création de compte cabinet"
+                      alt="Écran mobile Ecotocare : formulaire de création de compte cabinet"
                       fill
                       sizes="220px"
                       className="object-cover"

@@ -122,7 +122,7 @@ export function Footer() {
             <div className="col-span-2 flex flex-col gap-4 sm:col-span-1 lg:col-span-2">
               <Link href="/" className="flex items-center gap-2.5">
                 <Image
-                  src="/images/carelink-icon.png"
+                  src="/images/ecotocare-icon.png"
                   alt={`Logo ${siteConfig.name}`}
                   width={32}
                   height={32}

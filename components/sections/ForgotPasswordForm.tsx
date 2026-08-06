@@ -44,7 +44,7 @@ export function ForgotPasswordForm() {
           <div className="rounded-[2rem] border border-border bg-surface-raised p-8 shadow-card sm:p-10">
             <div className="flex flex-col items-center gap-3 text-center">
               <Image
-                src="/images/carelink-icon.png"
+                src="/images/ecotocare-icon.png"
                 alt={`Logo ${siteConfig.name}`}
                 width={44}
                 height={44}

@@ -55,8 +55,8 @@ export function DashboardShell({
         if (res.unreadCount > prevCount) {
           if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
             new Notification("Nouvelle notification", {
-              body: "Vous avez des notifications non lues sur Carelink.",
-              icon: "/images/carelink-icon.png",
+              body: "Vous avez des notifications non lues sur Ecotocare.",
+              icon: "/images/ecotocare-icon.png",
             });
           }
           toast("Vous avez une nouvelle notification.", { icon: "🔔" });

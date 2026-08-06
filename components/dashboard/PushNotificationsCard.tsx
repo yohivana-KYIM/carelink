@@ -53,10 +53,10 @@ export function PushNotificationsCard({ token }: { token: string | null }) {
             {status === "loading"
               ? "Vérification du statut..."
               : status === "subscribed"
-                ? "Activées sur cet appareil — vous recevez les notifications même hors de Carelink."
+                ? "Activées sur cet appareil — vous recevez les notifications même hors d'Ecotocare."
                 : status === "denied"
                   ? "Bloquées par le navigateur. Autorisez-les dans les paramètres du site pour les recevoir."
-                  : "Activez-les pour recevoir les notifications même quand Carelink n'est pas ouvert."}
+                  : "Activez-les pour recevoir les notifications même quand Ecotocare n'est pas ouvert."}
           </p>
         </div>
       </div>

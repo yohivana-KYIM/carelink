@@ -1,8 +1,8 @@
 import type { SafeUser } from "./api";
 
-const TOKEN_KEY = "carelink_token";
-const USER_KEY = "carelink_user";
-const REMEMBER_KEY = "carelink_remember";
+const TOKEN_KEY = "ecotocare_token";
+const USER_KEY = "ecotocare_user";
+const REMEMBER_KEY = "ecotocare_remember";
 
 /**
  * "Se souvenir de moi" coché → session persistée dans localStorage (survit à

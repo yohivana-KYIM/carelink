@@ -1,4 +1,4 @@
-// Service worker Carelink — notifications push (fonctionne même onglet/navigateur fermé,
+// Service worker Ecotocare — notifications push (fonctionne même onglet/navigateur fermé,
 // tant que l'OS/navigateur autorise les notifications pour ce site).
 
 self.addEventListener("install", () => {
@@ -12,7 +12,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("push", (event) => {
   if (!event.data) return;
 
-  let payload = { title: "Carelink", body: "Vous avez une nouvelle notification." };
+  let payload = { title: "Ecotocare", body: "Vous avez une nouvelle notification." };
   try {
     payload = { ...payload, ...event.data.json() };
   } catch {
@@ -22,8 +22,8 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(payload.title, {
       body: payload.body,
-      icon: "/images/carelink-icon.png",
-      badge: "/images/carelink-icon.png",
+      icon: "/images/ecotocare-icon.png",
+      badge: "/images/ecotocare-icon.png",
       data: { url: payload.url || "/dashboard/notifications" },
     })
   );
