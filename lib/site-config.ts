@@ -140,7 +140,7 @@ export const faqItems = [
   {
     question: "Combien de temps faut-il pour démarrer ?",
     answer:
-      "La mise en place technique est rapide, mais les modèles de message doivent être validés par Meta avant le premier envoi — ce délai peut aller de quelques heures à quelques jours et ne dépend pas de Carelink.",
+      "La mise en place technique est rapide, mais les modèles de message doivent être validés par Meta avant le premier envoi — ce délai peut aller de quelques heures à quelques jours et ne dépend pas d'Ecotocare.",
   },
   {
     question: "Puis-je personnaliser les messages envoyés ?",
