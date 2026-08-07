@@ -160,87 +160,44 @@ function HeroImageCarousel() {
 function GeometricDecorations() {
   return (
     <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-      {/* Grille fine et élégante avec masque radial */}
-      <div 
-        className="absolute inset-0 opacity-[0.04] dark:opacity-[0.06]" 
-        style={{ 
-          backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)', 
-          backgroundSize: '64px 64px',
-          maskImage: 'radial-gradient(circle at center, black, transparent 80%)',
-          WebkitMaskImage: 'radial-gradient(circle at center, black, transparent 80%)'
-        }} 
-      />
-
-      {/* Aurore boréale / Glow professionnel (Couleurs Senior: Brand, Bleu, Indigo) */}
-      <div className="absolute inset-0 filter blur-[100px] lg:blur-[140px] opacity-60 dark:opacity-40">
-        <motion.div
-          animate={{ scale: [1, 1.1, 1], x: [0, 60, 0], y: [0, -40, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] rounded-[100%] bg-brand-500/40 mix-blend-multiply dark:mix-blend-screen"
-        />
-        <motion.div
-          animate={{ scale: [1, 1.2, 1], x: [0, -80, 0], y: [0, 80, 0] }}
-          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute top-[10%] -right-[10%] w-[50%] h-[70%] rounded-[100%] bg-blue-500/30 mix-blend-multiply dark:mix-blend-screen"
-        />
-        <motion.div
-          animate={{ scale: [1, 1.3, 1], x: [0, 40, 0], y: [0, 40, 0] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 5 }}
-          className="absolute -bottom-[20%] left-[20%] w-[70%] h-[60%] rounded-[100%] bg-indigo-500/30 mix-blend-multiply dark:mix-blend-screen"
-        />
-      </div>
-
-      {/* Lignes courbes élégantes (Art & Mouvement) */}
-      <svg className="absolute inset-0 w-full h-full opacity-30 dark:opacity-20" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
-        <motion.path
-          d="M0,500 C200,400 400,600 600,500 C800,400 1000,500 1000,500"
-          fill="none"
-          stroke="url(#grad1)"
-          strokeWidth="1.5"
-          animate={{ d: [
-            "M0,500 C200,400 400,600 600,500 C800,400 1000,500 1000,500",
-            "M0,500 C200,600 400,400 600,500 C800,600 1000,500 1000,500",
-            "M0,500 C200,400 400,600 600,500 C800,400 1000,500 1000,500"
-          ]}}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.path
-          d="M0,600 C300,500 400,700 700,600 C900,500 1000,600 1000,600"
-          fill="none"
-          stroke="url(#grad2)"
-          strokeWidth="3"
-          animate={{ d: [
-            "M0,600 C300,500 400,700 700,600 C900,500 1000,600 1000,600",
-            "M0,600 C300,700 400,500 700,600 C900,700 1000,600 1000,600",
-            "M0,600 C300,500 400,700 700,600 C900,500 1000,600 1000,600"
-          ]}}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        />
-        <defs>
-          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="currentColor" stopOpacity="0" />
-            <stop offset="50%" stopColor="currentColor" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0" />
-            <stop offset="50%" stopColor="#3b82f6" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-      </svg>
-
-      {/* Éléments de verre (Glassmorphism) flottants très pro */}
+      {/* Halos de couleurs douces (amélioration de la couleur en fond) */}
       <motion.div
-        animate={{ y: [0, -25, 0], rotate: [0, 8, 0] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-[10%] left-[2%] lg:left-[5%] w-[250px] h-[250px] rounded-full border border-white/40 bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:border-white/10 dark:bg-white/5"
+        animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-brand-400/20 dark:bg-brand-500/15 rounded-full blur-[100px]"
       />
       <motion.div
-        animate={{ y: [0, 35, 0], rotate: [0, -12, 0] }}
-        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="absolute bottom-[2%] right-[2%] lg:right-[5%] w-[350px] h-[350px] rounded-[4rem] border border-white/40 bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:border-white/10 dark:bg-white/5 rotate-12"
+        animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute -bottom-20 right-[5%] w-[500px] h-[500px] bg-blue-400/20 dark:bg-blue-500/15 rounded-full blur-[100px]"
       />
+
+      {/* Formes originales restaurées, défloutées et mieux animées */}
+      <motion.div
+        animate={{ 
+          y: [0, -40, 0], 
+          x: [0, 20, 0],
+          rotate: [0, 12, 0], 
+          scale: [1, 1.05, 1] 
+        }}
+        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute -top-16 -left-16 lg:-top-24 lg:-left-24 w-[350px] lg:w-[550px] opacity-75 dark:opacity-60 mix-blend-multiply dark:mix-blend-screen drop-shadow-[0_20px_30px_rgba(0,0,0,0.1)]"
+      >
+        <Image src="/images/shape-1.png" alt="" width={600} height={600} className="w-full h-auto object-contain" />
+      </motion.div>
+
+      <motion.div
+        animate={{ 
+          y: [0, 50, 0], 
+          x: [0, -30, 0], 
+          rotate: [0, -15, 0],
+          scale: [1, 1.1, 1] 
+        }}
+        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute bottom-5 right-5 lg:-bottom-10 lg:right-[15%] w-[300px] lg:w-[450px] opacity-75 dark:opacity-60 mix-blend-multiply dark:mix-blend-screen drop-shadow-[0_20px_30px_rgba(0,0,0,0.1)]"
+      >
+        <Image src="/images/shape-2.png" alt="" width={500} height={500} className="w-full h-auto object-contain" />
+      </motion.div>
     </div>
   );
 }
