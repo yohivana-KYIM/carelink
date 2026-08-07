@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { ArrowLeft, CheckCircle2, Loader2, Mail } from "lucide-react";
-import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/lib/site-config";
 import { api } from "@/lib/api";
@@ -38,11 +37,56 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <section className="flex min-h-[calc(100vh-6rem)] items-center py-16">
-      <Container className="flex justify-center">
-        <Reveal className="w-full max-w-md">
-          <div className="rounded-[2rem] border border-border bg-surface-raised p-8 shadow-card sm:p-10">
-            <div className="flex flex-col items-center gap-3 text-center">
+    <section className="grid min-h-[calc(100vh-6rem)] lg:grid-cols-[0.95fr_1.05fr]">
+      {/* Colonne gauche — illustration */}
+      <div className="relative hidden overflow-hidden lg:block">
+        <Image
+          src="/images/motpasse.png"
+          alt="Illustration mot de passe oublié"
+          fill
+          priority
+          sizes="(min-width: 1024px) 55vw, 100vw"
+          className="object-contain"
+        />
+        {/* Fond flouté pour remplir l'espace sans couper l'image */}
+        <Image
+          src="/images/motpasse.png"
+          alt=""
+          aria-hidden
+          fill
+          sizes="(min-width: 1024px) 55vw, 100vw"
+          className="scale-125 object-cover object-center opacity-60 blur-3xl -z-10"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-950/80 via-brand-950/10 to-brand-950/30" />
+
+        <div className="absolute inset-x-0 top-0 flex items-center gap-2.5 p-10">
+          <Image
+            src="/images/ecotocare-icon.png"
+            alt={`Logo ${siteConfig.name}`}
+            width={36}
+            height={36}
+            className="rounded-[9px]"
+          />
+          <span className="text-lg font-bold tracking-tight text-white">
+            {siteConfig.name}
+          </span>
+        </div>
+
+        <div className="absolute inset-x-0 bottom-0 p-10">
+          <Reveal>
+            <p className="max-w-sm text-balance text-2xl font-semibold leading-snug text-white">
+              Réinitialisez votre mot de passe en quelques secondes.
+            </p>
+          </Reveal>
+        </div>
+      </div>
+
+      {/* Colonne droite — formulaire */}
+      <div className="relative flex items-center justify-center px-4 py-16 sm:px-6 lg:px-12 overflow-hidden bg-brand-50/30 dark:bg-brand-950/20">
+        <Reveal className="relative z-10 w-full max-w-md">
+          <div className="rounded-3xl bg-surface-raised/80 backdrop-blur-md p-8 sm:p-10 shadow-xl border border-border">
+            {/* Logo visible uniquement sur mobile */}
+            <div className="flex flex-col items-center gap-3 text-center lg:hidden mb-4">
               <Image
                 src="/images/ecotocare-icon.png"
                 alt={`Logo ${siteConfig.name}`}
@@ -50,6 +94,9 @@ export function ForgotPasswordForm() {
                 height={44}
                 className="rounded-xl"
               />
+            </div>
+
+            <div className="flex flex-col items-center gap-3 text-center">
               <h1 className="text-2xl font-semibold tracking-tight text-ink">
                 Mot de passe oublié
               </h1>
@@ -134,7 +181,7 @@ export function ForgotPasswordForm() {
             </Link>
           </div>
         </Reveal>
-      </Container>
+      </div>
     </section>
   );
 }
