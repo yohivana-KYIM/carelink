@@ -160,99 +160,87 @@ function HeroImageCarousel() {
 function GeometricDecorations() {
   return (
     <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-      {/* Grille de fond géométrique */}
+      {/* Grille fine et élégante avec masque radial */}
       <div 
-        className="absolute inset-0 opacity-[0.06] dark:opacity-[0.04]" 
+        className="absolute inset-0 opacity-[0.04] dark:opacity-[0.06]" 
         style={{ 
-          backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', 
-          backgroundSize: '48px 48px' 
+          backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)', 
+          backgroundSize: '64px 64px',
+          maskImage: 'radial-gradient(circle at center, black, transparent 80%)',
+          WebkitMaskImage: 'radial-gradient(circle at center, black, transparent 80%)'
         }} 
       />
 
-      {/* Lignes de construction d'ingénierie plus visibles */}
+      {/* Aurore boréale / Glow professionnel (Couleurs Senior: Brand, Bleu, Indigo) */}
+      <div className="absolute inset-0 filter blur-[100px] lg:blur-[140px] opacity-60 dark:opacity-40">
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], x: [0, 60, 0], y: [0, -40, 0] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] rounded-[100%] bg-brand-500/40 mix-blend-multiply dark:mix-blend-screen"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], x: [0, -80, 0], y: [0, 80, 0] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="absolute top-[10%] -right-[10%] w-[50%] h-[70%] rounded-[100%] bg-blue-500/30 mix-blend-multiply dark:mix-blend-screen"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.3, 1], x: [0, 40, 0], y: [0, 40, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 5 }}
+          className="absolute -bottom-[20%] left-[20%] w-[70%] h-[60%] rounded-[100%] bg-indigo-500/30 mix-blend-multiply dark:mix-blend-screen"
+        />
+      </div>
+
+      {/* Lignes courbes élégantes (Art & Mouvement) */}
+      <svg className="absolute inset-0 w-full h-full opacity-30 dark:opacity-20" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+        <motion.path
+          d="M0,500 C200,400 400,600 600,500 C800,400 1000,500 1000,500"
+          fill="none"
+          stroke="url(#grad1)"
+          strokeWidth="1.5"
+          animate={{ d: [
+            "M0,500 C200,400 400,600 600,500 C800,400 1000,500 1000,500",
+            "M0,500 C200,600 400,400 600,500 C800,600 1000,500 1000,500",
+            "M0,500 C200,400 400,600 600,500 C800,400 1000,500 1000,500"
+          ]}}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.path
+          d="M0,600 C300,500 400,700 700,600 C900,500 1000,600 1000,600"
+          fill="none"
+          stroke="url(#grad2)"
+          strokeWidth="3"
+          animate={{ d: [
+            "M0,600 C300,500 400,700 700,600 C900,500 1000,600 1000,600",
+            "M0,600 C300,700 400,500 700,600 C900,700 1000,600 1000,600",
+            "M0,600 C300,500 400,700 700,600 C900,500 1000,600 1000,600"
+          ]}}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
+        <defs>
+          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="currentColor" stopOpacity="0" />
+            <stop offset="50%" stopColor="currentColor" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0" />
+            <stop offset="50%" stopColor="#3b82f6" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      {/* Éléments de verre (Glassmorphism) flottants très pro */}
       <motion.div
-        initial={{ scaleY: 0 }}
-        animate={{ scaleY: 1 }}
-        transition={{ duration: 1.5, ease: "circOut" }}
-        className="absolute left-[3%] lg:left-[5%] top-0 h-full w-[2px] bg-black/20 dark:bg-white/20 origin-top"
+        animate={{ y: [0, -25, 0], rotate: [0, 8, 0] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-[10%] left-[2%] lg:left-[5%] w-[250px] h-[250px] rounded-full border border-white/40 bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:border-white/10 dark:bg-white/5"
       />
       <motion.div
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 1.5, ease: "circOut", delay: 0.3 }}
-        className="absolute top-[10%] lg:top-[15%] left-0 w-full h-[2px] bg-black/20 dark:bg-white/20 origin-left"
+        animate={{ y: [0, 35, 0], rotate: [0, -12, 0] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="absolute bottom-[2%] right-[2%] lg:right-[5%] w-[350px] h-[350px] rounded-[4rem] border border-white/40 bg-white/10 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:border-white/10 dark:bg-white/5 rotate-12"
       />
-      <motion.div
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 1.5, ease: "circOut", delay: 0.5 }}
-        className="absolute bottom-[5%] lg:bottom-[10%] left-0 w-full h-[2px] bg-black/20 dark:bg-white/20 origin-left"
-      />
-
-      {/* Motif de ciblage au croisement des lignes (déplacé pour être visible) */}
-      <motion.div
-        animate={{ rotate: 90 }}
-        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-        className="absolute top-[10%] lg:top-[15%] left-[3%] lg:left-[5%] -translate-x-1/2 -translate-y-1/2 text-black/50 dark:text-white/50"
-      >
-        <svg width="48" height="48" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M16 2v28M2 16h28" />
-          <circle cx="16" cy="16" r="8" />
-        </svg>
-      </motion.div>
-
-      {/* Formes flottantes isométriques (déplacées sur les côtés extrêmes) */}
-      <motion.div
-        animate={{ 
-          y: [0, -30, 0], 
-          rotate: [0, 45, 0],
-        }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-[5%] right-[2%] lg:right-[5%] text-black/30 dark:text-white/30"
-      >
-        <svg width="120" height="120" viewBox="0 0 80 80" fill="none" stroke="currentColor" strokeWidth="2">
-          <rect x="20" y="20" width="40" height="40" rx="4" />
-          <rect x="28" y="28" width="24" height="24" />
-        </svg>
-      </motion.div>
-
-      <motion.div
-        animate={{ 
-          y: [0, 50, 0],
-          rotate: [0, -20, 0]
-        }}
-        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-[2%] lg:bottom-[8%] left-[1%] lg:left-[3%] text-black/30 dark:text-white/30"
-      >
-        <svg width="150" height="150" viewBox="0 0 120 120" fill="none" stroke="currentColor" strokeWidth="2">
-          <polygon points="60,10 110,95 10,95" />
-          <polygon points="60,35 90,85 30,85" />
-        </svg>
-      </motion.div>
-
-      {/* Cercles techniques de fond rotatifs (très grands pour dépasser) */}
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-        className="absolute -right-[20%] lg:-right-[10%] -top-[20%] text-black/[0.08] dark:text-white/[0.08]"
-      >
-        <svg width="800" height="800" viewBox="0 0 600 600" fill="none" stroke="currentColor" strokeWidth="3">
-          <circle cx="300" cy="300" r="280" strokeDasharray="10 20" />
-          <circle cx="300" cy="300" r="200" strokeDasharray="2 8" />
-          <circle cx="300" cy="300" r="120" strokeDasharray="40 10" />
-        </svg>
-      </motion.div>
-
-      {/* Code-barres décoratif */}
-      <motion.div
-        animate={{ opacity: [0.4, 0.9, 0.4] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-5 right-5 lg:bottom-10 lg:right-10 flex gap-1 items-end opacity-60 dark:opacity-40"
-      >
-        {[4, 8, 3, 12, 6, 9, 4, 10, 5, 2, 8, 4, 6, 15, 3].map((h, i) => (
-          <div key={i} className="w-1.5 bg-black/50 dark:bg-white/50 rounded-t-sm" style={{ height: h * 4 }} />
-        ))}
-      </motion.div>
     </div>
   );
 }
