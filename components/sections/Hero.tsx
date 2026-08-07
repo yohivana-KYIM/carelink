@@ -160,43 +160,51 @@ function HeroImageCarousel() {
 function GeometricDecorations() {
   return (
     <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-      {/* Halos de couleurs douces (amélioration de la couleur en fond) */}
+      {/* Halos de lumière doux pour un rendu premium */}
       <motion.div
-        animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
+        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-brand-400/20 dark:bg-brand-500/15 rounded-full blur-[100px]"
+        className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-brand-400/15 dark:bg-brand-500/10 rounded-full blur-[100px]"
       />
       <motion.div
-        animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }}
+        animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        className="absolute -bottom-20 right-[5%] w-[500px] h-[500px] bg-blue-400/20 dark:bg-blue-500/15 rounded-full blur-[100px]"
+        className="absolute -bottom-20 right-[5%] w-[500px] h-[500px] bg-blue-400/10 dark:bg-blue-500/10 rounded-full blur-[100px]"
       />
 
-      {/* Formes originales restaurées, défloutées et mieux animées */}
+      {/* Arcs de cercle rayonnants (SVG Pur) aux couleurs du logo - Haut Gauche */}
       <motion.div
         animate={{ 
-          y: [0, -40, 0], 
-          x: [0, 20, 0],
-          rotate: [0, 12, 0], 
-          scale: [1, 1.05, 1] 
+          scale: [1, 1.03, 1],
+          rotate: [0, 3, 0]
         }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-16 -left-16 lg:-top-24 lg:-left-24 w-[350px] lg:w-[550px] opacity-75 dark:opacity-60 mix-blend-multiply dark:mix-blend-screen drop-shadow-[0_20px_30px_rgba(0,0,0,0.1)]"
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute -top-10 -left-10 text-brand-800 dark:text-brand-300 origin-top-left"
       >
-        <Image src="/images/shape-1.png" alt="" width={600} height={600} className="w-full h-auto object-contain" />
+        <svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-[0.25] dark:opacity-[0.3]">
+          <circle cx="0" cy="0" r="750" stroke="currentColor" strokeWidth="2" strokeDasharray="10 20" />
+          <circle cx="0" cy="0" r="600" stroke="currentColor" strokeWidth="40" opacity="0.3" />
+          <circle cx="0" cy="0" r="450" stroke="currentColor" strokeWidth="100" opacity="0.6" />
+          <circle cx="0" cy="0" r="280" stroke="currentColor" strokeWidth="30" opacity="0.4" />
+          <circle cx="0" cy="0" r="180" stroke="currentColor" strokeWidth="8" />
+        </svg>
       </motion.div>
 
+      {/* Arcs de cercle rayonnants - Bas Droite */}
       <motion.div
         animate={{ 
-          y: [0, 50, 0], 
-          x: [0, -30, 0], 
-          rotate: [0, -15, 0],
-          scale: [1, 1.1, 1] 
+          scale: [1, 1.04, 1],
+          rotate: [0, -3, 0]
         }}
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        className="absolute bottom-5 right-5 lg:-bottom-10 lg:right-[15%] w-[300px] lg:w-[450px] opacity-75 dark:opacity-60 mix-blend-multiply dark:mix-blend-screen drop-shadow-[0_20px_30px_rgba(0,0,0,0.1)]"
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="absolute -bottom-10 -right-10 text-brand-800 dark:text-brand-300 origin-bottom-right"
       >
-        <Image src="/images/shape-2.png" alt="" width={500} height={500} className="w-full h-auto object-contain" />
+        <svg width="600" height="600" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-[0.25] dark:opacity-[0.3]">
+          <circle cx="600" cy="600" r="500" stroke="currentColor" strokeWidth="60" opacity="0.4" />
+          <circle cx="600" cy="600" r="350" stroke="currentColor" strokeWidth="20" opacity="0.7" />
+          <circle cx="600" cy="600" r="250" stroke="currentColor" strokeWidth="80" opacity="0.2" />
+          <circle cx="600" cy="600" r="100" stroke="currentColor" strokeWidth="10" />
+        </svg>
       </motion.div>
     </div>
   );
