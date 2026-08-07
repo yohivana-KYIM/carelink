@@ -245,11 +245,8 @@ function GeometricDecorations() {
 
 function LoginImageCarousel() {
   const images = [
-    {
-      src: "/images/hero-dashboard-app.jpeg",
-      alt: "Main tenant un smartphone affichant le tableau de bord Ecotocare",
-    },
     { src: "/images/login.jpeg", alt: "Illustration connexion Ecotocare" },
+    { src: "/images/suivez.png", alt: "Tableau de bord de suivi Ecotocare" },
   ];
 
   const [index, setIndex] = useState(0);
@@ -273,13 +270,22 @@ function LoginImageCarousel() {
                 transition={{ duration: 0.8, ease: "easeInOut" }}
                 className="absolute inset-0"
               >
+                {/* Fond flouté pour combler l'espace sans couper l'image principale */}
+                <Image
+                  src={img.src}
+                  alt=""
+                  aria-hidden
+                  fill
+                  sizes="(min-width: 1024px) 55vw, 100vw"
+                  className="scale-125 object-cover object-center opacity-70 blur-3xl"
+                />
                 <Image
                   src={img.src}
                   alt={img.alt}
                   fill
-                  priority
+                  priority={i === 0}
                   sizes="(min-width: 1024px) 55vw, 100vw"
-                  className="object-cover"
+                  className="object-contain"
                 />
               </motion.div>
             )

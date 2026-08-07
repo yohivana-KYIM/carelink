@@ -102,7 +102,7 @@ function HeroImageCarousel() {
       alt: "Aperçu de l'interface Ecotocare - rappel patient",
     },
     {
-      src: "/images/patient.png",
+      src: "/images/hero-patient.png",
       alt: "Patient confirmant son rendez-vous en un clic depuis WhatsApp",
     },
   ];
