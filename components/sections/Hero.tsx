@@ -179,7 +179,7 @@ function GeometricDecorations() {
           rotate: [0, 3, 0]
         }}
         transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-10 -left-10 text-brand-800 dark:text-brand-300 origin-top-left"
+        className="absolute -top-10 -left-10 text-[#2560A6] dark:text-brand-300 origin-top-left"
       >
         <svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-[0.25] dark:opacity-[0.3]">
           <circle cx="0" cy="0" r="750" stroke="currentColor" strokeWidth="2" strokeDasharray="10 20" />
@@ -197,7 +197,7 @@ function GeometricDecorations() {
           rotate: [0, -3, 0]
         }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="absolute -bottom-10 -right-10 text-brand-800 dark:text-brand-300 origin-bottom-right"
+        className="absolute -bottom-10 -right-10 text-[#2560A6] dark:text-brand-300 origin-bottom-right"
       >
         <svg width="600" height="600" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-[0.25] dark:opacity-[0.3]">
           <circle cx="600" cy="600" r="500" stroke="currentColor" strokeWidth="60" opacity="0.4" />
