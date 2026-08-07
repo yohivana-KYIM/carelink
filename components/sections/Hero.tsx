@@ -131,23 +131,13 @@ function HeroImageCarousel() {
                 transition={{ duration: 0.8, ease: "easeInOut" }}
                 className="absolute inset-0"
               >
-                {/* Fond flouté issu de la même image : comble le cadre sans
-                    couper le sujet ni afficher de bande vide de couleur unie. */}
-                <Image
-                  src={image.src}
-                  alt=""
-                  aria-hidden
-                  fill
-                  sizes="(min-width: 1024px) 55vw, 100vw"
-                  className="scale-125 object-cover object-center opacity-70 blur-3xl"
-                />
                 <Image
                   src={image.src}
                   alt={image.alt}
                   fill
                   priority={index === 0}
                   sizes="(min-width: 1024px) 55vw, 100vw"
-                  className="object-contain"
+                  className="object-cover object-center"
                 />
               </motion.div>
             )
