@@ -29,57 +29,26 @@ const points = [
   },
 ];
 
-function ImageCarousel() {
-  const images = [
-    {
-      src: "/images/dental-office.jpeg",
-      alt: "Salle de soins dentaires avec pictogrammes de calendrier et de carte de rendez-vous",
-    },
-    { src: "/images/relance.jpeg", alt: "Patient recevant un rappel de rendez-vous" },
-  ];
-
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setIndex((i) => (i + 1) % images.length), 4200);
-    return () => clearInterval(t);
-  }, []);
-
-  return (
-    <div className="relative w-full h-full">
-      <AnimatePresence>
-        {images.map(
-          (img, i) =>
-            i === index && (
-              <motion.div
-                key={img.src}
-                initial={{ opacity: 0, x: 60 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -60 }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-                className="absolute inset-0"
-              >
-                <Image
-                  src={img.src}
-                  alt={img.alt}
-                  fill
-                  sizes="(min-width: 1024px) 420px, 340px"
-                  className="object-contain bg-brand-950/10"
-                />
-              </motion.div>
-            )
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
 export function ValueProp() {
   return (
     <section className="py-20 sm:py-28">
       <Container className="grid items-center gap-14 lg:grid-cols-2 lg:gap-16">
-        <Reveal className="relative mx-auto aspect-[4/3] w-full max-w-xl overflow-hidden rounded-[2rem] shadow-card lg:order-2">
-          <ImageCarousel />
+        <Reveal className="relative mx-auto aspect-[4/3] w-full max-w-xl overflow-hidden rounded-[2rem] shadow-card lg:order-2 bg-brand-950/10">
+          <Image
+            src="/images/prise.png"
+            alt=""
+            aria-hidden
+            fill
+            sizes="(min-width: 1024px) 420px, 340px"
+            className="scale-125 object-cover object-center opacity-70 blur-3xl"
+          />
+          <Image
+            src="/images/prise.png"
+            alt="Pourquoi WhatsApp - Ecotocare"
+            fill
+            sizes="(min-width: 1024px) 420px, 340px"
+            className="object-contain"
+          />
         </Reveal>
 
         <div className="flex flex-col gap-8 lg:order-1">
