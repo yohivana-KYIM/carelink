@@ -158,10 +158,10 @@ export function MobileMenu({
           </button>
         ) : (
           <>
-            <Button href="/login" variant="secondary" onClick={onClose}>
+            <Button href="/login" variant="secondary" onClick={onClose} className="hover:!bg-red-600 hover:!text-white hover:!border-red-600">
               Connexion
             </Button>
-            <Button href="/contact" onClick={onClose}>
+            <Button href="/contact" onClick={onClose} className="hover:!bg-black">
               Demander une démo
             </Button>
           </>

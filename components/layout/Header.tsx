@@ -114,11 +114,11 @@ export function Header() {
             <>
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-brand-700 active:scale-[0.97]"
+                className="inline-flex items-center justify-center rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-red-600 active:scale-[0.97]"
               >
                 Connexion
               </Link>
-              <Button href="/contact">Demander une démo</Button>
+              <Button href="/contact" className="hover:!bg-black hover:!border-black">Demander une démo</Button>
             </>
           )}
         </div>

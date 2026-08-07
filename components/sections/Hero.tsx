@@ -53,7 +53,7 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.15 }}
             className="flex flex-col gap-3 sm:flex-row sm:items-center"
           >
-            <Button href="/contact" className="dark:bg-white dark:text-brand-900 dark:hover:bg-white/90">Demander une démo</Button>
+            <Button href="/contact" className="hover:!bg-black dark:bg-white dark:text-brand-900 dark:hover:!bg-white/90">Demander une démo</Button>
             <Button href="#comment-ca-marche" variant="secondary">
               Contacter l&apos;équipe
             </Button>
