@@ -35,13 +35,13 @@ export function FeatureHighlight() {
 
         <Reveal
           delay={0.35}
-          className="relative mx-auto aspect-[768/1376] w-full max-w-sm overflow-hidden rounded-[2rem] shadow-card"
+          className="relative mx-auto aspect-[1402/1122] w-full max-w-xl overflow-hidden rounded-[2rem] shadow-card"
         >
           <Image
-            src="/images/reminder-illustration.jpeg"
-            alt="Illustration d'un smartphone avec bulles de messages, cloche de notification et calendrier de rendez-vous confirmé"
+            src="/images/patient.png"
+            alt="Patient recevant un rappel de rendez-vous par WhatsApp et le confirmant en un clic"
             fill
-            sizes="(min-width: 1024px) 420px, 340px"
+            sizes="(min-width: 1024px) 560px, 420px"
             className="object-cover"
           />
         </Reveal>
