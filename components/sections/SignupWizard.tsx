@@ -353,15 +353,23 @@ export function SignupWizard() {
           </div>
         </Reveal>
       </div>
-      <Reveal className="relative hidden overflow-hidden lg:block">
+      <Reveal className="relative hidden h-full min-h-[600px] w-full overflow-hidden rounded-[2rem] lg:block bg-brand-950/10 shadow-xl">
         <Image
-          src="/images/ecotocare-logo-horizontal.png"
+          src="/images/hero-patient.png"
+          alt=""
+          aria-hidden
+          fill
+          sizes="50vw"
+          className="scale-125 object-cover object-center opacity-70 blur-3xl"
+        />
+        <Image
+          src="/images/hero-patient.png"
           alt="Illustration inscription Ecotocare"
           fill
           sizes="50vw"
-          className="object-cover"
+          className="object-contain"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/20 to-brand-950/40" />
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-brand-950/60 via-transparent to-transparent" />
       </Reveal>
     </section>
   );
