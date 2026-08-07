@@ -12,7 +12,6 @@ import { Resources } from "@/components/sections/Resources";
 import { faqItems, siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
-  title: `${siteConfig.name} — ${siteConfig.tagline}`,
   description: siteConfig.description,
 };
 
