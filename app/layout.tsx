@@ -93,7 +93,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${figtree.variable} h-full`}
     >
-      <body className="flex min-h-full flex-col font-sans antialiased">
+      <body suppressHydrationWarning className="flex min-h-full flex-col font-sans antialiased">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

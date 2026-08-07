@@ -65,15 +65,43 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="flex flex-col gap-3 pt-2"
           >
-            {heroChecklist.map((item) => (
-              <li key={item} className="flex items-center gap-3">
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white">
+            {heroChecklist.map((item, index) => (
+              <motion.li 
+                key={item} 
+                className="flex items-center gap-3"
+              >
+                <motion.span 
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    boxShadow: [
+                      "0px 0px 0px 0px rgba(37,96,166,0)",
+                      "0px 0px 0px 8px rgba(37,96,166,0.2)",
+                      "0px 0px 0px 0px rgba(37,96,166,0)"
+                    ]
+                  }}
+                  transition={{ 
+                    duration: 3, 
+                    repeat: Infinity, 
+                    delay: index * 0.8,
+                    ease: "easeInOut" 
+                  }}
+                  className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white"
+                >
                   <Check size={13} strokeWidth={3} />
-                </span>
-                <span className="text-sm font-medium text-ink sm:text-base">
+                </motion.span>
+                <motion.span 
+                  animate={{ opacity: [0.7, 1, 0.7], x: [0, 4, 0] }}
+                  transition={{ 
+                    duration: 3, 
+                    repeat: Infinity, 
+                    delay: index * 0.8,
+                    ease: "easeInOut" 
+                  }}
+                  className="text-sm font-medium text-ink sm:text-base"
+                >
                   {item}
-                </span>
-              </li>
+                </motion.span>
+              </motion.li>
             ))}
           </motion.ul>
         </div>
