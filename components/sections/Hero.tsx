@@ -131,13 +131,22 @@ function HeroImageCarousel() {
                 transition={{ duration: 0.8, ease: "easeInOut" }}
                 className="absolute inset-0"
               >
+                {/* Fond flouté issu de la même image : comble le cadre sans couper le sujet */}
+                <Image
+                  src={image.src}
+                  alt=""
+                  aria-hidden
+                  fill
+                  sizes="(min-width: 1024px) 55vw, 100vw"
+                  className="scale-125 object-cover object-center opacity-70 blur-3xl"
+                />
                 <Image
                   src={image.src}
                   alt={image.alt}
                   fill
                   priority={index === 0}
                   sizes="(min-width: 1024px) 55vw, 100vw"
-                  className="object-cover object-center"
+                  className="object-contain"
                 />
               </motion.div>
             )
@@ -151,57 +160,57 @@ function HeroImageCarousel() {
 function GeometricDecorations() {
   return (
     <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-      {/* Grille de fond géométrique très subtile */}
+      {/* Grille de fond géométrique */}
       <div 
-        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.02]" 
+        className="absolute inset-0 opacity-[0.06] dark:opacity-[0.04]" 
         style={{ 
           backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', 
           backgroundSize: '48px 48px' 
         }} 
       />
 
-      {/* Lignes de construction d'ingénierie (UI propulsé) */}
+      {/* Lignes de construction d'ingénierie plus visibles */}
       <motion.div
         initial={{ scaleY: 0 }}
         animate={{ scaleY: 1 }}
         transition={{ duration: 1.5, ease: "circOut" }}
-        className="absolute left-[8%] top-0 h-full w-[1px] bg-black/10 dark:bg-white/10 origin-top"
+        className="absolute left-[3%] lg:left-[5%] top-0 h-full w-[2px] bg-black/20 dark:bg-white/20 origin-top"
       />
       <motion.div
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
         transition={{ duration: 1.5, ease: "circOut", delay: 0.3 }}
-        className="absolute top-[25%] left-0 w-full h-[1px] bg-black/10 dark:bg-white/10 origin-left"
+        className="absolute top-[10%] lg:top-[15%] left-0 w-full h-[2px] bg-black/20 dark:bg-white/20 origin-left"
       />
       <motion.div
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
         transition={{ duration: 1.5, ease: "circOut", delay: 0.5 }}
-        className="absolute bottom-[15%] left-0 w-[40%] h-[1px] bg-black/10 dark:bg-white/10 origin-left"
+        className="absolute bottom-[5%] lg:bottom-[10%] left-0 w-full h-[2px] bg-black/20 dark:bg-white/20 origin-left"
       />
 
-      {/* Motif de ciblage au croisement des lignes */}
+      {/* Motif de ciblage au croisement des lignes (déplacé pour être visible) */}
       <motion.div
         animate={{ rotate: 90 }}
         transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-        className="absolute top-[25%] left-[8%] -translate-x-1/2 -translate-y-1/2 text-black/30 dark:text-white/30"
+        className="absolute top-[10%] lg:top-[15%] left-[3%] lg:left-[5%] -translate-x-1/2 -translate-y-1/2 text-black/50 dark:text-white/50"
       >
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg width="48" height="48" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M16 2v28M2 16h28" />
           <circle cx="16" cy="16" r="8" />
         </svg>
       </motion.div>
 
-      {/* Formes flottantes isométriques / tech */}
+      {/* Formes flottantes isométriques (déplacées sur les côtés extrêmes) */}
       <motion.div
         animate={{ 
           y: [0, -30, 0], 
           rotate: [0, 45, 0],
         }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-[10%] right-[45%] text-black/10 dark:text-white/10"
+        className="absolute top-[5%] right-[2%] lg:right-[5%] text-black/30 dark:text-white/30"
       >
-        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <svg width="120" height="120" viewBox="0 0 80 80" fill="none" stroke="currentColor" strokeWidth="2">
           <rect x="20" y="20" width="40" height="40" rx="4" />
           <rect x="28" y="28" width="24" height="24" />
         </svg>
@@ -213,35 +222,35 @@ function GeometricDecorations() {
           rotate: [0, -20, 0]
         }}
         transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-[20%] left-[40%] text-black/10 dark:text-white/10"
+        className="absolute bottom-[2%] lg:bottom-[8%] left-[1%] lg:left-[3%] text-black/30 dark:text-white/30"
       >
-        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" stroke="currentColor" strokeWidth="1">
+        <svg width="150" height="150" viewBox="0 0 120 120" fill="none" stroke="currentColor" strokeWidth="2">
           <polygon points="60,10 110,95 10,95" />
           <polygon points="60,35 90,85 30,85" />
         </svg>
       </motion.div>
 
-      {/* Cercles techniques de fond rotatifs */}
+      {/* Cercles techniques de fond rotatifs (très grands pour dépasser) */}
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-        className="absolute -right-40 -top-40 text-black/[0.04] dark:text-white/[0.04]"
+        className="absolute -right-[20%] lg:-right-[10%] -top-[20%] text-black/[0.08] dark:text-white/[0.08]"
       >
-        <svg width="600" height="600" viewBox="0 0 600 600" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg width="800" height="800" viewBox="0 0 600 600" fill="none" stroke="currentColor" strokeWidth="3">
           <circle cx="300" cy="300" r="280" strokeDasharray="10 20" />
           <circle cx="300" cy="300" r="200" strokeDasharray="2 8" />
           <circle cx="300" cy="300" r="120" strokeDasharray="40 10" />
         </svg>
       </motion.div>
 
-      {/* Code-barres / Data pattern décoratif */}
+      {/* Code-barres décoratif */}
       <motion.div
-        animate={{ opacity: [0.3, 0.7, 0.3] }}
+        animate={{ opacity: [0.4, 0.9, 0.4] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-10 right-10 flex gap-[3px] items-end opacity-40 dark:opacity-20"
+        className="absolute bottom-5 right-5 lg:bottom-10 lg:right-10 flex gap-1 items-end opacity-60 dark:opacity-40"
       >
-        {[4, 8, 3, 12, 6, 9, 4, 10, 5, 2, 8, 4].map((h, i) => (
-          <div key={i} className="w-1 bg-black/30 dark:bg-white/30" style={{ height: h * 3 }} />
+        {[4, 8, 3, 12, 6, 9, 4, 10, 5, 2, 8, 4, 6, 15, 3].map((h, i) => (
+          <div key={i} className="w-1.5 bg-black/50 dark:bg-white/50 rounded-t-sm" style={{ height: h * 4 }} />
         ))}
       </motion.div>
     </div>
