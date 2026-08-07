@@ -108,14 +108,14 @@ export const howItWorksSteps = [
     title: "Configurez vos règles",
     description:
       "Définissez les délais de rappel (J-2, J-1) et la fréquence de relance par type de soin.",
-    image: null,
+    image: "/images/regle.png",
   },
   {
     number: "03",
     title: "Suivez vos patients",
     description:
       "Le dashboard se met à jour automatiquement selon les réponses reçues sur WhatsApp.",
-    image: null,
+    image: "/images/suivez.png",
   },
 ] as const;
 
