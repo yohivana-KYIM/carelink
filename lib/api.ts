@@ -3,7 +3,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 export class ApiError extends Error {
   status: number;
   details?: unknown;
-
   constructor(message: string, status: number, details?: unknown) {
     super(message);
     this.name = "ApiError";
@@ -24,26 +23,25 @@ async function request<T>(
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
-
-  if (res.status === 204) {
-    return undefined as T;
-  }
-
+  if (res.status === 204) return undefined as T;
   const data = await res.json().catch(() => null);
-
   if (!res.ok) {
-    throw new ApiError(
-      data?.error ?? "Une erreur est survenue. Merci de réessayer.",
-      res.status,
-      data?.details
-    );
+    throw new ApiError(data?.error ?? "Une erreur est survenue.", res.status, data?.details);
   }
-
   return data as T;
 }
 
+function authed<T>(token: string, path: string, options: { method?: string; body?: unknown } = {}) {
+  return request<T>(path, { ...options, token });
+}
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 export type UserRole = "SUPERADMIN" | "ADMIN" | "STANDARD";
 export type CabinetStatus = "PENDING" | "ACTIVE" | "REJECTED";
+export type AppointmentStatus =
+  | "PENDING" | "CONFIRMED" | "RESCHEDULE_REQUESTED"
+  | "NO_RESPONSE" | "CANCELLED" | "COMPLETED" | "NO_SHOW";
 
 export type SafeUser = {
   id: string;
@@ -51,6 +49,8 @@ export type SafeUser = {
   fullName: string;
   email: string;
   role: UserRole;
+  notifPushEnabled?: boolean;
+  notifEmailEnabled?: boolean;
   createdAt: string;
 };
 
@@ -61,6 +61,9 @@ export type Cabinet = {
   status: CabinetStatus;
   whatsappPhoneNumber: string | null;
   defaultRelanceMonths: number;
+  reminder1MinBefore?: number;
+  reminder2MinBefore?: number;
+  reminder3MinBefore?: number | null;
   validatedAt: string | null;
   rejectedAt: string | null;
   createdAt: string;
@@ -68,11 +71,7 @@ export type Cabinet = {
   _count?: { users: number; patients: number; appointments: number };
 };
 
-export type AuthResponse = {
-  token: string;
-  user: SafeUser;
-  cabinet: Cabinet | null;
-};
+export type AuthResponse = { token: string; user: SafeUser; cabinet: Cabinet | null };
 
 export type Notification = {
   id: string;
@@ -80,6 +79,7 @@ export type Notification = {
   type: string;
   title: string;
   body: string;
+  link?: string | null;
   isRead: boolean;
   createdAt: string;
 };
@@ -93,44 +93,48 @@ export type PaginatedNotifications = {
   totalPages: number;
 };
 
-export type TeamMember = {
-  id: string;
-  fullName: string;
-  email: string;
-  role: UserRole;
-  createdAt: string;
-};
+export type TeamMember = { id: string; fullName: string; email: string; role: UserRole; createdAt: string };
 
 export type MessageLog = {
   id: string;
   type: string;
-  body: string;
-  status: string;
+  content: string;
+  direction: string;
   createdAt: string;
 };
 
-export type Practitioner = {
-  id: string;
-  cabinetId: string;
-  fullName: string;
-  createdAt: string;
-};
+export type Practitioner = { id: string; cabinetId: string; fullName: string; createdAt: string };
 
 export type Patient = {
   id: string;
   cabinetId: string;
   fullName: string;
   phoneNumber: string;
+  email?: string | null;
   whatsappOptIn: boolean;
   whatsappOptInAt: string | null;
   lastVisitAt: string | null;
   relanceMonths: number | null;
+  noShowCount?: number;
   createdAt: string;
   appointments?: Appointment[];
   messageLogs?: MessageLog[];
 };
 
-export type AppointmentStatus = "PENDING" | "CONFIRMED" | "RESCHEDULE_REQUESTED" | "NO_RESPONSE" | "CANCELLED" | "COMPLETED";
+export type PaginatedPatients = {
+  patients: Patient[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
+export type PatientStats = {
+  total: number;
+  withWhatsapp: number;
+  noShows: number;
+  newThisMonth: number;
+};
 
 export type Appointment = {
   id: string;
@@ -138,16 +142,20 @@ export type Appointment = {
   patientId: string;
   patient?: Patient;
   practitionerId: string | null;
+  practitioner?: Practitioner | null;
   scheduledAt: string;
   status: AppointmentStatus;
   careType: string | null;
   notes: string | null;
+  source?: string;
   createdAt: string;
 };
 
 export type DashboardSummary = {
   todayCount: number;
   weekCount: number;
+  noShowCount: number;
+  rescheduleCount: number;
   confirmationRate: number | null;
   recoveredByRelance: number;
   statusBreakdown: Array<{ status: string; count: number }>;
@@ -172,148 +180,105 @@ export type PlatformStats = {
 export type CabinetSettings = {
   templateReminder48h: string | null;
   templateReminder24h: string | null;
+  templateReminderCustom: string | null;
   templateRelance: string | null;
+  reminder1MinBefore: number;
+  reminder2MinBefore: number;
+  reminder3MinBefore: number | null;
+  reportDailyEnabled: boolean;
+  reportWeeklyEnabled: boolean;
+  reportMonthlyEnabled: boolean;
+  reportEmail: string | null;
 };
 
-function authed<T>(token: string, path: string, options: { method?: string; body?: unknown } = {}) {
-  return request<T>(path, { ...options, token });
-}
+export type Availability = {
+  id: string;
+  cabinetId: string;
+  practitionerId: string | null;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  slotDurationMin: number;
+  createdAt: string;
+};
+
+export type Report = {
+  id: string;
+  cabinetId: string;
+  period: "DAILY" | "WEEKLY" | "MONTHLY";
+  periodStart: string;
+  periodEnd: string;
+  data: string;
+  sentAt: string | null;
+  createdAt: string;
+};
+
+export type NotifPrefs = { notifPushEnabled: boolean; notifEmailEnabled: boolean };
+
+// ─── API ─────────────────────────────────────────────────────────────────────
 
 export const api = {
-  registerCabinet: (input: {
-    cabinetName: string;
-    city?: string;
-    fullName: string;
-    email: string;
-    password: string;
-  }) => request<AuthResponse>("/api/auth/register-cabinet", { method: "POST", body: input }),
+  // Auth
+  registerCabinet: (input: { cabinetName: string; city?: string; fullName: string; email: string; password: string }) =>
+    request<AuthResponse>("/api/auth/register-cabinet", { method: "POST", body: input }),
 
   login: (input: { email: string; password: string; rememberMe?: boolean }) =>
     request<AuthResponse>("/api/auth/login", { method: "POST", body: input }),
 
-  changePassword: (token: string, input: { currentPassword: string; newPassword: string }) =>
-    authed<{ message: string }>(token, "/api/auth/change-password", { method: "POST", body: input }),
-
-  forgotPassword: (input: { email: string }) =>
-    request<{ message: string }>("/api/auth/forgot-password", { method: "POST", body: input }),
-
-  submitContactMessage: (input: {
-    fullName: string;
-    email: string;
-    clinic?: string;
-    phone?: string;
-    subject?: string;
-    message: string;
-  }) => request<{ contact: unknown }>("/api/contact/messages", { method: "POST", body: input }),
-
-  listContactMessages: (
-    token: string,
-    params: { page?: number; pageSize?: number; search?: string; sort?: "newest" | "oldest" } = {}
-  ) => {
-    const query = new URLSearchParams();
-    if (params.page) query.set("page", String(params.page));
-    if (params.pageSize) query.set("pageSize", String(params.pageSize));
-    if (params.search) query.set("search", params.search);
-    if (params.sort) query.set("sort", params.sort);
-    const qs = query.toString();
-    return authed<{
-      messages: Array<{
-        id: string;
-        fullName: string;
-        email: string;
-        clinic?: string | null;
-        phone?: string | null;
-        subject?: string | null;
-        message: string;
-        createdAt: string;
-      }>;
-      total: number;
-      page: number;
-      pageSize: number;
-      totalPages: number;
-    }>(token, `/api/contact/messages${qs ? `?${qs}` : ""}`);
-  },
-
-  resetPassword: (input: { token: string; password: string }) =>
-    request<{ message: string }>("/api/auth/reset-password", { method: "POST", body: input }),
+  me: (token: string) =>
+    request<{ user: SafeUser; cabinet: Cabinet | null }>("/api/auth/me", { token }),
 
   logout: (token: string) =>
     request<void>("/api/auth/logout", { method: "POST", token }),
 
-  me: (token: string) =>
-    request<{ user: SafeUser; cabinet: Cabinet | null }>("/api/auth/me", { token }),
+  forgotPassword: (input: { email: string }) =>
+    request<{ message: string }>("/api/auth/forgot-password", { method: "POST", body: input }),
 
-  dashboardSummary: (token: string) =>
-    authed<{ summary: DashboardSummary }>(token, "/api/dashboard/summary"),
+  resetPassword: (input: { token: string; password: string }) =>
+    request<{ message: string }>("/api/auth/reset-password", { method: "POST", body: input }),
 
-  listTeam: (token: string) => authed<{ members: TeamMember[] }>(token, "/api/team"),
+  changePassword: (token: string, input: { currentPassword: string; newPassword: string }) =>
+    authed<{ message: string }>(token, "/api/auth/change-password", { method: "POST", body: input }),
 
-  createTeamMember: (
-    token: string,
-    input: { fullName: string; email: string; password: string; role?: UserRole }
-  ) => authed<{ member: TeamMember }>(token, "/api/team", { method: "POST", body: input }),
-
-  deleteTeamMember: (token: string, id: string) =>
-    authed<void>(token, `/api/team/${id}`, { method: "DELETE" }),
-
-  listNotifications: (token: string, params: { page?: number; unreadOnly?: boolean } = {}) => {
-    const query = new URLSearchParams();
-    if (params.page) query.set("page", String(params.page));
-    if (params.unreadOnly) query.set("unreadOnly", "true");
-    const qs = query.toString();
-    return authed<PaginatedNotifications>(token, `/api/notifications${qs ? `?${qs}` : ""}`);
+  // Dashboard
+  dashboardSummary: (token: string, filters?: { year?: number; practitionerId?: string }) => {
+    const qs = new URLSearchParams();
+    if (filters?.year) qs.set("year", String(filters.year));
+    if (filters?.practitionerId) qs.set("practitionerId", filters.practitionerId);
+    const q = qs.toString();
+    return authed<{ summary: DashboardSummary }>(token, `/api/dashboard/summary${q ? `?${q}` : ""}`);
   },
 
-  markNotificationRead: (token: string, id: string) =>
-    authed<{ notification: Notification }>(token, `/api/notifications/${id}/read`, {
-      method: "PATCH",
-    }),
-
-  markAllNotificationsRead: (token: string) =>
-    authed<{ updated: number }>(token, "/api/notifications/read-all", { method: "PATCH" }),
-
-  deleteNotification: (token: string, id: string) =>
-    authed<void>(token, `/api/notifications/${id}`, { method: "DELETE" }),
-
-  bulkDeleteNotifications: (token: string, ids: string[]) =>
-    authed<{ deleted: number }>(token, "/api/notifications/bulk-delete", {
-      method: "POST",
-      body: { ids },
-    }),
-
-  deleteAllNotifications: (token: string) =>
-    authed<{ deleted: number }>(token, "/api/notifications", { method: "DELETE" }),
-
-  adminListCabinets: (
+  // Patients
+  listPatients: (
     token: string,
-    params: { page?: number; status?: CabinetStatus; search?: string } = {}
+    params: {
+      search?: string;
+      noShowOnly?: boolean;
+      whatsappOptIn?: boolean;
+      page?: number;
+      pageSize?: number;
+      sortBy?: string;
+      sortDir?: "asc" | "desc";
+    } = {}
   ) => {
-    const query = new URLSearchParams();
-    if (params.page) query.set("page", String(params.page));
-    if (params.status) query.set("status", params.status);
-    if (params.search) query.set("search", params.search);
-    const qs = query.toString();
-    return authed<PaginatedCabinets>(token, `/api/admin/cabinets${qs ? `?${qs}` : ""}`);
-  },
-
-  adminApproveCabinet: (token: string, id: string) =>
-    authed<{ cabinet: Cabinet }>(token, `/api/admin/cabinets/${id}/approve`, { method: "POST" }),
-
-  adminRejectCabinet: (token: string, id: string, reason?: string) =>
-    authed<{ cabinet: Cabinet }>(token, `/api/admin/cabinets/${id}/reject`, {
-      method: "POST",
-      body: { reason },
-    }),
-
-  adminStats: (token: string) => authed<{ stats: PlatformStats }>(token, "/api/admin/stats"),
-
-  listPatients: (token: string, search?: string) => {
-    const qs = search ? `?search=${encodeURIComponent(search)}` : "";
-    return authed<{ patients: Patient[] }>(token, `/api/patients${qs}`);
+    const qs = new URLSearchParams();
+    if (params.search) qs.set("search", params.search);
+    if (params.noShowOnly) qs.set("noShowOnly", "true");
+    if (params.whatsappOptIn !== undefined) qs.set("whatsappOptIn", String(params.whatsappOptIn));
+    if (params.page) qs.set("page", String(params.page));
+    if (params.pageSize) qs.set("pageSize", String(params.pageSize));
+    if (params.sortBy) qs.set("sortBy", params.sortBy);
+    if (params.sortDir) qs.set("sortDir", params.sortDir);
+    const q = qs.toString();
+    return authed<PaginatedPatients>(token, `/api/patients${q ? `?${q}` : ""}`);
   },
 
   getPatient: (token: string, id: string) =>
     authed<{ patient: Patient }>(token, `/api/patients/${id}`),
+
+  getPatientStats: (token: string) =>
+    authed<{ stats: PatientStats }>(token, "/api/patients/stats"),
 
   createPatient: (token: string, input: Partial<Patient>) =>
     authed<{ patient: Patient }>(token, "/api/patients", { method: "POST", body: input }),
@@ -322,26 +287,127 @@ export const api = {
     authed<{ count: number }>(token, "/api/patients/bulk", { method: "POST", body: { patients } }),
 
   updatePatient: (token: string, id: string, input: Partial<Patient>) =>
-    authed<{ patient: Patient }>(token, `/api/patients/${id}`, { method: "PUT", body: input }),
+    authed<{ patient: Patient }>(token, `/api/patients/${id}`, { method: "PATCH", body: input }),
 
-  listAppointments: (token: string, range: "today" | "week" | "all" = "all") =>
-    authed<{ appointments: Appointment[] }>(token, `/api/appointments?range=${range}`),
+  deletePatient: (token: string, id: string) =>
+    authed<void>(token, `/api/patients/${id}`, { method: "DELETE" }),
+
+  // Appointments
+  listAppointments: (
+    token: string,
+    params: {
+      range?: "today" | "week" | "all";
+      status?: AppointmentStatus;
+      practitionerId?: string;
+      patientId?: string;
+      dateFrom?: string;
+      dateTo?: string;
+      page?: number;
+      pageSize?: number;
+    } = {}
+  ) => {
+    const qs = new URLSearchParams();
+    if (params.range) qs.set("range", params.range);
+    if (params.status) qs.set("status", params.status);
+    if (params.practitionerId) qs.set("practitionerId", params.practitionerId);
+    if (params.patientId) qs.set("patientId", params.patientId);
+    if (params.dateFrom) qs.set("dateFrom", params.dateFrom);
+    if (params.dateTo) qs.set("dateTo", params.dateTo);
+    if (params.page) qs.set("page", String(params.page));
+    if (params.pageSize) qs.set("pageSize", String(params.pageSize));
+    const q = qs.toString();
+    return authed<{ appointments: Appointment[]; total: number }>(
+      token,
+      `/api/appointments${q ? `?${q}` : ""}`
+    );
+  },
 
   createAppointment: (token: string, input: Partial<Appointment>) =>
     authed<{ appointment: Appointment }>(token, "/api/appointments", { method: "POST", body: input }),
 
   updateAppointment: (token: string, id: string, input: Partial<Appointment>) =>
-    authed<{ appointment: Appointment }>(token, `/api/appointments/${id}`, { method: "PUT", body: input }),
+    authed<{ appointment: Appointment }>(token, `/api/appointments/${id}`, { method: "PATCH", body: input }),
 
   cancelAppointment: (token: string, id: string) =>
     authed<{ appointment: Appointment }>(token, `/api/appointments/${id}/cancel`, { method: "POST" }),
 
+  // Settings
   getSettings: (token: string) =>
     authed<{ settings: CabinetSettings }>(token, "/api/settings"),
 
   updateSettings: (token: string, input: Partial<CabinetSettings>) =>
     authed<{ settings: CabinetSettings }>(token, "/api/settings", { method: "PUT", body: input }),
 
+  // Team
+  listTeam: (token: string) => authed<{ members: TeamMember[] }>(token, "/api/team"),
+
+  createTeamMember: (token: string, input: { fullName: string; email: string; password: string; role?: UserRole }) =>
+    authed<{ member: TeamMember }>(token, "/api/team", { method: "POST", body: input }),
+
+  deleteTeamMember: (token: string, id: string) =>
+    authed<void>(token, `/api/team/${id}`, { method: "DELETE" }),
+
+  // Notifications
+  listNotifications: (token: string, params: { page?: number; unreadOnly?: boolean } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.page) qs.set("page", String(params.page));
+    if (params.unreadOnly) qs.set("unreadOnly", "true");
+    const q = qs.toString();
+    return authed<PaginatedNotifications>(token, `/api/notifications${q ? `?${q}` : ""}`);
+  },
+
+  markNotificationRead: (token: string, id: string) =>
+    authed<{ notification: Notification }>(token, `/api/notifications/${id}/read`, { method: "PATCH" }),
+
+  markAllNotificationsRead: (token: string) =>
+    authed<{ updated: number }>(token, "/api/notifications/read-all", { method: "PATCH" }),
+
+  deleteNotification: (token: string, id: string) =>
+    authed<void>(token, `/api/notifications/${id}`, { method: "DELETE" }),
+
+  bulkDeleteNotifications: (token: string, ids: string[]) =>
+    authed<{ deleted: number }>(token, "/api/notifications/bulk-delete", { method: "POST", body: { ids } }),
+
+  deleteAllNotifications: (token: string) =>
+    authed<{ deleted: number }>(token, "/api/notifications", { method: "DELETE" }),
+
+  // Admin
+  adminListCabinets: (token: string, params: { page?: number; status?: CabinetStatus; search?: string } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.page) qs.set("page", String(params.page));
+    if (params.status) qs.set("status", params.status);
+    if (params.search) qs.set("search", params.search);
+    const q = qs.toString();
+    return authed<PaginatedCabinets>(token, `/api/admin/cabinets${q ? `?${q}` : ""}`);
+  },
+
+  adminApproveCabinet: (token: string, id: string) =>
+    authed<{ cabinet: Cabinet }>(token, `/api/admin/cabinets/${id}/approve`, { method: "POST" }),
+
+  adminRejectCabinet: (token: string, id: string, reason?: string) =>
+    authed<{ cabinet: Cabinet }>(token, `/api/admin/cabinets/${id}/reject`, { method: "POST", body: { reason } }),
+
+  adminStats: (token: string) =>
+    authed<{ stats: PlatformStats }>(token, "/api/admin/stats"),
+
+  // Contact
+  submitContactMessage: (input: { fullName: string; email: string; clinic?: string; phone?: string; subject?: string; message: string }) =>
+    request<{ contact: unknown }>("/api/contact/messages", { method: "POST", body: input }),
+
+  listContactMessages: (token: string, params: { page?: number; pageSize?: number; search?: string; sort?: "newest" | "oldest" } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.page) qs.set("page", String(params.page));
+    if (params.pageSize) qs.set("pageSize", String(params.pageSize));
+    if (params.search) qs.set("search", params.search);
+    if (params.sort) qs.set("sort", params.sort);
+    const q = qs.toString();
+    return authed<{
+      messages: Array<{ id: string; fullName: string; email: string; clinic?: string | null; phone?: string | null; subject?: string | null; message: string; createdAt: string }>;
+      total: number; page: number; pageSize: number; totalPages: number;
+    }>(token, `/api/contact/messages${q ? `?${q}` : ""}`);
+  },
+
+  // Practitioners
   listPractitioners: (token: string) =>
     authed<{ practitioners: Practitioner[] }>(token, "/api/practitioners"),
 
@@ -351,12 +417,24 @@ export const api = {
   deletePractitioner: (token: string, id: string) =>
     authed<void>(token, `/api/practitioners/${id}`, { method: "DELETE" }),
 
+  // Public booking
   getPublicCabinetInfo: (cabinetId: string) =>
-    request<{ cabinet: { id: string, name: string, city: string | null, practitioners: { id: string, fullName: string }[] } }>(`/api/public/cabinets/${cabinetId}`),
+    request<{ cabinet: { id: string; name: string; city: string | null; practitioners: { id: string; fullName: string }[] } }>(
+      `/api/public/cabinets/${cabinetId}`
+    ),
+
+  getPublicSlots: (cabinetId: string, date: string, practitionerId?: string) => {
+    const qs = new URLSearchParams({ date });
+    if (practitionerId) qs.set("practitionerId", practitionerId);
+    return request<{ slots: Array<{ time: string; available: boolean }> }>(
+      `/api/public/cabinets/${cabinetId}/slots?${qs}`
+    );
+  },
 
   requestPublicAppointment: (cabinetId: string, input: { fullName: string; phoneNumber: string; scheduledAt: string; practitionerId?: string; careType?: string; notes?: string }) =>
     request<{ appointment: Appointment }>(`/api/public/cabinets/${cabinetId}/book`, { method: "POST", body: input }),
 
+  // Push
   getVapidPublicKey: () =>
     request<{ publicKey: string | null }>("/api/push/vapid-public-key"),
 
@@ -365,4 +443,45 @@ export const api = {
 
   unsubscribePush: (token: string, endpoint: string) =>
     authed<void>(token, "/api/push/unsubscribe", { method: "POST", body: { endpoint } }),
+
+  getNotifPrefs: (token: string) =>
+    authed<{ prefs: NotifPrefs }>(token, "/api/push/prefs"),
+
+  updateNotifPrefs: (token: string, prefs: Partial<NotifPrefs>) =>
+    authed<{ prefs: NotifPrefs }>(token, "/api/push/prefs", { method: "PATCH", body: prefs }),
+
+  // Disponibilités
+  listAvailabilities: (token: string, practitionerId?: string) => {
+    const qs = practitionerId ? `?practitionerId=${practitionerId}` : "";
+    return authed<{ availabilities: Availability[] }>(token, `/api/availability${qs}`);
+  },
+
+  createAvailability: (token: string, input: Omit<Availability, "id" | "createdAt">) =>
+    authed<{ availability: Availability }>(token, "/api/availability", { method: "POST", body: input }),
+
+  deleteAvailability: (token: string, id: string) =>
+    authed<void>(token, `/api/availability/${id}`, { method: "DELETE" }),
+
+  // Rapports
+  listReports: (token: string, params: { period?: string; page?: number; pageSize?: number } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.period) qs.set("period", params.period);
+    if (params.page) qs.set("page", String(params.page));
+    if (params.pageSize) qs.set("pageSize", String(params.pageSize));
+    const q = qs.toString();
+    return authed<{ reports: Report[]; total: number; page: number; totalPages: number }>(
+      token,
+      `/api/reports${q ? `?${q}` : ""}`
+    );
+  },
+
+  generateReport: (token: string, period: "DAILY" | "WEEKLY" | "MONTHLY") =>
+    authed<{ data: Record<string, unknown> }>(token, "/api/reports/generate", { method: "POST", body: { period } }),
+
+  // Newsletter
+  subscribeNewsletter: (email: string) =>
+    request<{ message: string }>("/api/newsletter/subscribe", { method: "POST", body: { email } }),
+
+  unsubscribeNewsletter: (email: string) =>
+    request<{ message: string }>("/api/newsletter/unsubscribe", { method: "POST", body: { email } }),
 };

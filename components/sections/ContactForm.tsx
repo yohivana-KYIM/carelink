@@ -2,11 +2,13 @@
 
 import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
-import { CheckCircle2, Loader2, Mail, MapPin, MessageCircle } from "lucide-react";
+import { CheckCircle2, Loader2, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { api } from "@/lib/api";
 import { siteConfig } from "@/lib/site-config";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -147,14 +149,42 @@ export function ContactForm() {
                 onChange={updateField("clinic")}
                 placeholder="Cabinet dentaire du Parc"
               />
-              <Field
-                id="phone"
-                label="Téléphone (optionnel)"
-                type="tel"
-                value={values.phone}
-                onChange={updateField("phone")}
-                placeholder="06 12 34 56 78"
-              />
+              <div className="flex flex-col gap-2">
+                <label htmlFor="phone" className="text-sm font-medium text-ink flex items-center gap-1.5">
+                  <Phone size={14} /> Téléphone (optionnel)
+                </label>
+                <div className="phone-input-container">
+                  <PhoneInput
+                    defaultCountry="fr"
+                    value={values.phone}
+                    onChange={(phone) => {
+                      setValues((prev) => ({ ...prev, phone }));
+                      if (status !== "idle") setStatus("idle");
+                    }}
+                    style={{ width: "100%" }}
+                    inputStyle={{
+                      width: "100%",
+                      borderRadius: "9999px",
+                      borderTopLeftRadius: "0",
+                      borderBottomLeftRadius: "0",
+                      border: "1px solid var(--border)",
+                      background: "var(--background)",
+                      padding: "0.6rem 1rem",
+                      fontSize: "0.875rem",
+                      color: "var(--ink)",
+                    }}
+                    countrySelectorStyleProps={{
+                      buttonStyle: {
+                        borderTopLeftRadius: "9999px",
+                        borderBottomLeftRadius: "9999px",
+                        border: "1px solid var(--border)",
+                        background: "var(--background)",
+                        padding: "0 0.75rem",
+                      },
+                    }}
+                  />
+                </div>
+              </div>
             </div>
 
             <Field

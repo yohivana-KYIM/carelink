@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, Loader2, UsersRound, Bell, Calendar, UserSquare2, Settings, Stethoscope } from "lucide-react";
+import { LayoutDashboard, Loader2, UsersRound, Bell, Calendar, UserSquare2, Settings, Stethoscope, Clock } from "lucide-react";
 import { SessionProvider, useSession } from "@/lib/session";
 import { DashboardShell, type DashboardNavItem } from "@/components/dashboard/DashboardShell";
 
@@ -11,6 +11,7 @@ const navItems: DashboardNavItem[] = [
   { label: "Rendez-vous", href: "/dashboard/appointments", icon: Calendar },
   { label: "Patients", href: "/dashboard/patients", icon: UserSquare2 },
   { label: "Praticiens", href: "/dashboard/practitioners", icon: Stethoscope },
+  { label: "Disponibilités", href: "/dashboard/availability", icon: Clock },
   { label: "Équipe", href: "/dashboard/team", icon: UsersRound },
   { label: "Notifications", href: "/dashboard/notifications", icon: Bell },
   { label: "Paramètres", href: "/dashboard/settings", icon: Settings },

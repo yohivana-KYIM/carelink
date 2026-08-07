@@ -9,6 +9,7 @@ import { CtaBanner } from "@/components/sections/CtaBanner";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { Faq } from "@/components/sections/Faq";
 import { Resources } from "@/components/sections/Resources";
+import { NewsletterBanner } from "@/components/sections/NewsletterBanner";
 import { faqItems, siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
@@ -47,6 +48,7 @@ export default function Home() {
       <Testimonials />
       <Faq />
       <Resources />
+      <NewsletterBanner />
     </>
   );
 }

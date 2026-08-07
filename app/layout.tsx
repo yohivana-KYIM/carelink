@@ -23,8 +23,12 @@ export const metadata: Metadata = {
   keywords: [...siteConfig.keywords],
   authors: [{ name: "MarketYou" }],
   creator: "MarketYou",
-  alternates: {
-    canonical: "/",
+  alternates: { canonical: "/" },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: siteConfig.name,
   },
   openGraph: {
     type: "website",
@@ -42,11 +46,7 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-    },
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
 };
 

@@ -1,0 +1,26 @@
+{
+  "name": "Ecotocare",
+  "short_name": "Ecotocare",
+  "description": "Rappels et relances patients par WhatsApp pour cabinets dentaires",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2e70be",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/ecotocare-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/ecotocare-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["medical", "productivity"],
+  "lang": "fr"
+}

@@ -80,7 +80,7 @@ export default function AppointmentsPage() {
   }, [token]);
 
   // Calcul des métriques
-  const { todayCount, tomorrowCount } = useMemo(() => {
+  const { todayCount, tomorrowCount, rescheduleCount } = useMemo(() => {
     const todayStr = new Date().toISOString().slice(0, 10);
     
     const tomorrow = new Date();
@@ -89,14 +89,16 @@ export default function AppointmentsPage() {
     
     let tCount = 0;
     let tmCount = 0;
+    let rsCount = 0;
     
     appointments.forEach(a => {
       const dStr = new Date(a.scheduledAt).toISOString().slice(0, 10);
       if (dStr === todayStr) tCount++;
       if (dStr === tomorrowStr) tmCount++;
+      if (a.status === "RESCHEDULE_REQUESTED") rsCount++;
     });
     
-    return { todayCount: tCount, tomorrowCount: tmCount };
+    return { todayCount: tCount, tomorrowCount: tmCount, rescheduleCount: rsCount };
   }, [appointments]);
 
   const totalPages = Math.ceil(appointments.length / pageSize);
@@ -210,7 +212,43 @@ export default function AppointmentsPage() {
           <p className="mt-1 text-3xl font-bold text-ink">{tomorrowCount}</p>
           <p className="mt-1 text-xs text-ink-soft">Patients programmés</p>
         </div>
+        {rescheduleCount > 0 && (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm dark:border-amber-500/30 dark:bg-amber-500/10 sm:col-span-2">
+            <p className="text-sm font-medium text-amber-700 dark:text-amber-400">🔄 Reprogrammations demandées</p>
+            <p className="mt-1 text-3xl font-bold text-amber-700 dark:text-amber-300">{rescheduleCount}</p>
+            <p className="mt-1 text-xs text-amber-600 dark:text-amber-500">Patient(s) souhaitant changer de créneau — à traiter</p>
+          </div>
+        )}
       </div>
+
+      {/* Alerte reprogrammation */}
+      {rescheduleCount > 0 && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-500/20 dark:bg-amber-500/5">
+          <p className="text-sm font-semibold text-amber-700 dark:text-amber-400 mb-3">
+            🔄 {rescheduleCount} rendez-vous à reprogrammer
+          </p>
+          <div className="flex flex-col gap-2">
+            {appointments
+              .filter((a) => a.status === "RESCHEDULE_REQUESTED")
+              .map((a) => (
+                <div key={a.id} className="flex items-center justify-between rounded-xl bg-white/60 px-4 py-3 dark:bg-white/5">
+                  <div>
+                    <p className="text-sm font-medium text-ink">{a.patient?.fullName}</p>
+                    <p className="text-xs text-ink-muted">
+                      RDV prévu le {new Date(a.scheduledAt).toLocaleString("fr-FR")}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => openEditModal(a)}
+                    className="rounded-full bg-amber-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-amber-700"
+                  >
+                    Reprogrammer
+                  </button>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
 
       <div className="flex items-center gap-2 border-b border-border pb-2">
         <button
