@@ -4,7 +4,7 @@ import { useEffect, useState, FormEvent, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Loader2, Plus, Search, Edit, Download, Upload, Share2,
-  Users, AlertTriangle, MessageCircle, UserPlus, Trash2, SlidersHorizontal, X,
+  Users, AlertTriangle, MessageCircle, UserPlus, Trash2, SlidersHorizontal, X, Send,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
@@ -49,6 +49,7 @@ export default function PatientsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [relancingId, setRelancingId] = useState<string | null>(null);
   const [form, setForm] = useState({ fullName: "", phoneNumber: "", email: "", whatsappOptIn: false, relanceMonths: 6 });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -159,6 +160,19 @@ export default function PatientsPage() {
       toast.success("Patient supprimé");
       await load();
     } catch { toast.error("Erreur de suppression"); }
+  }
+
+  async function handleRelanceNow(p: Patient) {
+    if (!token) return;
+    setRelancingId(p.id);
+    try {
+      await api.relancePatientNow(token, p.id);
+      toast.success(`Relance envoyée à ${p.fullName}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Échec de l'envoi de la relance");
+    } finally {
+      setRelancingId(null);
+    }
   }
 
   return (
@@ -312,6 +326,14 @@ export default function PatientsPage() {
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleRelanceNow(p)}
+                          disabled={!p.whatsappOptIn || relancingId === p.id}
+                          title={p.whatsappOptIn ? "Relancer maintenant" : "Le patient n'a pas donné son consentement WhatsApp"}
+                          className="text-ink-soft hover:text-brand-600 transition-colors disabled:cursor-not-allowed disabled:opacity-30"
+                        >
+                          {relancingId === p.id ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
+                        </button>
                         <button onClick={() => openEdit(p)} className="text-ink-soft hover:text-brand-600 transition-colors"><Edit size={15} /></button>
                         {isAdmin && (
                           <button onClick={() => handleDelete(p.id)} className="text-ink-soft hover:text-red-600 transition-colors"><Trash2 size={15} /></button>

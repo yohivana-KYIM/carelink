@@ -51,6 +51,7 @@ export type SafeUser = {
   role: UserRole;
   notifPushEnabled?: boolean;
   notifEmailEnabled?: boolean;
+  avatarUrl?: string | null;
   createdAt: string;
 };
 
@@ -72,6 +73,18 @@ export type Cabinet = {
 };
 
 export type AuthResponse = { token: string; user: SafeUser; cabinet: Cabinet | null };
+
+export type Testimonial = {
+  id: string;
+  authorName: string;
+  authorRole: string | null;
+  rating: number | null;
+  message: string;
+  visible: boolean;
+  likes: number;
+  dislikes: number;
+  createdAt: string;
+};
 
 export type Notification = {
   id: string;
@@ -179,6 +192,9 @@ export type PlatformStats = {
 };
 
 export type CabinetSettings = {
+  name: string;
+  logoUrl: string | null;
+  primaryColor: string | null;
   templateReminder48h: string | null;
   templateReminder24h: string | null;
   templateReminderCustom: string | null;
@@ -241,7 +257,7 @@ export const api = {
   changePassword: (token: string, input: { currentPassword: string; newPassword: string }) =>
     authed<{ message: string }>(token, "/api/auth/change-password", { method: "POST", body: input }),
 
-  updateProfile: (token: string, input: { fullName?: string; email?: string }) =>
+  updateProfile: (token: string, input: { fullName?: string; email?: string; avatarUrl?: string | null }) =>
     authed<{ user: SafeUser; cabinet: Cabinet | null }>(token, "/api/auth/me", { method: "PATCH", body: input }),
 
   // Dashboard
@@ -350,6 +366,9 @@ export const api = {
 
   createTeamMember: (token: string, input: { fullName: string; email: string; password: string; role?: UserRole }) =>
     authed<{ member: TeamMember }>(token, "/api/team", { method: "POST", body: input }),
+
+  updateTeamMember: (token: string, id: string, input: { fullName?: string; email?: string }) =>
+    authed<{ member: TeamMember }>(token, `/api/team/${id}`, { method: "PATCH", body: input }),
 
   deleteTeamMember: (token: string, id: string) =>
     authed<void>(token, `/api/team/${id}`, { method: "DELETE" }),
@@ -491,4 +510,26 @@ export const api = {
 
   unsubscribeNewsletter: (email: string) =>
     request<{ message: string }>("/api/newsletter/unsubscribe", { method: "POST", body: { email } }),
+
+  // Avis publics (témoignages)
+  listTestimonials: () =>
+    request<{ testimonials: Testimonial[] }>("/api/testimonials"),
+
+  submitTestimonial: (input: { authorName: string; authorRole?: string; rating?: number; message: string }) =>
+    request<{ testimonial: Testimonial }>("/api/testimonials", { method: "POST", body: input }),
+
+  likeTestimonial: (id: string) =>
+    request<{ testimonial: Testimonial }>(`/api/testimonials/${id}/like`, { method: "POST" }),
+
+  dislikeTestimonial: (id: string) =>
+    request<{ testimonial: Testimonial }>(`/api/testimonials/${id}/dislike`, { method: "POST" }),
+
+  adminListTestimonials: (token: string) =>
+    authed<{ testimonials: Testimonial[] }>(token, "/api/admin/testimonials"),
+
+  adminSetTestimonialVisibility: (token: string, id: string, visible: boolean) =>
+    authed<{ testimonial: Testimonial }>(token, `/api/admin/testimonials/${id}`, { method: "PATCH", body: { visible } }),
+
+  adminDeleteTestimonial: (token: string, id: string) =>
+    authed<void>(token, `/api/admin/testimonials/${id}`, { method: "DELETE" }),
 };

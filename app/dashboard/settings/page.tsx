@@ -1,14 +1,17 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
+import Image from "next/image";
 import {
   Loader2, Settings2, Save, ShieldCheck, Eye, EyeOff,
   Bell, Clock, Mail, ToggleLeft, ToggleRight, FileText, UserCircle,
+  Camera, Palette, Building2,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
 import { api, ApiError, type CabinetSettings, type NotifPrefs } from "@/lib/api";
 import { PushNotificationsCard } from "@/components/dashboard/PushNotificationsCard";
+import { fileToCompressedDataUrl } from "@/lib/image-upload";
 
 function minutesToHuman(min: number): string {
   if (min >= 1440) return `${Math.floor(min / 1440)}j (${min} min)`;
@@ -43,6 +46,7 @@ export default function SettingsPage() {
       <ChangePasswordCard token={token} />
       <NotifPrefsCard token={token} />
       <PushNotificationsCard token={token} />
+      {canManage && <CabinetBrandingCard token={token} />}
       {canManage && <ReminderRulesCard token={token} />}
       {canManage && <CabinetTemplatesCard token={token} />}
       {canManage && <ReportSettingsCard token={token} />}
@@ -55,12 +59,33 @@ function ProfileCard({ token }: { token: string | null }) {
   const { user, refresh } = useSession();
   const [fullName, setFullName] = useState(user?.fullName ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatarUrl ?? null);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     setFullName(user?.fullName ?? "");
     setEmail(user?.email ?? "");
+    setAvatarUrl(user?.avatarUrl ?? null);
   }, [user]);
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !token) return;
+    setUploadingAvatar(true);
+    try {
+      const dataUrl = await fileToCompressedDataUrl(file, { maxSize: 256 });
+      await api.updateProfile(token, { avatarUrl: dataUrl });
+      setAvatarUrl(dataUrl);
+      await refresh();
+      toast.success("Photo de profil mise à jour");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Échec de l'envoi de la photo");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -83,9 +108,25 @@ function ProfileCard({ token }: { token: string | null }) {
         </span>
         <div>
           <h2 className="text-base font-semibold text-ink">Profil</h2>
-          <p className="text-sm text-ink-muted">Votre nom et votre adresse email.</p>
+          <p className="text-sm text-ink-muted">Votre nom, votre email et votre photo.</p>
         </div>
       </div>
+
+      <div className="flex items-center gap-4">
+        <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-100 text-lg font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
+          {avatarUrl ? (
+            <Image src={avatarUrl} alt="Photo de profil" fill className="object-cover" unoptimized />
+          ) : (
+            fullName.charAt(0).toUpperCase() || "?"
+          )}
+        </div>
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-surface">
+          {uploadingAvatar ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
+          {uploadingAvatar ? "Envoi..." : "Changer la photo"}
+          <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={uploadingAvatar} />
+        </label>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium text-ink">Nom complet</label>
@@ -236,6 +277,112 @@ function NotifPrefsCard({ token }: { token: string | null }) {
         ))}
       </div>
     </div>
+  );
+}
+
+// ─── Identité du cabinet (branding) ────────────────────────────────────────────
+function CabinetBrandingCard({ token }: { token: string | null }) {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [name, setName] = useState("");
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [primaryColor, setPrimaryColor] = useState("#2e70be");
+
+  useEffect(() => {
+    if (!token) return;
+    api.getSettings(token)
+      .then(r => {
+        setName(r.settings.name);
+        setLogoUrl(r.settings.logoUrl);
+        setPrimaryColor(r.settings.primaryColor ?? "#2e70be");
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [token]);
+
+  async function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploadingLogo(true);
+    try {
+      const dataUrl = await fileToCompressedDataUrl(file, { maxSize: 320 });
+      setLogoUrl(dataUrl);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Image invalide");
+    } finally {
+      setUploadingLogo(false);
+    }
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!token) return;
+    setSaving(true);
+    try {
+      await api.updateSettings(token, { name, logoUrl, primaryColor });
+      toast.success("Identité du cabinet mise à jour");
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Erreur");
+    } finally { setSaving(false); }
+  }
+
+  if (loading) return <div className="flex justify-center py-8"><Loader2 className="animate-spin text-ink-soft" size={20} /></div>;
+
+  return (
+    <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-surface-raised p-6 flex flex-col gap-5">
+      <div className="flex items-center gap-3">
+        <span className="flex size-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10">
+          <Building2 size={18} />
+        </span>
+        <div>
+          <h2 className="text-base font-semibold text-ink">Identité du cabinet</h2>
+          <p className="text-sm text-ink-muted">Nom, logo et couleur affichés sur votre espace.</p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <div className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface text-ink-soft">
+          {logoUrl ? (
+            <Image src={logoUrl} alt="Logo du cabinet" fill className="object-contain p-1" unoptimized />
+          ) : (
+            <Building2 size={22} />
+          )}
+        </div>
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-surface">
+          {uploadingLogo ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
+          {uploadingLogo ? "Traitement..." : "Changer le logo"}
+          <input type="file" accept="image/*" className="hidden" onChange={handleLogoChange} disabled={uploadingLogo} />
+        </label>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-ink">Nom du cabinet</label>
+          <input type="text" required minLength={2} value={name} onChange={e => setName(e.target.value)}
+            className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-ink focus:border-brand-400 focus:outline-none" />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-ink flex items-center gap-1.5"><Palette size={14} /> Couleur principale</label>
+          <div className="flex items-center gap-3">
+            <input type="color" value={primaryColor} onChange={e => setPrimaryColor(e.target.value)}
+              className="size-10 cursor-pointer rounded-lg border border-border bg-background" />
+            <input type="text" value={primaryColor} onChange={e => setPrimaryColor(e.target.value)}
+              pattern="^#[0-9a-fA-F]{6}$"
+              className="w-32 rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-ink focus:border-brand-400 focus:outline-none" />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button type="submit" disabled={saving || uploadingLogo}
+          className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-70">
+          {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+          {saving ? "Enregistrement..." : "Enregistrer"}
+        </button>
+      </div>
+    </form>
   );
 }
 

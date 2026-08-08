@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { motion } from "motion/react";
-import { Loader2, Trash2, UserPlus } from "lucide-react";
+import { Loader2, Trash2, UserPlus, Pencil, Check, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
 import { api, type TeamMember } from "@/lib/api";
@@ -16,6 +16,9 @@ export default function TeamPage() {
   const [form, setForm] = useState<{ fullName: string; email: string; password: string; role: "STANDARD" | "ADMIN" }>({ fullName: "", email: "", password: "", role: "STANDARD" });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({ fullName: "", email: "" });
+  const [savingEdit, setSavingEdit] = useState(false);
 
   async function load() {
     if (!token) return;
@@ -54,6 +57,26 @@ export default function TeamPage() {
       toast.error(msg);
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  function openEdit(member: TeamMember) {
+    setEditingId(member.id);
+    setEditForm({ fullName: member.fullName, email: member.email });
+  }
+
+  async function handleSaveEdit(id: string) {
+    if (!token) return;
+    setSavingEdit(true);
+    try {
+      await api.updateTeamMember(token, id, editForm);
+      toast.success("Membre mis à jour");
+      setEditingId(null);
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Échec de la mise à jour");
+    } finally {
+      setSavingEdit(false);
     }
   }
 
@@ -157,31 +180,87 @@ export default function TeamPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {members.map((member) => (
-                <tr key={member.id}>
-                  <td className="px-5 py-3.5 font-medium text-ink">{member.fullName}</td>
-                  <td className="px-5 py-3.5 text-ink-muted">{member.email}</td>
-                  <td className="px-5 py-3.5">
-                    <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
-                      {member.role === "ADMIN" ? "Docteur" : "Secrétariat"}
-                    </span>
-                  </td>
-                  {isAdmin ? (
-                    <td className="px-5 py-3.5 text-right">
-                      {member.role === "STANDARD" ? (
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(member.id)}
-                          aria-label="Supprimer"
-                          className="text-ink-soft transition-colors hover:text-red-600 dark:hover:text-red-400"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      ) : null}
+              {members.map((member) => {
+                const isEditing = editingId === member.id;
+                return (
+                  <tr key={member.id}>
+                    <td className="px-5 py-3.5 font-medium text-ink">
+                      {isEditing ? (
+                        <input
+                          value={editForm.fullName}
+                          onChange={(e) => setEditForm((f) => ({ ...f, fullName: e.target.value }))}
+                          className="w-full rounded-full border border-border bg-background px-3 py-1.5 text-sm text-ink focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800"
+                        />
+                      ) : (
+                        member.fullName
+                      )}
                     </td>
-                  ) : null}
-                </tr>
-              ))}
+                    <td className="px-5 py-3.5 text-ink-muted">
+                      {isEditing ? (
+                        <input
+                          type="email"
+                          value={editForm.email}
+                          onChange={(e) => setEditForm((f) => ({ ...f, email: e.target.value }))}
+                          className="w-full rounded-full border border-border bg-background px-3 py-1.5 text-sm text-ink focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800"
+                        />
+                      ) : (
+                        member.email
+                      )}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
+                        {member.role === "ADMIN" ? "Docteur" : "Secrétariat"}
+                      </span>
+                    </td>
+                    {isAdmin ? (
+                      <td className="px-5 py-3.5 text-right">
+                        {member.role === "STANDARD" ? (
+                          isEditing ? (
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleSaveEdit(member.id)}
+                                disabled={savingEdit}
+                                aria-label="Enregistrer"
+                                className="text-ink-soft transition-colors hover:text-emerald-600 disabled:opacity-50"
+                              >
+                                {savingEdit ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditingId(null)}
+                                aria-label="Annuler"
+                                className="text-ink-soft transition-colors hover:text-ink"
+                              >
+                                <X size={15} />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-end gap-3">
+                              <button
+                                type="button"
+                                onClick={() => openEdit(member)}
+                                aria-label="Modifier"
+                                className="text-ink-soft transition-colors hover:text-brand-600"
+                              >
+                                <Pencil size={15} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(member.id)}
+                                aria-label="Supprimer"
+                                className="text-ink-soft transition-colors hover:text-red-600 dark:hover:text-red-400"
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            </div>
+                          )
+                        ) : null}
+                      </td>
+                    ) : null}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
