@@ -241,6 +241,9 @@ export const api = {
   changePassword: (token: string, input: { currentPassword: string; newPassword: string }) =>
     authed<{ message: string }>(token, "/api/auth/change-password", { method: "POST", body: input }),
 
+  updateProfile: (token: string, input: { fullName?: string; email?: string }) =>
+    authed<{ user: SafeUser; cabinet: Cabinet | null }>(token, "/api/auth/me", { method: "PATCH", body: input }),
+
   // Dashboard
   dashboardSummary: (token: string, filters?: { year?: number; practitionerId?: string }) => {
     const qs = new URLSearchParams();

@@ -3,7 +3,7 @@
 import { useEffect, useState, FormEvent } from "react";
 import {
   Loader2, Settings2, Save, ShieldCheck, Eye, EyeOff,
-  Bell, Clock, Mail, ToggleLeft, ToggleRight, FileText,
+  Bell, Clock, Mail, ToggleLeft, ToggleRight, FileText, UserCircle,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
@@ -39,6 +39,7 @@ export default function SettingsPage() {
         <p className="mt-1 text-sm text-ink-muted">Compte, notifications et configuration du cabinet.</p>
       </div>
 
+      <ProfileCard token={token} />
       <ChangePasswordCard token={token} />
       <NotifPrefsCard token={token} />
       <PushNotificationsCard token={token} />
@@ -46,6 +47,65 @@ export default function SettingsPage() {
       {canManage && <CabinetTemplatesCard token={token} />}
       {canManage && <ReportSettingsCard token={token} />}
     </div>
+  );
+}
+
+// ─── Profil ───────────────────────────────────────────────────────────────────
+function ProfileCard({ token }: { token: string | null }) {
+  const { user, refresh } = useSession();
+  const [fullName, setFullName] = useState(user?.fullName ?? "");
+  const [email, setEmail] = useState(user?.email ?? "");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setFullName(user?.fullName ?? "");
+    setEmail(user?.email ?? "");
+  }, [user]);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!token) return;
+    setSaving(true);
+    try {
+      await api.updateProfile(token, { fullName, email });
+      await refresh();
+      toast.success("Profil mis à jour");
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Erreur");
+    } finally { setSaving(false); }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-surface-raised p-6 flex flex-col gap-5">
+      <div className="flex items-center gap-3">
+        <span className="flex size-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10">
+          <UserCircle size={18} />
+        </span>
+        <div>
+          <h2 className="text-base font-semibold text-ink">Profil</h2>
+          <p className="text-sm text-ink-muted">Votre nom et votre adresse email.</p>
+        </div>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-ink">Nom complet</label>
+          <input type="text" required minLength={2} value={fullName} onChange={e => setFullName(e.target.value)}
+            className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-ink focus:border-brand-400 focus:outline-none" />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-ink">Email</label>
+          <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
+            className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-ink focus:border-brand-400 focus:outline-none" />
+        </div>
+      </div>
+      <div className="flex justify-end">
+        <button type="submit" disabled={saving}
+          className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-70">
+          {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+          {saving ? "Enregistrement..." : "Enregistrer"}
+        </button>
+      </div>
+    </form>
   );
 }
 
