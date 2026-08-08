@@ -62,7 +62,7 @@ export default function AppointmentsPage() {
     try {
       // Pour le calendrier, on charge tout (all)
       const [resAppts, resPats, resPracs] = await Promise.all([
-        api.listAppointments(token, "all"),
+        api.listAppointments(token, { range: "all" }),
         api.listPatients(token),
         api.listPractitioners(token)
       ]);

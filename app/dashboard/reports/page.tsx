@@ -122,7 +122,7 @@ export default function ReportsPage() {
                   </div>
                 )}
 
-                {data.topCareTypes && Array.isArray(data.topCareTypes) && (data.topCareTypes as unknown[]).length > 0 && (
+                {Boolean(data.topCareTypes) && Array.isArray(data.topCareTypes) && (data.topCareTypes as unknown[]).length > 0 && (
                   <div className="mt-4">
                     <p className="text-xs font-semibold text-ink-muted mb-2 flex items-center gap-1"><TrendingUp size={12} /> Types de soins populaires</p>
                     <div className="flex flex-wrap gap-2">

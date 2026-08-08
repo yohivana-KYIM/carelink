@@ -178,9 +178,9 @@ export default function PatientProfilePage() {
                     <span className="text-xs font-semibold text-ink-muted">{msg.type}</span>
                     <span className="text-xs text-ink-soft">{new Date(msg.createdAt).toLocaleString()}</span>
                   </div>
-                  <p className="text-sm text-ink whitespace-pre-wrap">{msg.body}</p>
-                  <span className={`self-end text-xs font-medium ${msg.status === 'SENT' || msg.status === 'DELIVERED' ? 'text-emerald-600' : 'text-amber-600'}`}>
-                    {msg.status}
+                  <p className="text-sm text-ink whitespace-pre-wrap">{msg.content}</p>
+                  <span className={`self-end text-xs font-medium ${msg.direction === 'INBOUND' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                    {msg.direction === 'INBOUND' ? 'Reçu du patient' : 'Envoyé au patient'}
                   </span>
                 </div>
               ))}
