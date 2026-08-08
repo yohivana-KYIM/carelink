@@ -29,6 +29,13 @@ export function MobileMenu({
     }
   }, []);
 
+  // Filet de sécurité : ferme toujours le menu quand la page change,
+  // même si un clic ne passe pas par le onClick d'un lien (ex: navigation clavier).
+  useEffect(() => {
+    onClose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
   useEffect(() => {
     const panel = panelRef.current;
     if (!panel) return;
@@ -89,9 +96,10 @@ export function MobileMenu({
   return (
     <div
       ref={panelRef}
-      className="fixed inset-0 z-[60] flex flex-col gap-8 bg-background p-6 pt-8 lg:hidden"
+      className="fixed inset-0 z-[60] flex flex-col gap-8 overflow-y-auto bg-background p-6 pt-8 lg:hidden"
       style={{ visibility: "hidden" }}
     >
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-8 sm:max-w-lg">
       <div className="flex items-center justify-between">
         <div>
           <span className="text-sm font-semibold uppercase tracking-widest text-ink-soft">
@@ -166,6 +174,7 @@ export function MobileMenu({
             </Button>
           </>
         )}
+      </div>
       </div>
     </div>
   );

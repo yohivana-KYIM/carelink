@@ -52,7 +52,11 @@ export function LoginForm() {
         <LoginImageCarousel />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/20 to-brand-950/40" />
 
-        <div className="absolute inset-x-0 top-0 flex items-center gap-2.5 p-10">
+        <Link
+          href="/"
+          className="absolute inset-x-0 top-0 flex items-center gap-2.5 p-10"
+          aria-label={`${siteConfig.name} — accueil`}
+        >
           <Image
             src="/images/ecotocare-icon.png"
             alt={`Logo ${siteConfig.name}`}
@@ -63,7 +67,7 @@ export function LoginForm() {
           <span className="text-lg font-bold tracking-tight text-white">
             {siteConfig.name}
           </span>
-        </div>
+        </Link>
 
         <div className="absolute inset-x-0 bottom-0 p-10">
           <Reveal>
@@ -80,13 +84,15 @@ export function LoginForm() {
         <Reveal className="relative z-10 w-full max-w-md">
           <div className="rounded-3xl bg-surface-raised/80 backdrop-blur-md p-8 sm:p-10 shadow-xl border border-border">
             <div className="flex flex-col items-center gap-3 text-center lg:hidden">
-              <Image
-                src="/images/ecotocare-icon.png"
-                alt={`Logo ${siteConfig.name}`}
-                width={44}
-                height={44}
-                className="rounded-xl"
-              />
+              <Link href="/" aria-label={`${siteConfig.name} — accueil`}>
+                <Image
+                  src="/images/ecotocare-icon.png"
+                  alt={`Logo ${siteConfig.name}`}
+                  width={44}
+                  height={44}
+                  className="rounded-xl"
+                />
+              </Link>
             </div>
             <div className="flex flex-col items-center gap-2 text-center">
               <h1 className="text-2xl font-semibold tracking-tight text-ink">
