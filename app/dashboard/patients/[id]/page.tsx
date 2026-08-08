@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Loader2, ArrowLeft, Calendar, MessageCircle, User as UserIcon } from "lucide-react";
+import { Loader2, ArrowLeft, Calendar, MessageCircle, User as UserIcon, Send } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
 import { api, type Patient } from "@/lib/api";
@@ -13,15 +13,45 @@ export default function PatientProfilePage() {
   const router = useRouter();
   const [patient, setPatient] = useState<Patient | null>(null);
   const [loading, setLoading] = useState(true);
+  const [relancing, setRelancing] = useState(false);
+  const [togglingRelance, setTogglingRelance] = useState(false);
 
   useEffect(() => {
     if (!token || !params.id) return;
-    
+
     api.getPatient(token, params.id as string)
       .then(res => setPatient(res.patient))
       .catch(() => toast.error("Impossible de charger le patient"))
       .finally(() => setLoading(false));
   }, [token, params.id]);
+
+  async function handleRelanceNow() {
+    if (!token || !patient) return;
+    setRelancing(true);
+    try {
+      await api.relancePatientNow(token, patient.id);
+      toast.success(`Relance envoyée à ${patient.fullName}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Échec de l'envoi de la relance");
+    } finally {
+      setRelancing(false);
+    }
+  }
+
+  async function handleToggleRelanceEnabled() {
+    if (!token || !patient) return;
+    const next = !patient.relanceEnabled;
+    setTogglingRelance(true);
+    try {
+      const res = await api.updatePatient(token, patient.id, { relanceEnabled: next });
+      setPatient(res.patient);
+      toast.success(next ? "Relance automatique réactivée" : "Relance automatique désactivée pour ce patient");
+    } catch {
+      toast.error("Échec de la mise à jour");
+    } finally {
+      setTogglingRelance(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -74,9 +104,37 @@ export default function PatientProfilePage() {
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-ink-muted">Relance auto</span>
+            <span className="text-ink-muted">Fréquence de relance</span>
             <span className="font-semibold text-ink">{patient.relanceMonths ? `${patient.relanceMonths} mois` : "Non défini"}</span>
           </div>
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-ink-muted">Relance automatique</span>
+            <button
+              onClick={handleToggleRelanceEnabled}
+              disabled={togglingRelance}
+              className={`relative h-6 w-11 rounded-full transition-colors disabled:opacity-50 ${
+                patient.relanceEnabled ? "bg-brand-600" : "bg-surface-raised border border-border"
+              }`}
+              aria-pressed={patient.relanceEnabled}
+              aria-label="Activer ou désactiver la relance automatique"
+            >
+              <span
+                className={`absolute top-0.5 size-5 rounded-full bg-white shadow transition-transform ${
+                  patient.relanceEnabled ? "translate-x-5" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </div>
+
+          <button
+            onClick={handleRelanceNow}
+            disabled={relancing || !patient.whatsappOptIn}
+            title={!patient.whatsappOptIn ? "Ce patient n'a pas donné son consentement WhatsApp" : undefined}
+            className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {relancing ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+            Relancer maintenant
+          </button>
         </div>
 
         {/* Historique RDV */}

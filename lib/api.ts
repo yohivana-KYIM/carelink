@@ -115,6 +115,7 @@ export type Patient = {
   whatsappOptInAt: string | null;
   lastVisitAt: string | null;
   relanceMonths: number | null;
+  relanceEnabled: boolean;
   noShowCount?: number;
   createdAt: string;
   appointments?: Appointment[];
@@ -291,6 +292,9 @@ export const api = {
 
   deletePatient: (token: string, id: string) =>
     authed<void>(token, `/api/patients/${id}`, { method: "DELETE" }),
+
+  relancePatientNow: (token: string, id: string) =>
+    authed<{ sent: boolean }>(token, `/api/relances/${id}/send`, { method: "POST" }),
 
   // Appointments
   listAppointments: (
