@@ -285,6 +285,7 @@ export const api = {
       search?: string;
       noShowOnly?: boolean;
       whatsappOptIn?: boolean;
+      year?: number;
       page?: number;
       pageSize?: number;
       sortBy?: string;
@@ -295,6 +296,7 @@ export const api = {
     if (params.search) qs.set("search", params.search);
     if (params.noShowOnly) qs.set("noShowOnly", "true");
     if (params.whatsappOptIn !== undefined) qs.set("whatsappOptIn", String(params.whatsappOptIn));
+    if (params.year) qs.set("year", String(params.year));
     if (params.page) qs.set("page", String(params.page));
     if (params.pageSize) qs.set("pageSize", String(params.pageSize));
     if (params.sortBy) qs.set("sortBy", params.sortBy);

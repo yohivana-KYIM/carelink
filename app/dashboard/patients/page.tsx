@@ -39,6 +39,9 @@ export default function PatientsPage() {
   const [search, setSearch] = useState("");
   const [noShowOnly, setNoShowOnly] = useState(false);
   const [whatsappOnly, setWhatsappOnly] = useState(false);
+  const [year, setYear] = useState("");
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 6 }, (_, i) => String(currentYear - i));
   const [sortBy, setSortBy] = useState("fullName");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [page, setPage] = useState(1);
@@ -60,7 +63,7 @@ export default function PatientsPage() {
     setLoading(true);
     try {
       const [pRes, sRes] = await Promise.all([
-        api.listPatients(token, { search, noShowOnly, whatsappOptIn: whatsappOnly || undefined, page, pageSize, sortBy, sortDir }),
+        api.listPatients(token, { search, noShowOnly, whatsappOptIn: whatsappOnly || undefined, year: year ? Number(year) : undefined, page, pageSize, sortBy, sortDir }),
         api.getPatientStats(token),
       ]);
       setPatients(pRes.patients);
@@ -70,20 +73,28 @@ export default function PatientsPage() {
     setLoading(false);
   }
 
-  useEffect(() => { void load(); }, [token, search, noShowOnly, whatsappOnly, page, sortBy, sortDir]);
+  useEffect(() => { void load(); }, [token, search, noShowOnly, whatsappOnly, year, page, sortBy, sortDir]);
 
-  // Export CSV
-  function handleExportCSV() {
-    const headers = ["Nom", "Telephone", "Email", "WhatsApp", "Relance(mois)", "No-shows"];
-    const rows = patients.map(p => [
-      `"${p.fullName}"`, `"${p.phoneNumber}"`, `"${p.email ?? ""}"`,
-      p.whatsappOptIn ? "Oui" : "Non", p.relanceMonths ?? "", p.noShowCount ?? 0,
-    ]);
-    const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = "patients_ecotocare.csv";
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  // Export CSV — exporte l'intégralité des résultats filtrés (pas seulement la page affichée)
+  async function handleExportCSV() {
+    if (!token) return;
+    try {
+      const res = await api.listPatients(token, {
+        search, noShowOnly, whatsappOptIn: whatsappOnly || undefined,
+        year: year ? Number(year) : undefined, page: 1, pageSize: 5000, sortBy, sortDir,
+      });
+      const headers = ["Nom", "Telephone", "Email", "WhatsApp", "Relance(mois)", "No-shows"];
+      const rows = res.patients.map(p => [
+        `"${p.fullName}"`, `"${p.phoneNumber}"`, `"${p.email ?? ""}"`,
+        p.whatsappOptIn ? "Oui" : "Non", p.relanceMonths ?? "", p.noShowCount ?? 0,
+      ]);
+      const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = "patients_ecotocare.csv";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      toast.success(`${res.patients.length} patients exportés`);
+    } catch { toast.error("Erreur d'export"); }
   }
 
   function handleImportCSV(e: React.ChangeEvent<HTMLInputElement>) {
@@ -237,7 +248,7 @@ export default function PatientsPage() {
           <SlidersHorizontal size={14} /> Filtres
           {(noShowOnly || whatsappOnly) && (
             <span className="flex size-4 items-center justify-center rounded-full bg-brand-600 text-[10px] text-white">
-              {[noShowOnly, whatsappOnly].filter(Boolean).length}
+              {[noShowOnly, whatsappOnly, Boolean(year)].filter(Boolean).length}
             </span>
           )}
         </button>
@@ -258,6 +269,14 @@ export default function PatientsPage() {
                 className="size-4 rounded border-border text-brand-600" />
               Opt-in WhatsApp uniquement
             </label>
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-ink-muted">Année d&apos;ajout :</label>
+              <select value={year} onChange={e => { setYear(e.target.value); setPage(1); }}
+                className="rounded-full border border-border bg-background px-3 py-1.5 text-sm text-ink focus:outline-none">
+                <option value="">Toutes</option>
+                {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </div>
             <div className="flex items-center gap-2">
               <label className="text-sm text-ink-muted">Trier par :</label>
               <select value={sortBy} onChange={e => setSortBy(e.target.value)}

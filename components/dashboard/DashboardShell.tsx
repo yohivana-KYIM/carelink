@@ -10,6 +10,8 @@ import { api } from "@/lib/api";
 import { siteConfig } from "@/lib/site-config";
 import { toast } from "react-hot-toast";
 import { enablePushNotifications } from "@/lib/push";
+import { HelpWidget } from "./HelpWidget";
+import { OnboardingTour } from "./OnboardingTour";
 
 export type DashboardNavItem = {
   label: string;
@@ -185,6 +187,8 @@ export function DashboardShell({
         onClose={() => setConfirmLogoutOpen(false)}
         loading={logoutLoading}
       />
+      <HelpWidget />
+      <OnboardingTour userId={user?.id} />
     </div>
   );
 }
