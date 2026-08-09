@@ -64,6 +64,8 @@ export type Cabinet = {
   city: string | null;
   status: CabinetStatus;
   whatsappPhoneNumber: string | null;
+  logoUrl?: string | null;
+  primaryColor?: string | null;
   defaultRelanceMonths: number;
   reminder1MinBefore?: number;
   reminder2MinBefore?: number;
