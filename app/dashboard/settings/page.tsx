@@ -44,6 +44,7 @@ export default function SettingsPage() {
 
       <ProfileCard token={token} />
       <ChangePasswordCard token={token} />
+      <TwoFactorCard token={token} />
       <NotifPrefsCard token={token} />
       <PushNotificationsCard token={token} />
       {canManage && <CabinetBrandingCard token={token} />}
@@ -216,6 +217,56 @@ function ChangePasswordCard({ token }: { token: string | null }) {
         </button>
       </div>
     </form>
+  );
+}
+
+// ─── Double authentification (2FA) ─────────────────────────────────────────────
+function TwoFactorCard({ token }: { token: string | null }) {
+  const { user, refresh } = useSession();
+  const [saving, setSaving] = useState(false);
+
+  async function toggle() {
+    if (!token || !user) return;
+    setSaving(true);
+    const next = !user.twoFactorEnabled;
+    try {
+      await api.toggleTwoFactor(token, next);
+      await refresh();
+      toast.success(
+        next
+          ? "Double authentification activée : un code vous sera envoyé par email à chaque connexion."
+          : "Double authentification désactivée."
+      );
+    } catch {
+      toast.error("Erreur lors de la mise à jour");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="rounded-2xl border border-border bg-surface-raised p-6 flex flex-col gap-4">
+      <div className="flex items-center gap-3">
+        <span className="flex size-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10">
+          <ShieldCheck size={18} />
+        </span>
+        <div>
+          <h2 className="text-base font-semibold text-ink">Double authentification (2FA)</h2>
+          <p className="text-sm text-ink-muted">Un code de connexion supplémentaire vous sera envoyé par email.</p>
+        </div>
+      </div>
+      <div className="flex items-center justify-between rounded-xl border border-border p-4">
+        <div className="flex items-center gap-3">
+          <Mail size={16} className="text-ink-muted" />
+          <span className="text-sm font-medium text-ink">Exiger un code par email à chaque connexion</span>
+        </div>
+        <button type="button" onClick={toggle} disabled={saving || !user} className="text-brand-600 dark:text-brand-400 disabled:opacity-50">
+          {user?.twoFactorEnabled
+            ? <ToggleRight size={28} className="text-brand-600" />
+            : <ToggleLeft size={28} className="text-ink-soft" />}
+        </button>
+      </div>
+    </div>
   );
 }
 

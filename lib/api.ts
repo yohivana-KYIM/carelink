@@ -52,8 +52,11 @@ export type SafeUser = {
   notifPushEnabled?: boolean;
   notifEmailEnabled?: boolean;
   avatarUrl?: string | null;
+  twoFactorEnabled?: boolean;
   createdAt: string;
 };
+
+export type TwoFactorRequiredResponse = { twoFactorRequired: true; challengeId: string };
 
 export type Cabinet = {
   id: string;
@@ -240,7 +243,13 @@ export const api = {
     request<AuthResponse>("/api/auth/register-cabinet", { method: "POST", body: input }),
 
   login: (input: { email: string; password: string; rememberMe?: boolean }) =>
-    request<AuthResponse>("/api/auth/login", { method: "POST", body: input }),
+    request<AuthResponse | TwoFactorRequiredResponse>("/api/auth/login", { method: "POST", body: input }),
+
+  verifyTwoFactor: (input: { challengeId: string; code: string; rememberMe?: boolean }) =>
+    request<AuthResponse>("/api/auth/verify-2fa", { method: "POST", body: input }),
+
+  toggleTwoFactor: (token: string, enabled: boolean) =>
+    authed<{ user: SafeUser }>(token, "/api/auth/2fa", { method: "PATCH", body: { enabled } }),
 
   me: (token: string) =>
     request<{ user: SafeUser; cabinet: Cabinet | null }>("/api/auth/me", { token }),

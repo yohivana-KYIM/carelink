@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { AlertCircle, Loader2, Lock, Mail, Eye, EyeOff } from "lucide-react";
+import { AlertCircle, Loader2, Lock, Mail, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/lib/site-config";
 import { toast } from "react-hot-toast";
@@ -22,6 +22,9 @@ export function LoginForm() {
   const [rememberMe, setRememberMe] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [step, setStep] = useState<"credentials" | "otp">("credentials");
+  const [challengeId, setChallengeId] = useState("");
+  const [otpCode, setOtpCode] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -33,13 +36,37 @@ export function LoginForm() {
 
     setStatus("loading");
     try {
-      const { token, user } = await api.login({ email, password, rememberMe });
+      const result = await api.login({ email, password, rememberMe });
+      if ("twoFactorRequired" in result) {
+        setChallengeId(result.challengeId);
+        setStep("otp");
+        setStatus("idle");
+        toast.success("Un code de connexion vous a été envoyé par email.");
+        return;
+      }
+      saveSession(result.token, result.user, rememberMe);
+      setStatus("success");
+      toast.success("Connexion réussie !");
+      router.push(result.user.role === "SUPERADMIN" ? "/admin" : "/dashboard");
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : "Impossible de se connecter au serveur Ecotocare.";
+      setErrorMessage(msg);
+      setStatus("error");
+      toast.error(msg);
+    }
+  }
+
+  async function handleVerifyOtp(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setStatus("loading");
+    try {
+      const { token, user } = await api.verifyTwoFactor({ challengeId, code: otpCode, rememberMe });
       saveSession(token, user, rememberMe);
       setStatus("success");
       toast.success("Connexion réussie !");
       router.push(user.role === "SUPERADMIN" ? "/admin" : "/dashboard");
     } catch (err) {
-      const msg = err instanceof ApiError ? err.message : "Impossible de se connecter au serveur Ecotocare.";
+      const msg = err instanceof ApiError ? err.message : "Code invalide.";
       setErrorMessage(msg);
       setStatus("error");
       toast.error(msg);
@@ -96,13 +123,85 @@ export function LoginForm() {
             </div>
             <div className="flex flex-col items-center gap-2 text-center">
               <h1 className="text-2xl font-semibold tracking-tight text-ink">
-                Connexion à votre espace
+                {step === "otp" ? "Vérification en 2 étapes" : "Connexion à votre espace"}
               </h1>
               <p className="text-sm text-ink-muted">
-                Accédez au tableau de bord de votre cabinet.
+                {step === "otp"
+                  ? `Entrez le code à 6 chiffres envoyé à ${email}.`
+                  : "Accédez au tableau de bord de votre cabinet."}
               </p>
             </div>
 
+            {step === "otp" ? (
+              <form onSubmit={handleVerifyOtp} noValidate className="mt-8 flex flex-col gap-5">
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="otp-code" className="text-sm font-medium text-ink">
+                    Code de connexion
+                  </label>
+                  <div className="relative">
+                    <ShieldCheck
+                      size={16}
+                      className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-soft"
+                    />
+                    <input
+                      id="otp-code"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={6}
+                      required
+                      value={otpCode}
+                      onChange={(event) => {
+                        setOtpCode(event.target.value.replace(/\D/g, ""));
+                        if (status !== "idle") setStatus("idle");
+                      }}
+                      placeholder="123456"
+                      className="w-full rounded-full border border-border bg-background py-2.5 pl-11 pr-4 text-center text-lg tracking-[0.4em] text-ink placeholder:text-ink-soft focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={status === "loading" || status === "success" || otpCode.length !== 6}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700 active:scale-[0.97] disabled:opacity-70"
+                >
+                  {status === "loading" ? (
+                    <motion.span
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                      className="flex"
+                    >
+                      <Loader2 size={16} />
+                    </motion.span>
+                  ) : null}
+                  {status === "loading" ? "Vérification..." : status === "success" ? "Connecté !" : "Vérifier le code"}
+                </button>
+
+                {status === "error" ? (
+                  <motion.p
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center justify-center gap-1.5 text-center text-sm font-medium text-red-600 dark:text-red-400"
+                  >
+                    <AlertCircle size={15} />
+                    {errorMessage}
+                  </motion.p>
+                ) : null}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep("credentials");
+                    setOtpCode("");
+                    setStatus("idle");
+                  }}
+                  className="text-center text-sm font-medium text-ink-muted hover:text-ink transition-colors"
+                >
+                  ← Retour à la connexion
+                </button>
+              </form>
+            ) : (
             <form onSubmit={handleSubmit} noValidate className="mt-8 flex flex-col gap-5">
               <div className="flex flex-col gap-2">
                 <label htmlFor="login-email" className="text-sm font-medium text-ink">
@@ -211,7 +310,9 @@ export function LoginForm() {
                 </motion.p>
               ) : null}
             </form>
+            )}
 
+            {step === "credentials" && (
             <p className="mt-8 text-center text-sm text-ink-muted">
               Pas encore de compte ?{" "}
               <Link
@@ -221,6 +322,7 @@ export function LoginForm() {
                 Créer un compte
               </Link>
             </p>
+            )}
           </div>
         </Reveal>
       </div>
