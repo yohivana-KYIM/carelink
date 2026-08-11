@@ -23,12 +23,12 @@ export const siteConfig = {
 } as const;
 
 export const navLinks = [
-  { label: "Fonctionnalités", href: "/#fonctionnalites" },
-  { label: "Comment ça marche", href: "/#comment-ca-marche" },
-  { label: "Sécurité", href: "/#securite" },
-  { label: "FAQ", href: "/#faq" },
-  { label: "Ressources", href: "/#ressources" },
-  { label: "Contact", href: "/contact" },
+  { label: "Fonctionnalités", href: "/#fonctionnalites", key: "nav.features" },
+  { label: "Comment ça marche", href: "/#comment-ca-marche", key: "nav.howItWorks" },
+  { label: "Sécurité", href: "/#securite", key: "nav.security" },
+  { label: "FAQ", href: "/#faq", key: "nav.faq" },
+  { label: "Ressources", href: "/#ressources", key: "nav.resources" },
+  { label: "Contact", href: "/contact", key: "nav.contact" },
 ] as const;
 
 export const heroChecklist = [

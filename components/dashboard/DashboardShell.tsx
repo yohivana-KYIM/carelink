@@ -6,7 +6,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Bell, LogOut, Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
-import { ThemeToggle } from "@/components/layout/ThemeToggle";import { ConfirmDialog } from "@/components/ui/ConfirmDialog";import { useSession } from "@/lib/session";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";import { useSession } from "@/lib/session";
 import { api } from "@/lib/api";
 import { siteConfig } from "@/lib/site-config";
 import { toast } from "react-hot-toast";
@@ -214,6 +216,7 @@ export function DashboardShell({
                 </span>
               ) : null}
             </Link>
+            <LanguageSwitcher className="hidden sm:inline-flex" />
             <ThemeToggle />
             <button
               type="button"

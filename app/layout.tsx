@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { MotionProvider } from "@/components/providers/MotionProvider";
 import { siteConfig } from "@/lib/site-config";
 import { Toaster } from "react-hot-toast";
+import { LocaleProvider } from "@/lib/i18n";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -107,10 +108,12 @@ export default function RootLayout({
           }}
         />
         <ThemeProvider>
-          <MotionProvider>
-            {children}
-            <Toaster position="top-right" />
-          </MotionProvider>
+          <LocaleProvider>
+            <MotionProvider>
+              {children}
+              <Toaster position="top-right" />
+            </MotionProvider>
+          </LocaleProvider>
         </ThemeProvider>
       </body>
     </html>

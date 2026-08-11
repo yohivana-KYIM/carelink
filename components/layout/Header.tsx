@@ -10,8 +10,10 @@ import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ThemeToggle } from "./ThemeToggle";
 import { MobileMenu } from "./MobileMenu";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { navLinks, siteConfig } from "@/lib/site-config";
 import { getStoredUser, clearSession } from "@/lib/auth-storage";
+import { useLocale } from "@/lib/i18n";
 import type { SafeUser } from "@/lib/api";
 
 export function Header() {
@@ -20,6 +22,7 @@ export function Header() {
   const [user, setUser] = useState<SafeUser | null>(null);
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
   const pathname = usePathname();
+  const { t } = useLocale();
 
   useEffect(() => {
     setUser(getStoredUser());
@@ -75,13 +78,14 @@ export function Header() {
                     : "px-3"
                 }
               >
-                {link.label}
+                {t(link.key, link.label)}
               </HoverLink>
             );
           })}
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <LanguageSwitcher />
           <ThemeToggle />
 
           {user ? (
@@ -100,14 +104,14 @@ export function Header() {
                 href={user.role === "SUPERADMIN" ? "/admin" : "/dashboard"}
                 className="inline-flex items-center justify-center rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-brand-700 active:scale-[0.97]"
               >
-                Mon Espace
+                {t("nav.myAccount", "Mon Espace")}
               </Link>
               <button
                 type="button"
                 onClick={() => setConfirmLogoutOpen(true)}
                 className="inline-flex items-center justify-center rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink transition-colors duration-300 hover:bg-surface-raised active:scale-[0.97]"
               >
-                Déconnexion
+                {t("nav.logout", "Déconnexion")}
               </button>
             </div>
           ) : (
@@ -116,19 +120,20 @@ export function Header() {
                 href="/login"
                 className="inline-flex items-center justify-center rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-300 hover:bg-red-600 active:scale-[0.97]"
               >
-                Connexion
+                {t("nav.login", "Connexion")}
               </Link>
-              <Button href="/contact" className="hover:!bg-black hover:!border-black">Demander une démo</Button>
+              <Button href="/contact" className="hover:!bg-black hover:!border-black">{t("nav.demo", "Demander une démo")}</Button>
             </>
           )}
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
+          <LanguageSwitcher />
           <ThemeToggle />
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
-            aria-label="Ouvrir le menu"
+            aria-label={t("nav.openMenu", "Ouvrir le menu")}
             aria-expanded={menuOpen}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-ink-muted shadow-sm transition-colors duration-200 hover:bg-surface-raised focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
           >

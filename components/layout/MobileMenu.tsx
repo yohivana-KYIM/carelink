@@ -7,6 +7,8 @@ import { X } from "lucide-react";
 import { gsap, prefersReducedMotion } from "@/lib/gsap";
 import { navLinks } from "@/lib/site-config";
 import { Button } from "@/components/ui/Button";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+import { useLocale } from "@/lib/i18n";
 
 export function MobileMenu({
   open,
@@ -22,6 +24,7 @@ export function MobileMenu({
   const panelRef = useRef<HTMLDivElement>(null);
   const linkRefs = useRef<Array<HTMLLIElement | null>>([]);
   const pathname = usePathname();
+  const { t } = useLocale();
 
   useEffect(() => {
     if (panelRef.current) {
@@ -118,14 +121,17 @@ export function MobileMenu({
             </div>
           ) : null}
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Fermer le menu"
-          className="flex size-10 items-center justify-center rounded-full border border-border text-ink-muted"
-        >
-          <X size={18} />
-        </button>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher />
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t("nav.closeMenu", "Fermer le menu")}
+            className="flex size-10 items-center justify-center rounded-full border border-border text-ink-muted"
+          >
+            <X size={18} />
+          </button>
+        </div>
       </div>
 
       <nav className="flex flex-col gap-1">
@@ -147,7 +153,7 @@ export function MobileMenu({
                     isActive ? "text-brand-600 dark:text-brand-400" : "text-ink"
                   }`}
                 >
-                  {link.label}
+                  {t(link.key, link.label)}
                 </Link>
               </li>
             );
@@ -162,15 +168,15 @@ export function MobileMenu({
             onClick={onLogout}
             className="inline-flex w-full items-center justify-center rounded-full border border-border bg-surface px-4 py-3 text-sm font-semibold text-ink transition-colors duration-200 hover:bg-surface-raised"
           >
-            Déconnexion
+            {t("nav.logout", "Déconnexion")}
           </button>
         ) : (
           <>
             <Button href="/login" variant="secondary" onClick={onClose} className="hover:!bg-red-600 hover:!text-white hover:!border-red-600">
-              Connexion
+              {t("nav.login", "Connexion")}
             </Button>
             <Button href="/contact" onClick={onClose} className="hover:!bg-black">
-              Demander une démo
+              {t("nav.demo", "Demander une démo")}
             </Button>
           </>
         )}

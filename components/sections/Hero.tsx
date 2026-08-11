@@ -6,8 +6,10 @@ import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { heroChecklist, siteConfig } from "@/lib/site-config";
+import { useLocale } from "@/lib/i18n";
 
 export function Hero() {
+  const { t } = useLocale();
   return (
     <section className="relative px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-8 lg:px-10 xl:px-16">
       <GeometricDecorations />
@@ -20,10 +22,10 @@ export function Hero() {
             className="flex flex-wrap items-center gap-3"
           >
             <span className="rounded-full px-3.5 py-1.5 text-xs font-semibold bg-white text-brand-900 ring-1 ring-white/10 dark:bg-white/10 dark:text-white dark:ring-white/10">
-              Nouveau
+              {t("hero.badge", "Nouveau")}
             </span>
             <span className="text-sm font-medium text-ink-muted">
-              Découvrez {siteConfig.name}
+              {t("hero.discover", `Découvrez ${siteConfig.name}`, { name: siteConfig.name })}
             </span>
           </motion.div>
 
@@ -33,7 +35,7 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.05 }}
             className="text-balance text-4xl font-bold leading-[1.05] tracking-tight text-ink sm:text-5xl lg:text-[3.25rem]"
           >
-            Ne manquez plus aucun rendez-vous patient
+            {t("hero.title", "Ne manquez plus aucun rendez-vous patient")}
           </motion.h1>
 
           <motion.p
@@ -42,9 +44,11 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="max-w-md text-balance text-base leading-relaxed text-ink-muted sm:text-lg"
           >
-            {siteConfig.name} envoie automatiquement les rappels de
-            rendez-vous et relance les patients inactifs par WhatsApp, le
-            canal que vos patients consultent déjà tous les jours.
+            {t(
+              "hero.subtitle",
+              `${siteConfig.name} envoie automatiquement les rappels de rendez-vous et relance les patients inactifs par WhatsApp, le canal que vos patients consultent déjà tous les jours.`,
+              { name: siteConfig.name }
+            )}
           </motion.p>
 
           <motion.div
@@ -53,9 +57,9 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.15 }}
             className="flex flex-col gap-3 sm:flex-row sm:items-center"
           >
-            <Button href="/contact" className="hover:!bg-black dark:bg-white dark:text-brand-900 dark:hover:!bg-white/90">Demander une démo</Button>
+            <Button href="/contact" className="hover:!bg-black dark:bg-white dark:text-brand-900 dark:hover:!bg-white/90">{t("hero.cta.demo", "Demander une démo")}</Button>
             <Button href="#comment-ca-marche" variant="secondary">
-              Contacter l&apos;équipe
+              {t("hero.cta.contact", "Contacter l'équipe")}
             </Button>
           </motion.div>
 
