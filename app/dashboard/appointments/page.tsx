@@ -24,6 +24,25 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
+function statusLabel(status: string) {
+  const labels: Record<string, string> = {
+    PENDING: "En attente",
+    CONFIRMED: "Confirmé",
+    CANCELLED: "Annulé",
+    RESCHEDULE_REQUESTED: "Report demandé",
+    NO_RESPONSE: "Sans réponse",
+    COMPLETED: "Terminé",
+  };
+  return labels[status] ?? status;
+}
+
+function statusClass(status: string) {
+  if (status === "CONFIRMED") return "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400";
+  if (status === "CANCELLED") return "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400";
+  if (status === "COMPLETED") return "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-400";
+  if (status === "NO_RESPONSE") return "bg-slate-100 text-slate-600 dark:bg-slate-500/15 dark:text-slate-400";
+  return "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400";
+}
 function Modal({ isOpen, onClose, title, children }: { isOpen: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
   if (!isOpen) return null;
   return (
@@ -317,12 +336,8 @@ export default function AppointmentsPage() {
                     <td className="px-5 py-3 text-ink-muted">{a.patient?.fullName || "Inconnu"}</td>
                     <td className="px-5 py-3 text-ink-muted">{a.careType || "—"}</td>
                     <td className="px-5 py-3">
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                        a.status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' :
-                        a.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
-                        'bg-amber-100 text-amber-700'
-                      }`}>
-                        {a.status}
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass(a.status)}`}>
+                        {statusLabel(a.status)}
                       </span>
                     </td>
                     <td className="px-5 py-3 text-right flex gap-2 justify-end">
