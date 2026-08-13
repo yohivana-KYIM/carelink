@@ -82,14 +82,16 @@ export function PublicReviews() {
         ) : reviews.length > 0 ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {reviews.map((t) => (
-              <div key={t.id} className="flex flex-col gap-3 rounded-2xl border border-border bg-surface-raised p-6">
+              <div key={t.id} className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-surface-raised p-6 transition-all duration-300 hover:-translate-y-1 hover:border-brand-200/70 hover:shadow-lg dark:hover:border-brand-800/70">
+                {/* Lueur fond */}
+                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-brand-50/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-brand-500/8" />
                 <Stars rating={t.rating} />
-                <p className="flex-1 text-sm leading-relaxed text-ink">{t.message}</p>
-                <div>
+                <p className="relative flex-1 text-sm leading-relaxed text-ink">{t.message}</p>
+                <div className="relative">
                   <p className="text-sm font-semibold text-ink">{t.authorName}</p>
                   {t.authorRole ? <p className="text-xs text-ink-soft">{t.authorRole}</p> : null}
                 </div>
-                <div className="flex items-center gap-4 border-t border-border pt-3">
+                <div className="relative flex items-center gap-4 border-t border-border pt-3">
                   <button
                     type="button"
                     onClick={() => handleReact(t.id, "like")}

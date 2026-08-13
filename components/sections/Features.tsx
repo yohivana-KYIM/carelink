@@ -41,16 +41,20 @@ export function Features() {
             const Icon = iconMap[feature.icon];
             return (
               <RevealItem key={feature.title}>
-                <div className="group h-full rounded-2xl border border-border bg-surface-raised p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-lg dark:hover:border-brand-800">
-                  <span className="flex size-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition-colors group-hover:bg-brand-600 group-hover:text-white dark:bg-brand-500/10 dark:text-brand-400">
+                <div className="group relative h-full overflow-hidden rounded-2xl border border-border bg-surface-raised p-6 shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-200/80 hover:shadow-xl dark:hover:border-brand-800/80">
+                  {/* Lueur de fond au hover */}
+                  <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-brand-50/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-brand-500/10" />
+                  <span className="relative flex size-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition-all duration-300 group-hover:scale-110 group-hover:bg-brand-600 group-hover:text-white group-hover:shadow-md dark:bg-brand-500/10 dark:text-brand-400">
                     <Icon size={20} />
                   </span>
-                  <h3 className="mt-5 text-lg font-semibold text-ink">
+                  <h3 className="relative mt-5 text-lg font-semibold text-ink">
                     {feature.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+                  <p className="relative mt-2 text-sm leading-relaxed text-ink-muted">
                     {feature.description}
                   </p>
+                  {/* Barre colorée en bas */}
+                  <div className="absolute bottom-0 left-0 h-[3px] w-0 bg-gradient-to-r from-brand-600 to-brand-400 transition-all duration-500 group-hover:w-full rounded-b-2xl" />
                 </div>
               </RevealItem>
             );

@@ -338,6 +338,7 @@ export const api = {
       patientId?: string;
       dateFrom?: string;
       dateTo?: string;
+      year?: number;
       page?: number;
       pageSize?: number;
     } = {}
@@ -349,6 +350,7 @@ export const api = {
     if (params.patientId) qs.set("patientId", params.patientId);
     if (params.dateFrom) qs.set("dateFrom", params.dateFrom);
     if (params.dateTo) qs.set("dateTo", params.dateTo);
+    if (params.year) qs.set("year", String(params.year));
     if (params.page) qs.set("page", String(params.page));
     if (params.pageSize) qs.set("pageSize", String(params.pageSize));
     const q = qs.toString();
@@ -458,8 +460,20 @@ export const api = {
 
   // Public booking
   getPublicCabinetInfo: (cabinetId: string) =>
-    request<{ cabinet: { id: string; name: string; city: string | null; practitioners: { id: string; fullName: string }[] } }>(
-      `/api/public/cabinets/${cabinetId}`
+    request<{
+      cabinet: {
+        id: string;
+        name: string;
+        city: string | null;
+        logoUrl?: string | null;
+        primaryColor?: string | null;
+        practitioners: { id: string; fullName: string }[];
+      };
+    }>(`/api/public/cabinets/${cabinetId}`),
+
+  getPublicPatientInfo: (cabinetId: string, patientId: string) =>
+    request<{ patient: { id: string; fullName: string; phoneNumber: string } }>(
+      `/api/public/cabinets/${cabinetId}/patients/${patientId}`
     ),
 
   getPublicSlots: (cabinetId: string, date: string, practitionerId?: string) => {
@@ -470,7 +484,7 @@ export const api = {
     );
   },
 
-  requestPublicAppointment: (cabinetId: string, input: { fullName: string; phoneNumber: string; scheduledAt: string; practitionerId?: string; careType?: string; notes?: string }) =>
+  requestPublicAppointment: (cabinetId: string, input: { fullName: string; phoneNumber: string; scheduledAt: string; practitionerId?: string; careType?: string; notes?: string; patientId?: string }) =>
     request<{ appointment: Appointment }>(`/api/public/cabinets/${cabinetId}/book`, { method: "POST", body: input }),
 
   // Push

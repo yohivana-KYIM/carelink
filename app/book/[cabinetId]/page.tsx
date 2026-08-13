@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, FormEvent, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
+import { CabinetTheme } from "@/components/providers/CabinetTheme";
 import { Loader2, CalendarCheck, Clock, User, Phone, Stethoscope, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { api } from "@/lib/api";
@@ -27,6 +28,8 @@ type PublicCabinet = {
   id: string;
   name: string;
   city: string | null;
+  logoUrl?: string | null;
+  primaryColor?: string | null;
   practitioners: { id: string; fullName: string }[];
 };
 
@@ -43,7 +46,10 @@ async function fetchSlots(cabinetId: string, date: string, practitionerId?: stri
 
 export default function PublicBookingPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const cabinetId = params.cabinetId as string;
+  // Lien personnalisé envoyé à un patient précis : /book/:cabinetId?patient=<id>
+  const patientId = searchParams.get("patient");
 
   const [cabinet, setCabinet] = useState<PublicCabinet | null>(null);
   const [loading, setLoading] = useState(true);
@@ -75,6 +81,19 @@ export default function PublicBookingPage() {
       .catch(() => toast.error("Le cabinet demandé est introuvable"))
       .finally(() => setLoading(false));
   }, [cabinetId]);
+
+  // Lien personnalisé : préremplit le nom et le téléphone du patient concerné.
+  useEffect(() => {
+    if (!cabinetId || !patientId) return;
+    api
+      .getPublicPatientInfo(cabinetId, patientId)
+      .then((res) =>
+        setForm((f) => ({ ...f, fullName: res.patient.fullName, phoneNumber: res.patient.phoneNumber }))
+      )
+      .catch(() => {
+        /* lien invalide ou expiré : le patient remplit simplement le formulaire lui-même */
+      });
+  }, [cabinetId, patientId]);
 
   const loadSlots = useCallback(
     async (date: Date) => {
@@ -113,6 +132,7 @@ export default function PublicBookingPage() {
         ...form,
         practitionerId: form.practitionerId || undefined,
         scheduledAt: scheduledAt.toISOString(),
+        patientId: patientId || undefined,
       });
       setSuccess(true);
     } catch (err: unknown) {
@@ -180,16 +200,18 @@ export default function PublicBookingPage() {
 
   return (
     <div className="relative min-h-screen bg-surface-raised py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <CabinetTheme primaryColor={cabinet.primaryColor} />
       <GeometricDecorations />
       <div className="relative z-10 mx-auto max-w-2xl">
         {/* Header */}
         <div className="text-center mb-8">
           <Image
-            src="/images/ecotocare-icon.png"
-            alt="Ecotocare"
+            src={cabinet.logoUrl || "/images/ecotocare-icon.png"}
+            alt={cabinet.name}
             width={48}
             height={48}
-            className="mx-auto rounded-xl mb-4 shadow-sm"
+            unoptimized={Boolean(cabinet.logoUrl)}
+            className="mx-auto rounded-xl mb-4 shadow-sm object-cover"
           />
           <h1 className="text-3xl font-bold tracking-tight text-ink">{cabinet.name}</h1>
           <p className="mt-2 text-ink-muted">

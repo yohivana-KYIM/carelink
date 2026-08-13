@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Loader2, Plus, Search, Edit, Download, Upload, Share2,
   Users, AlertTriangle, MessageCircle, UserPlus, Trash2, SlidersHorizontal, X, Send,
+  Link as LinkIcon,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
@@ -130,6 +131,13 @@ export default function PatientsPage() {
     const url = `${window.location.origin}/book/${user.cabinetId}`;
     navigator.clipboard.writeText(url);
     toast.success("Lien copié !");
+  }
+
+  function copyPatientBookingLink(p: Patient) {
+    if (!user?.cabinetId) return;
+    const url = `${window.location.origin}/book/${user.cabinetId}?patient=${p.id}`;
+    navigator.clipboard.writeText(url);
+    toast.success(`Lien personnalisé copié pour ${p.fullName}`);
   }
 
   function openCreate() {
@@ -345,6 +353,13 @@ export default function PatientsPage() {
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => copyPatientBookingLink(p)}
+                          title="Copier le lien de RDV personnalisé pour ce patient"
+                          className="text-ink-soft hover:text-brand-600 transition-colors"
+                        >
+                          <LinkIcon size={15} />
+                        </button>
                         <button
                           onClick={() => handleRelanceNow(p)}
                           disabled={!p.whatsappOptIn || relancingId === p.id}

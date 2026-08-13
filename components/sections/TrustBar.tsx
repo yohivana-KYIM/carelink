@@ -36,24 +36,17 @@ const cards = [
 ];
 
 const glowColors: Record<string, string> = {
-  brand:   "group-hover:shadow-brand-400/30",
-  emerald: "group-hover:shadow-emerald-400/30",
-  violet:  "group-hover:shadow-violet-400/30",
-  sky:     "group-hover:shadow-sky-400/30",
-};
-
-const ringColors: Record<string, string> = {
-  brand:   "group-hover:border-brand-400/60",
-  emerald: "group-hover:border-emerald-400/60",
-  violet:  "group-hover:border-violet-400/60",
-  sky:     "group-hover:border-sky-400/60",
+  brand:   "group-hover:shadow-brand-400/40",
+  emerald: "group-hover:shadow-emerald-400/40",
+  violet:  "group-hover:shadow-violet-400/40",
+  sky:     "group-hover:shadow-sky-400/40",
 };
 
 export function TrustBar() {
   return (
     <section id="securite" className="scroll-mt-24 py-12">
       <Container>
-        <div className="rounded-[2rem] border border-border bg-surface-raised p-6 shadow-card">
+        <div className="rounded-[2rem] border border-border bg-surface-raised p-6 shadow-card sm:p-8">
           {/* Header */}
           <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -100,27 +93,31 @@ function TrustCard({
     <RevealItem>
       <motion.div
         className={[
-          "group relative overflow-hidden rounded-[1.75rem] border border-white/10",
-          "bg-white/5 shadow-sm cursor-pointer select-none",
-          "transition-all duration-300",
-          ringColors[meta.glow],
+          "group relative overflow-hidden rounded-[1.75rem] border",
+          "cursor-pointer select-none",
+          "transition-all duration-500",
+          "border-border bg-surface dark:bg-surface-raised",
           glowColors[meta.glow],
-          "hover:shadow-xl",
+          "hover:shadow-2xl",
         ].join(" ")}
         onHoverStart={() => setHovered(true)}
         onHoverEnd={() => setHovered(false)}
         onTapStart={() => setHovered(true)}
         onTap={() => setHovered(false)}
-        whileHover={{ y: -4, scale: 1.02 }}
+        whileHover={{ y: -6, scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
-        transition={{ type: "spring", stiffness: 300, damping: 22 }}
+        transition={{ type: "spring", stiffness: 280, damping: 20 }}
       >
-        {/* Background image — revealed on hover */}
+        {/* Fond image — révélé au hover avec blur décroissant */}
         <motion.div
           className="absolute inset-0 z-0"
-          initial={{ opacity: 0, scale: 1.08 }}
-          animate={hovered ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.08 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          initial={{ opacity: 0, scale: 1.12, filter: "blur(4px)" }}
+          animate={
+            hovered
+              ? { opacity: 1, scale: 1, filter: "blur(0px)" }
+              : { opacity: 0, scale: 1.12, filter: "blur(4px)" }
+          }
+          transition={{ duration: 0.45, ease: "easeOut" }}
         >
           <Image
             src={meta.image}
@@ -130,49 +127,62 @@ function TrustCard({
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
             className="object-cover object-center"
           />
-          {/* Color overlay on image */}
-          <div className={`absolute inset-0 bg-gradient-to-br ${meta.accent} opacity-70`} />
-          <div className="absolute inset-0 bg-black/40" />
+          <div className={`absolute inset-0 bg-gradient-to-br ${meta.accent} opacity-75`} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
         </motion.div>
 
+        {/* Lueur d'arrière-plan subtile au repos */}
+        <div className={`pointer-events-none absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${meta.accent} opacity-[0.07] rounded-[1.75rem]`} />
+
         {/* Card content */}
-        <div className="relative z-10 flex flex-col gap-4 p-6 h-full min-h-[180px]">
-          {/* Icon */}
+        <div className="relative z-10 flex flex-col gap-5 p-6 h-full min-h-[200px]">
+          {/* Icône avec fond animé */}
           <motion.span
             animate={
               hovered
-                ? { backgroundColor: "rgba(255,255,255,0.2)", color: "#fff", scale: 1.1 }
-                : {}
+                ? { backgroundColor: "rgba(255,255,255,0.25)", color: "#fff", scale: 1.15, rotate: 8 }
+                : { scale: 1, rotate: 0 }
             }
-            transition={{ duration: 0.25 }}
-            className={`flex size-10 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300`}
+            transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
+            className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300 shadow-sm"
           >
-            <Icon size={18} />
+            <Icon size={20} />
           </motion.span>
 
-          <div>
+          <div className="flex flex-col gap-2 flex-1">
             <motion.p
               animate={hovered ? { color: "#fff" } : {}}
-              transition={{ duration: 0.25 }}
-              className="text-sm font-semibold text-ink"
+              transition={{ duration: 0.2 }}
+              className="text-sm font-bold text-ink leading-snug"
             >
               {point.title}
             </motion.p>
             <motion.p
-              animate={hovered ? { color: "rgba(255,255,255,0.8)" } : {}}
-              transition={{ duration: 0.25 }}
-              className="mt-2 text-sm leading-relaxed text-ink-soft"
+              animate={hovered ? { color: "rgba(255,255,255,0.82)" } : {}}
+              transition={{ duration: 0.2 }}
+              className="text-sm leading-relaxed text-ink-soft"
             >
               {point.description}
             </motion.p>
           </div>
 
-          {/* Animated bottom bar */}
+          {/* Badge "En savoir plus" apparu au hover */}
           <motion.div
-            className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r ${meta.accent}`}
+            initial={{ opacity: 0, y: 8 }}
+            animate={hovered ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+            transition={{ duration: 0.25, delay: 0.05 }}
+            className="flex items-center gap-1.5 text-xs font-semibold text-white/80"
+          >
+            <span className={`h-1 w-4 rounded-full bg-gradient-to-r ${meta.accent}`} />
+            Sécurisé &amp; certifié
+          </motion.div>
+
+          {/* Barre de progression bas */}
+          <motion.div
+            className={`absolute bottom-0 left-0 h-[3px] bg-gradient-to-r ${meta.accent} rounded-b-[1.75rem]`}
             initial={{ width: "0%" }}
             animate={hovered ? { width: "100%" } : { width: "0%" }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
           />
         </div>
       </motion.div>

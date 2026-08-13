@@ -2,7 +2,7 @@
 
 import { useEffect, useState, FormEvent, useMemo } from "react";
 import { motion } from "motion/react";
-import { Loader2, Plus, Calendar as CalendarIcon, Edit, X, List, Grid } from "lucide-react";
+import { Loader2, Plus, Calendar as CalendarIcon, Edit, X, List, Grid, Download } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
 import { api, type Appointment, type Patient, type Practitioner } from "@/lib/api";
@@ -68,20 +68,23 @@ export default function AppointmentsPage() {
   const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
   const [page, setPage] = useState(1);
   const pageSize = 10;
-  
+  const [year, setYear] = useState("");
+  const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 6 }, (_, i) => String(currentYear - i));
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  
+
   const [form, setForm] = useState({ patientId: "", practitionerId: "", scheduledAt: "", careType: "", notes: "", status: "PENDING" });
 
   async function load() {
     if (!token) return;
     setLoading(true);
     try {
-      // Pour le calendrier, on charge tout (all)
+      // Pour le calendrier, on charge tout (all), avec filtre annee optionnel
       const [resAppts, resPats, resPracs] = await Promise.all([
-        api.listAppointments(token, { range: "all" }),
+        api.listAppointments(token, { range: "all", year: year ? Number(year) : undefined, pageSize: 5000 }),
         api.listPatients(token),
         api.listPractitioners(token)
       ]);
@@ -96,7 +99,32 @@ export default function AppointmentsPage() {
 
   useEffect(() => {
     void load();
-  }, [token]);
+  }, [token, year]);
+
+  function handleExportCSV() {
+    const headers = ["Patient", "Praticien", "Date", "Heure", "Statut", "Motif"];
+    const rows = appointments.map((a) => {
+      const d = new Date(a.scheduledAt);
+      return [
+        `"${a.patient?.fullName ?? ""}"`,
+        `"${a.practitioner?.fullName ?? ""}"`,
+        d.toLocaleDateString("fr-FR"),
+        d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
+        statusLabel(a.status),
+        `"${a.careType ?? ""}"`,
+      ];
+    });
+    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "rendez-vous_ecotocare.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success(`${appointments.length} rendez-vous exportés`);
+  }
 
   // Calcul des métriques
   const { todayCount, tomorrowCount, rescheduleCount } = useMemo(() => {
@@ -269,19 +297,39 @@ export default function AppointmentsPage() {
         </div>
       )}
 
-      <div className="flex items-center gap-2 border-b border-border pb-2">
-        <button
-          onClick={() => setViewMode("calendar")}
-          className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${viewMode === "calendar" ? "bg-brand-600 text-white" : "text-ink-muted hover:bg-surface-raised"}`}
-        >
-          <Grid size={16} /> Calendrier
-        </button>
-        <button
-          onClick={() => setViewMode("list")}
-          className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${viewMode === "list" ? "bg-brand-600 text-white" : "text-ink-muted hover:bg-surface-raised"}`}
-        >
-          <List size={16} /> Liste détaillée
-        </button>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setViewMode("calendar")}
+            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${viewMode === "calendar" ? "bg-brand-600 text-white" : "text-ink-muted hover:bg-surface-raised"}`}
+          >
+            <Grid size={16} /> Calendrier
+          </button>
+          <button
+            onClick={() => setViewMode("list")}
+            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${viewMode === "list" ? "bg-brand-600 text-white" : "text-ink-muted hover:bg-surface-raised"}`}
+          >
+            <List size={16} /> Liste détaillée
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <select
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            className="rounded-full border border-border bg-background px-3 py-2 text-sm text-ink focus:outline-none"
+          >
+            <option value="">Toutes les années</option>
+            {yearOptions.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+          <button
+            onClick={handleExportCSV}
+            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink hover:bg-surface-raised"
+          >
+            <Download size={15} /> Exporter
+          </button>
+        </div>
       </div>
 
       {loading ? (

@@ -21,11 +21,13 @@ export function HowItWorks() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {howItWorksSteps.map((step, index) => (
             <Reveal key={step.number} delay={index * 0.1}>
-              <div className="flex h-full flex-col gap-5 rounded-2xl border border-border bg-surface-raised p-6 shadow-card">
-                <span className="text-4xl font-bold text-brand-200 dark:text-brand-800">
+              <div className="group relative flex h-full flex-col gap-5 overflow-hidden rounded-2xl border border-border bg-surface-raised p-6 shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-200/80 hover:shadow-xl dark:hover:border-brand-800/80">
+                {/* Lueur fond */}
+                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-brand-50/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-brand-500/10" />
+                <span className="relative text-4xl font-bold text-brand-200 transition-colors duration-300 group-hover:text-brand-300 dark:text-brand-800 dark:group-hover:text-brand-700">
                   {step.number}
                 </span>
-                <div>
+                <div className="relative">
                   <h3 className="text-lg font-semibold text-ink">{step.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-ink-muted">
                     {step.description}
@@ -42,6 +44,8 @@ export function HowItWorks() {
                     />
                   </div>
                 ) : null}
+                {/* Barre colorée bas */}
+                <div className="absolute bottom-0 left-0 h-[3px] w-0 bg-gradient-to-r from-brand-600 to-brand-400 transition-all duration-500 group-hover:w-full rounded-b-2xl" />
               </div>
             </Reveal>
           ))}

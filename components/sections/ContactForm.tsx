@@ -119,9 +119,12 @@ export function ContactForm() {
           <form
             onSubmit={handleSubmit}
             noValidate
-            className="flex flex-col gap-5 rounded-[2rem] border border-border bg-surface-raised p-8 shadow-card sm:p-10"
+            className="relative overflow-hidden flex flex-col gap-5 rounded-[2rem] border border-border bg-surface-raised p-8 shadow-card sm:p-10"
           >
-            <div className="grid gap-5 sm:grid-cols-2">
+            {/* Décoration fond */}
+            <div className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-brand-100/40 blur-3xl dark:bg-brand-800/20" />
+            <div className="pointer-events-none absolute -bottom-12 -left-12 size-36 rounded-full bg-brand-100/30 blur-2xl dark:bg-brand-800/15" />
+            <div className="relative z-10 grid gap-5 sm:grid-cols-2">
               <Field
                 id="name"
                 label="Nom complet"
@@ -141,7 +144,7 @@ export function ContactForm() {
               />
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="relative z-10 grid gap-5 sm:grid-cols-2">
               <Field
                 id="clinic"
                 label="Nom du cabinet"
@@ -188,6 +191,7 @@ export function ContactForm() {
             </div>
 
             <Field
+              className="relative z-10"
               id="subject"
               label="Objet"
               value={values.subject}
@@ -260,6 +264,7 @@ function Field({
   placeholder,
   type = "text",
   required = false,
+  className = "",
 }: {
   id: string;
   label: string;
@@ -268,9 +273,10 @@ function Field({
   placeholder: string;
   type?: string;
   required?: boolean;
+  className?: string;
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className={`flex flex-col gap-2 ${className}`}>
       <label htmlFor={id} className="text-sm font-medium text-ink">
         {label} {required ? <span className="text-brand-600">*</span> : null}
       </label>

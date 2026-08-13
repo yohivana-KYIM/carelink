@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, FileText, TrendingUp, RefreshCw, Calendar } from "lucide-react";
+import { Loader2, FileText, TrendingUp, RefreshCw, Calendar, Download } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
 import { api, type Report } from "@/lib/api";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
 const PERIOD_LABELS: Record<string, string> = {
   DAILY: "Journalier",
@@ -41,6 +43,27 @@ export default function ReportsPage() {
       await load();
     } catch { toast.error("Erreur de génération"); }
     setGenerating(false);
+  }
+
+  async function downloadPdf(id: string) {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_URL}/api/reports/${id}/pdf`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error();
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `rapport-${id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error("Erreur de téléchargement du PDF");
+    }
   }
 
   return (
@@ -104,6 +127,13 @@ export default function ReportsPage() {
                       </div>
                     </div>
                   </div>
+                  <button
+                    onClick={() => downloadPdf(r.id)}
+                    title="Télécharger en PDF"
+                    className="flex shrink-0 items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-ink-muted hover:bg-surface hover:text-ink transition-colors"
+                  >
+                    <Download size={13} /> PDF
+                  </button>
                 </div>
 
                 {appts && (

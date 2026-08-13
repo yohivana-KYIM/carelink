@@ -15,6 +15,7 @@ import { toast } from "react-hot-toast";
 import { enablePushNotifications } from "@/lib/push";
 import { HelpWidget } from "./HelpWidget";
 import { OnboardingTour } from "./OnboardingTour";
+import { CabinetTheme } from "@/components/providers/CabinetTheme";
 
 export type DashboardNavItem = {
   label: string;
@@ -257,6 +258,7 @@ export function DashboardShell({
       />
       <HelpWidget />
       <OnboardingTour userId={user?.id} />
+      <CabinetTheme primaryColor={cabinet?.primaryColor} />
     </div>
   );
 }
