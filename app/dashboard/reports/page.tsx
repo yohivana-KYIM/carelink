@@ -110,8 +110,10 @@ export default function ReportsPage() {
             try { data = JSON.parse(r.data); } catch { /* ignore */ }
             const appts = data.appointments as { total?: number; confirmed?: number; noShows?: number; cancelled?: number } | undefined;
             return (
-              <div key={r.id} className="rounded-2xl border border-border bg-surface-raised p-5">
-                <div className="flex items-start justify-between gap-3 mb-4">
+              <div key={r.id} className="group relative overflow-hidden rounded-2xl border border-border bg-surface-raised p-5 transition-all duration-300 hover:shadow-lg hover:border-border">
+                {/* Lueur fond */}
+                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-brand-50/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-brand-500/8" />
+                <div className="relative z-10 flex items-start justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3">
                     <span className="flex size-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10">
                       <FileText size={16} />
@@ -137,23 +139,26 @@ export default function ReportsPage() {
                 </div>
 
                 {appts && (
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <div className="relative z-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
                     {[
-                      { label: "RDV total", value: appts.total ?? 0, color: "brand" },
-                      { label: "Confirmés", value: appts.confirmed ?? 0, color: "emerald" },
-                      { label: "Absents", value: appts.noShows ?? 0, color: "amber" },
-                      { label: "Taux confirm.", value: `${(data.confirmationRate as number | undefined) ?? 0}%`, color: "violet" },
-                    ].map(({ label, value, color }) => (
-                      <div key={label} className={`rounded-xl bg-${color}-50 dark:bg-${color}-500/10 p-3`}>
-                        <p className={`text-xs text-${color}-600 dark:text-${color}-400`}>{label}</p>
-                        <p className={`text-xl font-bold text-${color}-700 dark:text-${color}-300`}>{String(value)}</p>
-                      </div>
-                    ))}
+                      { label: "RDV total", value: appts.total ?? 0, cls: "bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 text-brand-700 dark:text-brand-300" },
+                      { label: "Confirmés", value: appts.confirmed ?? 0, cls: "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-emerald-700 dark:text-emerald-300" },
+                      { label: "Absents", value: appts.noShows ?? 0, cls: "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 text-amber-700 dark:text-amber-300" },
+                      { label: "Taux confirm.", value: `${(data.confirmationRate as number | undefined) ?? 0}%`, cls: "bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400 text-violet-700 dark:text-violet-300" },
+                    ].map(({ label, value, cls }) => {
+                      const [bg, , labelColor, , valueColor] = cls.split(" ");
+                      return (
+                        <div key={label} className={`rounded-xl p-3 ${bg}`}>
+                          <p className={`text-xs font-medium ${labelColor}`}>{label}</p>
+                          <p className={`mt-0.5 text-xl font-bold ${valueColor}`}>{String(value)}</p>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
 
                 {Boolean(data.topCareTypes) && Array.isArray(data.topCareTypes) && (data.topCareTypes as unknown[]).length > 0 && (
-                  <div className="mt-4">
+                  <div className="relative z-10 mt-4">
                     <p className="text-xs font-semibold text-ink-muted mb-2 flex items-center gap-1"><TrendingUp size={12} /> Types de soins populaires</p>
                     <div className="flex flex-wrap gap-2">
                     {(data.topCareTypes as { type: string; count: number }[]).map(t => (

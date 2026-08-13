@@ -10,7 +10,7 @@ test:
   tags:
     - ecotocare-vps
   script:
-    - docker run --rm -v "$CI_PROJECT_DIR":/app -w /app node:20-alpine sh -c "npm ci --no-audit --no-fund && npm run lint"
+    - docker run --rm -v "$CI_PROJECT_DIR":/app -w /app node:20-alpine sh -c "npm ci --no-audit --no-fund && npm run lint && npm test"
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
   # Dette de lint préexistante (avant ce pipeline) ne doit pas bloquer le déploiement.

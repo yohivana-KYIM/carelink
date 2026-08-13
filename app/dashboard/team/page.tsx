@@ -183,7 +183,7 @@ export default function TeamPage() {
               {members.map((member) => {
                 const isEditing = editingId === member.id;
                 return (
-                  <tr key={member.id}>
+                  <tr key={member.id} className="transition-colors hover:bg-surface">
                     <td className="px-5 py-3.5 font-medium text-ink">
                       {isEditing ? (
                         <input
@@ -192,7 +192,12 @@ export default function TeamPage() {
                           className="w-full rounded-full border border-border bg-background px-3 py-1.5 text-sm text-ink focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800"
                         />
                       ) : (
-                        member.fullName
+                        <div className="flex items-center gap-2.5">
+                          <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
+                            {member.fullName.charAt(0).toUpperCase()}
+                          </div>
+                          {member.fullName}
+                        </div>
                       )}
                     </td>
                     <td className="px-5 py-3.5 text-ink-muted">
@@ -208,7 +213,11 @@ export default function TeamPage() {
                       )}
                     </td>
                     <td className="px-5 py-3.5">
-                      <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                        member.role === "ADMIN"
+                          ? "bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300"
+                          : "bg-surface text-ink-muted border border-border"
+                      }`}>
                         {member.role === "ADMIN" ? "Docteur" : "Secrétariat"}
                       </span>
                     </td>

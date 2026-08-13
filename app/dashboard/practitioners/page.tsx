@@ -106,23 +106,27 @@ export default function PractitionersPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {practitioners.map(p => (
-            <div key={p.id} className="flex flex-col gap-3 rounded-2xl border border-border bg-surface-raised p-5 relative group">
+            <div key={p.id} className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-border bg-surface-raised p-5 transition-all duration-300 hover:-translate-y-1 hover:border-brand-200/70 hover:shadow-lg dark:hover:border-brand-800/70">
+              {/* Lueur fond */}
+              <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-brand-50/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-brand-500/8" />
               {isAdmin && (
-                <button 
+                <button
                   onClick={() => handleDelete(p.id)}
-                  className="absolute top-4 right-4 text-ink-muted hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute right-4 top-4 z-10 rounded-full p-1.5 text-ink-muted opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 dark:hover:bg-red-500/10"
                   title="Supprimer"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={15} />
                 </button>
               )}
-              <div className="flex size-12 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+              <div className="relative z-10 flex size-12 items-center justify-center rounded-full bg-brand-50 text-brand-600 transition-transform duration-300 group-hover:scale-110 dark:bg-brand-500/10 dark:text-brand-400">
                 <Stethoscope size={20} />
               </div>
-              <div>
+              <div className="relative z-10">
                 <p className="font-semibold text-ink">{p.fullName}</p>
-                <p className="text-xs text-ink-soft mt-1">Ajouté le {new Date(p.createdAt).toLocaleDateString()}</p>
+                <p className="mt-1 text-xs text-ink-soft">Ajouté le {new Date(p.createdAt).toLocaleDateString("fr-FR")}</p>
               </div>
+              {/* Barre colorée bas */}
+              <div className="absolute bottom-0 left-0 h-[3px] w-0 bg-gradient-to-r from-brand-600 to-brand-400 transition-all duration-500 group-hover:w-full rounded-b-2xl" />
             </div>
           ))}
         </div>

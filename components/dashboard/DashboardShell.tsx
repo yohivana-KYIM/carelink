@@ -189,7 +189,7 @@ export function DashboardShell({
       </AnimatePresence>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-surface-raised px-4 sm:px-6">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-surface-raised/95 backdrop-blur-sm px-4 sm:px-6 sticky top-0 z-30">
           <button
             type="button"
             onClick={toggleSidebar}
@@ -315,42 +315,46 @@ function SidebarContent({
               href={item.href}
               onClick={onNavigate}
               title={collapsed ? item.label : undefined}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
                 collapsed ? "justify-center" : ""
               } ${
                 isActive
-                  ? "bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
+                  ? "bg-brand-50 text-brand-700 shadow-sm dark:bg-brand-500/15 dark:text-brand-300"
                   : "text-ink-muted hover:bg-surface hover:text-ink"
               }`}
             >
-              <item.icon size={17} className="shrink-0" />
+              <item.icon size={17} className={`shrink-0 transition-transform duration-200 ${isActive ? "scale-110" : ""}`} />
               {!collapsed && <span className="truncate">{item.label}</span>}
+              {!collapsed && isActive && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-600 dark:bg-brand-400" />}
             </Link>
           );
         })}
       </nav>
 
       {userFullName ? (
-        <div className={`mt-auto border-t border-border bg-surface/50 p-5 ${collapsed ? "flex justify-center px-2" : ""}`}>
-          <div className={`flex items-center gap-3 ${collapsed ? "justify-center" : ""}`}>
+        <div className={`mt-auto border-t border-border bg-surface/60 px-4 py-4 ${collapsed ? "flex justify-center px-2" : ""}`}>
+          <div className={`flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-surface ${collapsed ? "justify-center" : ""}`}>
             {avatarUrl ? (
               <Image
                 src={avatarUrl}
                 alt={userFullName}
-                width={40}
-                height={40}
-                className="size-10 shrink-0 rounded-full border border-border object-cover"
+                width={36}
+                height={36}
+                className="size-9 shrink-0 rounded-full border border-border object-cover"
                 unoptimized
               />
             ) : (
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
                 {userFullName.charAt(0).toUpperCase()}
               </div>
             )}
             {!collapsed && (
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-ink">{userFullName}</p>
-                <p className="truncate text-xs text-ink-soft">Connecté</p>
+                <p className="flex items-center gap-1 text-xs text-ink-soft">
+                  <span className="inline-block size-1.5 rounded-full bg-emerald-500" />
+                  Connecté
+                </p>
               </div>
             )}
           </div>

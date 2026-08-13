@@ -126,27 +126,31 @@ export function SignupWizard() {
     <section className="grid min-h-[calc(100vh-6rem)] items-center py-16 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
       <div className="relative flex w-full items-center justify-center px-6 overflow-hidden bg-brand-50/30 dark:bg-brand-950/20 sm:px-10 lg:px-12">
         <GeometricDecorations />
-        <Reveal className="relative z-10 w-full max-w-3xl">
-          <div className="rounded-[2rem] border border-border bg-surface-raised/80 backdrop-blur-md p-8 shadow-xl sm:p-12">
-            <div className="flex flex-col items-center gap-3 text-center">
+        <Reveal className="relative z-10 w-full max-w-3xl py-10">
+          <div className="relative overflow-hidden rounded-[2rem] border border-border bg-surface-raised/80 backdrop-blur-md p-8 shadow-xl sm:p-12">
+            {/* Lueur décorative dans la card */}
+            <div className="pointer-events-none absolute -right-20 -top-20 size-56 rounded-full bg-brand-100/50 blur-3xl dark:bg-brand-800/20" />
+            <div className="pointer-events-none absolute -bottom-16 -left-16 size-40 rounded-full bg-brand-100/40 blur-2xl dark:bg-brand-800/15" />
+
+            <div className="relative z-10 flex flex-col items-center gap-3 text-center">
               <Image
                 src="/images/ecotocare-icon.png"
                 alt={`Logo ${siteConfig.name}`}
-                width={44}
-                height={44}
-                className="rounded-xl"
+                width={48}
+                height={48}
+                className="rounded-xl shadow-sm"
               />
               <h1 className="text-2xl font-semibold tracking-tight text-ink">
                 Créer votre compte {siteConfig.name}
               </h1>
               <p className="text-sm text-ink-muted">
-                Trois étapes rapides pour préparer l&apos;espace de votre
-                cabinet.
+                Trois étapes rapides pour préparer l&apos;espace de votre cabinet.
               </p>
             </div>
 
             {status !== "success" ? (
               <>
+                <Stepper current={step} />
                 <form onSubmit={handleSubmit} noValidate className="mt-8">
               <AnimatePresence mode="wait">
               <motion.div
@@ -267,9 +271,13 @@ export function SignupWizard() {
                   </AnimatePresence>
 
                   {error ? (
-                    <p className="mt-4 text-sm font-medium text-red-600 dark:text-red-400">
+                    <motion.p
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-4 flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400"
+                    >
                       {error}
-                    </p>
+                    </motion.p>
                   ) : null}
 
                   <div className="mt-7 flex items-center gap-3">

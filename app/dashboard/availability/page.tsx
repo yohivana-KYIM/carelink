@@ -226,21 +226,26 @@ export default function AvailabilityPage() {
             {availabilities.map((a) => {
               const prac = practitioners.find((p) => p.id === a.practitionerId);
               return (
-                <div key={a.id} className="flex items-center justify-between px-6 py-4">
-                  <div>
-                    <p className="text-sm font-semibold text-ink">
-                      {DAYS[a.dayOfWeek]} · {a.startTime} — {a.endTime}
-                    </p>
-                    <p className="text-xs text-ink-muted mt-0.5">
-                      Créneaux de {a.slotDurationMin} min
-                      {prac ? ` · ${prac.fullName}` : " · Tout le cabinet"}
-                    </p>
+                <div key={a.id} className="flex items-center justify-between px-6 py-4 transition-colors hover:bg-surface">
+                  <div className="flex items-center gap-3">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                      <Clock size={14} />
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-ink">
+                        {DAYS[a.dayOfWeek]} · {a.startTime} — {a.endTime}
+                      </p>
+                      <p className="mt-0.5 text-xs text-ink-muted">
+                        Créneaux de {a.slotDurationMin} min
+                        {prac ? ` · ${prac.fullName}` : " · Tout le cabinet"}
+                      </p>
+                    </div>
                   </div>
                   <button
                     onClick={() => handleDelete(a.id)}
-                    className="text-ink-soft hover:text-red-600 transition-colors"
+                    className="flex size-8 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10"
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={15} />
                   </button>
                 </div>
               );

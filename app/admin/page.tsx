@@ -174,7 +174,7 @@ export default function AdminCabinetsPage() {
             </thead>
             <tbody className="divide-y divide-border">
               {cabinets.map((cabinet) => (
-                <motion.tr key={cabinet.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <motion.tr key={cabinet.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="transition-colors hover:bg-surface">
                   <td className="px-5 py-3.5">
                     <p className="font-medium text-ink">{cabinet.name}</p>
                     <p className="text-xs text-ink-soft">{cabinet.city ?? "—"}</p>
@@ -296,12 +296,19 @@ function StatCard({
     emerald: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
   }[tone];
 
+  const glowClasses = {
+    brand: "from-brand-50/60 dark:from-brand-500/10",
+    amber: "from-amber-50/60 dark:from-amber-500/10",
+    emerald: "from-emerald-50/60 dark:from-emerald-500/10",
+  }[tone];
+
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface-raised p-5">
-      <span className={`flex size-10 items-center justify-center rounded-xl ${toneClasses}`}>
+    <div className="group relative overflow-hidden flex flex-col gap-3 rounded-2xl border border-border bg-surface-raised p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+      <div className={`pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br ${glowClasses} to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
+      <span className={`relative flex size-10 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 ${toneClasses}`}>
         <Icon size={18} />
       </span>
-      <div>
+      <div className="relative">
         <p className="text-2xl font-semibold text-ink">{value}</p>
         <p className="text-sm text-ink-soft">{label}</p>
       </div>
