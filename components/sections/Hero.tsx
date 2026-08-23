@@ -35,7 +35,7 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.05 }}
             className="text-balance text-4xl font-bold leading-[1.05] tracking-tight text-ink sm:text-5xl lg:text-[3.25rem]"
           >
-            {t("hero.title", "Ne manquez plus aucun rendez-vous patient")}
+            {t("hero.title", "Ne manquez plus aucun rendez-vous patient grâce à WhatsApp")}
           </motion.h1>
 
           <motion.p
@@ -46,7 +46,7 @@ export function Hero() {
           >
             {t(
               "hero.subtitle",
-              `${siteConfig.name} envoie automatiquement les rappels de rendez-vous et relance les patients inactifs par WhatsApp, le canal que vos patients consultent déjà tous les jours.`,
+              `${siteConfig.name}, le logiciel de rappel de rendez-vous par WhatsApp pour cabinets dentaires : rappels automatiques et relance des patients inactifs, sur le canal que vos patients consultent déjà tous les jours.`,
               { name: siteConfig.name }
             )}
           </motion.p>

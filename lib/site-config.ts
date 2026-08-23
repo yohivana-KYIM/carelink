@@ -1,17 +1,18 @@
 export const siteConfig = {
   name: "Ecotocare",
-  tagline: "Rappels et relances patients par WhatsApp",
+  tagline: "Logiciel de rappel de rendez-vous WhatsApp pour cabinets dentaires",
   description:
-    "Ecotocare automatise les rappels de rendez-vous et les relances de patients inactifs par WhatsApp pour les cabinets dentaires : moins de rendez-vous manqués, un dashboard simple, sans installation.",
+    "Ecotocare est le logiciel de rappel de rendez-vous par WhatsApp pour cabinets dentaires : rappels automatiques, relance des patients inactifs, moins de rendez-vous manqués, dashboard cabinet dentaire sans installation.",
   url: "https://ecotocare.com",
   locale: "fr_FR",
   keywords: [
-    "rappel rendez-vous WhatsApp",
-    "logiciel cabinet dentaire",
-    "relance patients inactifs",
+    "rappel rendez-vous WhatsApp dentiste",
+    "logiciel de rappel de rendez-vous pour dentiste",
+    "réduire les rendez-vous manqués cabinet dentaire",
+    "relance patients inactifs WhatsApp",
     "no-show dentiste",
-    "WhatsApp Business API santé",
-    "dashboard cabinet dentaire",
+    "WhatsApp Business API cabinet dentaire",
+    "dashboard cabinet dentaire sans installation",
   ],
   contactEmail: "contact@ecotocare.com",
   social: {
