@@ -2,7 +2,7 @@
 
 import { useEffect, useState, FormEvent } from "react";
 import { motion } from "motion/react";
-import { Loader2, Plus, Stethoscope, Trash2, X } from "lucide-react";
+import { Loader2, Pencil, Plus, Stethoscope, Trash2, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
 import { api, type Practitioner } from "@/lib/api";
@@ -29,7 +29,8 @@ export default function PractitionersPage() {
   
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  
+  const [editingId, setEditingId] = useState<string | null>(null);
+
   const [form, setForm] = useState({ fullName: "" });
 
   async function load() {
@@ -49,7 +50,14 @@ export default function PractitionersPage() {
   }, [token]);
 
   function openCreateModal() {
+    setEditingId(null);
     setForm({ fullName: "" });
+    setModalOpen(true);
+  }
+
+  function openEditModal(p: Practitioner) {
+    setEditingId(p.id);
+    setForm({ fullName: p.fullName });
     setModalOpen(true);
   }
 
@@ -58,8 +66,13 @@ export default function PractitionersPage() {
     if (!token) return;
     setSubmitting(true);
     try {
-      await api.createPractitioner(token, form);
-      toast.success("Praticien ajouté avec succès");
+      if (editingId) {
+        await api.updatePractitioner(token, editingId, form);
+        toast.success("Praticien renommé avec succès");
+      } else {
+        await api.createPractitioner(token, form);
+        toast.success("Praticien ajouté avec succès");
+      }
       setModalOpen(false);
       await load();
     } catch (err: any) {
@@ -110,13 +123,22 @@ export default function PractitionersPage() {
               {/* Lueur fond */}
               <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-brand-50/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-brand-500/8" />
               {isAdmin && (
-                <button
-                  onClick={() => handleDelete(p.id)}
-                  className="absolute right-4 top-4 z-10 rounded-full p-1.5 text-ink-muted opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 dark:hover:bg-red-500/10"
-                  title="Supprimer"
-                >
-                  <Trash2 size={15} />
-                </button>
+                <div className="absolute right-4 top-4 z-10 flex items-center gap-1 opacity-0 transition-all group-hover:opacity-100">
+                  <button
+                    onClick={() => openEditModal(p)}
+                    className="rounded-full p-1.5 text-ink-muted hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-500/10"
+                    title="Renommer"
+                  >
+                    <Pencil size={15} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(p.id)}
+                    className="rounded-full p-1.5 text-ink-muted hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10"
+                    title="Supprimer"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
               )}
               <div className="relative z-10 flex size-12 items-center justify-center rounded-full bg-brand-50 text-brand-600 transition-transform duration-300 group-hover:scale-110 dark:bg-brand-500/10 dark:text-brand-400">
                 <Stethoscope size={20} />
@@ -132,20 +154,20 @@ export default function PractitionersPage() {
         </div>
       )}
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Nouveau praticien">
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editingId ? "Renommer le praticien" : "Nouveau praticien"}>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="text-sm font-medium text-ink">Nom complet (ex: Dr. Dupont)</label>
-            <input 
-              required 
-              value={form.fullName} 
-              onChange={e => setForm({...form, fullName: e.target.value})} 
+            <input
+              required
+              value={form.fullName}
+              onChange={e => setForm({...form, fullName: e.target.value})}
               placeholder="Dr. Jean Dupont"
-              className="mt-1 w-full rounded-full border border-border bg-background px-4 py-2 text-sm text-ink focus:border-brand-400 focus:outline-none" 
+              className="mt-1 w-full rounded-full border border-border bg-background px-4 py-2 text-sm text-ink focus:border-brand-400 focus:outline-none"
             />
           </div>
           <button type="submit" disabled={submitting} className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-70">
-            {submitting ? <Loader2 size={16} className="animate-spin" /> : "Créer le praticien"}
+            {submitting ? <Loader2 size={16} className="animate-spin" /> : editingId ? "Enregistrer" : "Créer le praticien"}
           </button>
         </form>
       </Modal>

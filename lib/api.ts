@@ -493,6 +493,9 @@ export const api = {
   createPractitioner: (token: string, input: { fullName: string }) =>
     authed<{ practitioner: Practitioner }>(token, "/api/practitioners", { method: "POST", body: input }),
 
+  updatePractitioner: (token: string, id: string, input: { fullName: string }) =>
+    authed<{ practitioner: Practitioner }>(token, `/api/practitioners/${id}`, { method: "PATCH", body: input }),
+
   deletePractitioner: (token: string, id: string) =>
     authed<void>(token, `/api/practitioners/${id}`, { method: "DELETE" }),
 
@@ -522,7 +525,7 @@ export const api = {
     );
   },
 
-  requestPublicAppointment: (cabinetId: string, input: { fullName: string; phoneNumber: string; scheduledAt: string; practitionerId?: string; careType?: string; notes?: string; patientId?: string }) =>
+  requestPublicAppointment: (cabinetId: string, input: { fullName: string; phoneNumber: string; scheduledAt: string; practitionerId?: string; careType?: string; notes?: string; patientId?: string; whatsappOptIn?: boolean }) =>
     request<{ appointment: Appointment }>(`/api/public/cabinets/${cabinetId}/book`, { method: "POST", body: input }),
 
   // Push

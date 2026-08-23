@@ -6,13 +6,15 @@ import { LayoutDashboard, Loader2, UsersRound, Bell, Calendar, UserSquare2, Sett
 import { SessionProvider, useSession } from "@/lib/session";
 import { DashboardShell, type DashboardNavItem } from "@/components/dashboard/DashboardShell";
 
-const navItems: DashboardNavItem[] = [
+const baseNavItems: (DashboardNavItem & { adminOnly?: boolean })[] = [
   { label: "Vue d'ensemble", href: "/dashboard", icon: LayoutDashboard },
   { label: "Rendez-vous", href: "/dashboard/appointments", icon: Calendar },
   { label: "Patients", href: "/dashboard/patients", icon: UserSquare2 },
   { label: "Praticiens", href: "/dashboard/practitioners", icon: Stethoscope },
-  { label: "Disponibilités", href: "/dashboard/availability", icon: Clock },
-  { label: "Rapports", href: "/dashboard/reports", icon: FileText },
+  // Configuration des créneaux hebdomadaires et consultation des statistiques
+  // relèvent de l'administration du cabinet (cahier des charges §2) — pas du secrétariat.
+  { label: "Disponibilités", href: "/dashboard/availability", icon: Clock, adminOnly: true },
+  { label: "Rapports", href: "/dashboard/reports", icon: FileText, adminOnly: true },
   { label: "Équipe", href: "/dashboard/team", icon: UsersRound },
   { label: "Notifications", href: "/dashboard/notifications", icon: Bell },
   { label: "Paramètres", href: "/dashboard/settings", icon: Settings },
@@ -37,6 +39,8 @@ function DashboardGuard({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
+
+  const navItems = baseNavItems.filter((item) => !item.adminOnly || user?.role === "ADMIN");
 
   return (
     <DashboardShell navItems={navItems} roleLabel={user?.role === "ADMIN" ? "Docteur" : "Secrétariat"}>

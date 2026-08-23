@@ -57,7 +57,12 @@ export default function AvailabilityPage() {
     }
   }
 
-  useEffect(() => { void load(); }, [token]);
+  useEffect(() => {
+    // Rien à charger pour un rôle non admin — la page affiche "Accès réservé" sans jamais lire `loading`.
+    if (user?.role !== "ADMIN" && user?.role !== "SUPERADMIN") return;
+    void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, user?.role]);
 
   async function handleAdd(e: FormEvent) {
     e.preventDefault();

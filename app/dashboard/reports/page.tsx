@@ -32,7 +32,12 @@ export default function ReportsPage() {
     setLoading(false);
   }
 
-  useEffect(() => { void load(); }, [token, filter]);
+  useEffect(() => {
+    // Rien à charger pour un rôle non admin — la page affiche "Accès réservé" sans jamais lire `loading`.
+    if (!isAdmin) return;
+    void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, filter, isAdmin]);
 
   async function generate(period: "DAILY" | "WEEKLY" | "MONTHLY") {
     if (!token) return;
@@ -64,6 +69,14 @@ export default function ReportsPage() {
     } catch {
       toast.error("Erreur de téléchargement du PDF");
     }
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex min-h-[30vh] items-center justify-center text-ink-soft text-sm">
+        Accès réservé aux administrateurs.
+      </div>
+    );
   }
 
   return (

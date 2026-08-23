@@ -71,6 +71,7 @@ export default function PublicBookingPage() {
     practitionerId: "",
     careType: "",
     notes: "",
+    whatsappOptIn: false,
   });
 
   useEffect(() => {
@@ -176,14 +177,16 @@ export default function PublicBookingPage() {
             <strong>{cabinet.name}</strong> a bien été reçue.
           </p>
           <p className="text-sm text-ink-soft mb-6">
-            📱 Vous allez recevoir une confirmation sur WhatsApp. Le secrétariat vous contactera pour valider le créneau.
+            {form.whatsappOptIn
+              ? "📱 Vous allez recevoir une confirmation sur WhatsApp. Le secrétariat vous contactera pour valider le créneau."
+              : "Le secrétariat vous contactera pour valider le créneau."}
           </p>
           <button
             onClick={() => {
               setSuccess(false);
               setSelectedDate(null);
               setSelectedTime(null);
-              setForm({ fullName: "", phoneNumber: "", practitionerId: "", careType: "", notes: "" });
+              setForm({ fullName: "", phoneNumber: "", practitionerId: "", careType: "", notes: "", whatsappOptIn: false });
             }}
             className="text-brand-600 font-semibold hover:underline"
           >
@@ -407,6 +410,20 @@ export default function PublicBookingPage() {
               </p>
             )}
           </div>
+
+          <label className="flex items-start gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink-muted">
+            <input
+              type="checkbox"
+              checked={form.whatsappOptIn}
+              onChange={(e) => setForm({ ...form, whatsappOptIn: e.target.checked })}
+              className="mt-0.5 size-4 shrink-0 accent-brand-600"
+            />
+            <span>
+              J&apos;accepte de recevoir sur WhatsApp les rappels concernant ce rendez-vous (48h et 24h avant),
+              ainsi que d&apos;éventuelles relances de suivi. Vous pouvez retirer ce consentement à tout moment
+              auprès du cabinet.
+            </span>
+          </label>
 
           <button
             type="submit"
