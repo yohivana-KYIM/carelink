@@ -276,6 +276,7 @@ export default function AdminCabinetsPage() {
           <WhatsappConnectModal
             token={token}
             cabinet={whatsappCabinet}
+            whatsappProvider={stats?.whatsappProvider ?? "console"}
             onClose={() => setWhatsappCabinet(null)}
             onUpdated={(updated) => {
               setWhatsappCabinet(updated);
@@ -291,11 +292,13 @@ export default function AdminCabinetsPage() {
 function WhatsappConnectModal({
   token,
   cabinet,
+  whatsappProvider,
   onClose,
   onUpdated,
 }: {
   token: string | null;
   cabinet: Cabinet;
+  whatsappProvider: "console" | "twilio" | "evolution";
   onClose: () => void;
   onUpdated: (cabinet: Cabinet) => void;
 }) {
@@ -402,86 +405,192 @@ function WhatsappConnectModal({
           </button>
         </div>
 
-        {cabinet.whatsappVerifiedAt ? (
+        {cabinet.whatsappVerifiedAt || cabinet.evolutionConnectedAt ? (
           <div className="mb-4 flex items-center gap-2 rounded-xl bg-emerald-50 px-3.5 py-2.5 text-sm font-medium text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
             <ShieldCheck size={16} /> Numéro vérifié
           </div>
         ) : null}
 
-        {step === "number" || !cabinet.whatsappVerifiedAt ? (
-          <form onSubmit={saveNumber} className="mb-5 flex flex-col gap-2">
-            <label className="text-xs font-medium text-ink-muted" htmlFor="wa-phone">
-              Numéro WhatsApp complet (format international)
-            </label>
-            <div className="flex gap-2">
-              <input
-                id="wa-phone"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="+33612345678"
-                required
-                className="flex-1 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800"
-              />
-              <button
-                type="submit"
-                disabled={savingNumber}
-                className="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
-              >
-                {savingNumber ? <Loader2 className="animate-spin" size={16} /> : "Enregistrer"}
-              </button>
-            </div>
-          </form>
-        ) : null}
+        {whatsappProvider === "evolution" ? (
+          <EvolutionConnectSection token={token} cabinet={cabinet} onUpdated={onUpdated} />
+        ) : (
+          <>
+            {step === "number" || !cabinet.whatsappVerifiedAt ? (
+              <form onSubmit={saveNumber} className="mb-5 flex flex-col gap-2">
+                <label className="text-xs font-medium text-ink-muted" htmlFor="wa-phone">
+                  Numéro WhatsApp complet (format international)
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    id="wa-phone"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="+33612345678"
+                    required
+                    className="flex-1 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800"
+                  />
+                  <button
+                    type="submit"
+                    disabled={savingNumber}
+                    className="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
+                  >
+                    {savingNumber ? <Loader2 className="animate-spin" size={16} /> : "Enregistrer"}
+                  </button>
+                </div>
+              </form>
+            ) : null}
 
-        {waLink ? (
-          <div className="mb-5 flex flex-col items-center gap-3 rounded-xl border border-border bg-surface p-4">
-            {qrDataUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- data URL généré côté client, next/image inutile ici
-              <img src={qrDataUrl} alt="QR code de connexion WhatsApp" width={180} height={180} className="rounded-lg" />
-            ) : (
-              <div className="flex size-[180px] items-center justify-center">
-                <Loader2 className="animate-spin text-ink-soft" size={20} />
+            {waLink ? (
+              <div className="mb-5 flex flex-col items-center gap-3 rounded-xl border border-border bg-surface p-4">
+                {qrDataUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- data URL généré côté client, next/image inutile ici
+                  <img src={qrDataUrl} alt="QR code de connexion WhatsApp" width={180} height={180} className="rounded-lg" />
+                ) : (
+                  <div className="flex size-[180px] items-center justify-center">
+                    <Loader2 className="animate-spin text-ink-soft" size={20} />
+                  </div>
+                )}
+                <p className="text-center text-xs text-ink-soft">
+                  Scannez ce QR code depuis le téléphone du cabinet pour ouvrir la discussion WhatsApp, ou utilisez le code de vérification ci-dessous.
+                </p>
               </div>
-            )}
-            <p className="text-center text-xs text-ink-soft">
-              Scannez ce QR code depuis le téléphone du cabinet pour ouvrir la discussion WhatsApp, ou utilisez le code de vérification ci-dessous.
-            </p>
-          </div>
-        ) : null}
+            ) : null}
 
-        {waLink ? (
-          <div className="flex flex-col gap-3">
-            <button
-              type="button"
-              onClick={sendCode}
-              disabled={sendingCode}
-              className="flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-brand-300 disabled:opacity-50"
-            >
-              {sendingCode ? <Loader2 className="animate-spin" size={16} /> : <MessageCircle size={16} />}
-              {codeSentAt ? "Renvoyer le code" : "Envoyer le code de vérification"}
-            </button>
+            {waLink ? (
+              <div className="flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={sendCode}
+                  disabled={sendingCode}
+                  className="flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-brand-300 disabled:opacity-50"
+                >
+                  {sendingCode ? <Loader2 className="animate-spin" size={16} /> : <MessageCircle size={16} />}
+                  {codeSentAt ? "Renvoyer le code" : "Envoyer le code de vérification"}
+                </button>
 
-            <form onSubmit={confirmCode} className="flex gap-2">
-              <input
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="Code à 6 chiffres"
-                maxLength={6}
-                required
-                className="flex-1 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800"
-              />
-              <button
-                type="submit"
-                disabled={confirming || code.length !== 6}
-                className="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
-              >
-                {confirming ? <Loader2 className="animate-spin" size={16} /> : "Confirmer"}
-              </button>
-            </form>
-          </div>
-        ) : null}
+                <form onSubmit={confirmCode} className="flex gap-2">
+                  <input
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    placeholder="Code à 6 chiffres"
+                    maxLength={6}
+                    required
+                    className="flex-1 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800"
+                  />
+                  <button
+                    type="submit"
+                    disabled={confirming || code.length !== 6}
+                    className="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
+                  >
+                    {confirming ? <Loader2 className="animate-spin" size={16} /> : "Confirmer"}
+                  </button>
+                </form>
+              </div>
+            ) : null}
+          </>
+        )}
       </motion.div>
     </motion.div>
+  );
+}
+
+function EvolutionConnectSection({
+  token,
+  cabinet,
+  onUpdated,
+}: {
+  token: string | null;
+  cabinet: Cabinet;
+  onUpdated: (cabinet: Cabinet) => void;
+}) {
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [loadingQr, setLoadingQr] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [state, setState] = useState<"open" | "connecting" | "close" | "unknown" | null>(
+    cabinet.evolutionConnectedAt ? "open" : null
+  );
+
+  async function loadQrCode() {
+    if (!token) return;
+    setLoadingQr(true);
+    try {
+      const res = await api.adminGetEvolutionQrCode(token, cabinet.id);
+      setQrDataUrl(res.qrCodeDataUrl);
+      toast.success("QR code généré — scannez-le avec le téléphone du cabinet.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur lors de la génération du QR code");
+    } finally {
+      setLoadingQr(false);
+    }
+  }
+
+  async function checkConnection() {
+    if (!token) return;
+    setChecking(true);
+    try {
+      const res = await api.adminCheckEvolutionConnection(token, cabinet.id);
+      setState(res.state);
+      onUpdated(res.cabinet);
+      if (res.state === "open") {
+        toast.success("Numéro connecté avec succès");
+      } else {
+        toast("QR pas encore scanné — réessayez après avoir scanné.", { icon: "⏳" });
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur lors de la vérification de la connexion");
+    } finally {
+      setChecking(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="rounded-xl bg-amber-50 px-3.5 py-2.5 text-xs text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+        Connexion avancée non-officielle (Evolution API). Le numéro scanné n&apos;est pas couvert par
+        l&apos;API Business officielle Meta et peut être bloqué par WhatsApp sans préavis.
+      </div>
+
+      {cabinet.evolutionConnectedAt ? (
+        <p className="text-xs text-ink-soft">
+          Connecté depuis le {new Date(cabinet.evolutionConnectedAt).toLocaleDateString("fr-FR")}.
+        </p>
+      ) : null}
+
+      <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-surface p-4">
+        {qrDataUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- data URL généré côté client, next/image inutile ici
+          <img src={qrDataUrl} alt="QR code Evolution API" width={220} height={220} className="rounded-lg" />
+        ) : (
+          <div className="flex size-[220px] items-center justify-center text-center text-xs text-ink-soft">
+            {loadingQr ? <Loader2 className="animate-spin" size={20} /> : "Cliquez sur « Générer le QR »"}
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={loadQrCode}
+          disabled={loadingQr}
+          className="rounded-xl border border-border px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-brand-300 disabled:opacity-50"
+        >
+          {loadingQr ? <Loader2 className="animate-spin" size={16} /> : "Générer le QR"}
+        </button>
+      </div>
+
+      <button
+        type="button"
+        onClick={checkConnection}
+        disabled={checking}
+        className="flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
+      >
+        {checking ? <Loader2 className="animate-spin" size={16} /> : <ShieldCheck size={16} />}
+        Vérifier la connexion
+      </button>
+
+      {state && state !== "open" ? (
+        <p className="text-center text-xs text-ink-soft">
+          Statut : {state === "connecting" ? "en attente du scan..." : state === "close" ? "déconnecté" : "inconnu"}
+        </p>
+      ) : null}
+    </div>
   );
 }
 

@@ -66,6 +66,8 @@ export type Cabinet = {
   whatsappPhoneNumber: string | null;
   whatsappVerifiedAt?: string | null;
   aiRelanceEnabled?: boolean;
+  evolutionInstanceName?: string | null;
+  evolutionConnectedAt?: string | null;
   logoUrl?: string | null;
   primaryColor?: string | null;
   defaultRelanceMonths: number;
@@ -196,6 +198,7 @@ export type PlatformStats = {
   activeCabinets: number;
   rejectedCabinets: number;
   totalUsers: number;
+  whatsappProvider: "console" | "twilio" | "evolution";
 };
 
 export type CabinetSettings = {
@@ -453,6 +456,18 @@ export const api = {
       method: "POST",
       body: { code },
     }),
+
+  adminGetEvolutionQrCode: (token: string, cabinetId: string) =>
+    authed<{ instanceName: string; qrCodeDataUrl: string | null }>(
+      token,
+      `/api/admin/cabinets/${cabinetId}/whatsapp/evolution-qr`
+    ),
+
+  adminCheckEvolutionConnection: (token: string, cabinetId: string) =>
+    authed<{ state: "open" | "connecting" | "close" | "unknown"; cabinet: Cabinet }>(
+      token,
+      `/api/admin/cabinets/${cabinetId}/whatsapp/evolution-status`
+    ),
 
   // Contact
   submitContactMessage: (input: { fullName: string; email: string; clinic?: string; phone?: string; subject?: string; message: string }) =>
