@@ -125,6 +125,16 @@ export type MessageLog = {
   createdAt: string;
 };
 
+export type Relance = {
+  id: string;
+  patientId: string;
+  content: string;
+  aiGenerated: boolean;
+  createdAt: string;
+  replied: boolean;
+  patient: { id: string; fullName: string; phoneNumber: string };
+};
+
 export type Practitioner = { id: string; cabinetId: string; fullName: string; createdAt: string };
 
 export type Patient = {
@@ -336,6 +346,9 @@ export const api = {
   relancePatientNow: (token: string, id: string) =>
     authed<{ sent: boolean }>(token, `/api/relances/${id}/send`, { method: "POST" }),
 
+  listRelances: (token: string) =>
+    authed<{ relances: Relance[] }>(token, "/api/relances"),
+
   // Appointments
   listAppointments: (
     token: string,
@@ -375,7 +388,7 @@ export const api = {
     authed<{ appointment: Appointment }>(token, `/api/appointments/${id}`, { method: "PATCH", body: input }),
 
   cancelAppointment: (token: string, id: string) =>
-    authed<{ appointment: Appointment }>(token, `/api/appointments/${id}/cancel`, { method: "POST" }),
+    authed<{ appointment: Appointment }>(token, `/api/appointments/${id}`, { method: "DELETE" }),
 
   // Settings
   getSettings: (token: string) =>
