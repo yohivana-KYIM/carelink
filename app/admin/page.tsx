@@ -1,14 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
+import QRCode from "qrcode";
 import {
   Building2,
   Check,
   CheckCircle2,
   Clock3,
   Loader2,
+  MessageCircle,
   Search,
+  ShieldCheck,
   Users,
   X,
   XCircle,
@@ -35,6 +38,7 @@ export default function AdminCabinetsPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [whatsappCabinet, setWhatsappCabinet] = useState<Cabinet | null>(null);
 
   async function load() {
     if (!token) return;
@@ -195,6 +199,19 @@ export default function AdminCabinetsPage() {
                   <td className="px-5 py-3.5 text-ink-muted">{cabinet._count?.patients ?? 0}</td>
                   <td className="px-5 py-3.5">
                     <div className="flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setWhatsappCabinet(cabinet)}
+                        aria-label="Connecter WhatsApp"
+                        title="Connecter le numéro WhatsApp du cabinet"
+                        className={`flex size-8 items-center justify-center rounded-full transition-colors ${
+                          cabinet.whatsappVerifiedAt
+                            ? "bg-emerald-100 text-emerald-600 hover:bg-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-400"
+                            : "bg-brand-50 text-brand-600 hover:bg-brand-100 dark:bg-brand-500/15 dark:text-brand-400"
+                        }`}
+                      >
+                        <MessageCircle size={15} />
+                      </button>
                       {cabinet.status !== "ACTIVE" && (
                         <button
                           type="button"
@@ -253,7 +270,218 @@ export default function AdminCabinetsPage() {
           </div>
         </div>
       ) : null}
+
+      <AnimatePresence>
+        {whatsappCabinet ? (
+          <WhatsappConnectModal
+            token={token}
+            cabinet={whatsappCabinet}
+            onClose={() => setWhatsappCabinet(null)}
+            onUpdated={(updated) => {
+              setWhatsappCabinet(updated);
+              setCabinets((prev) => prev.map((c) => (c.id === updated.id ? { ...c, ...updated } : c)));
+            }}
+          />
+        ) : null}
+      </AnimatePresence>
     </div>
+  );
+}
+
+function WhatsappConnectModal({
+  token,
+  cabinet,
+  onClose,
+  onUpdated,
+}: {
+  token: string | null;
+  cabinet: Cabinet;
+  onClose: () => void;
+  onUpdated: (cabinet: Cabinet) => void;
+}) {
+  const [phoneNumber, setPhoneNumber] = useState(cabinet.whatsappPhoneNumber ?? "");
+  const [waLink, setWaLink] = useState<string | null>(
+    cabinet.whatsappPhoneNumber ? `https://wa.me/${cabinet.whatsappPhoneNumber.replace(/\D/g, "")}` : null
+  );
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [step, setStep] = useState<"number" | "code">(cabinet.whatsappPhoneNumber ? "code" : "number");
+  const [savingNumber, setSavingNumber] = useState(false);
+  const [sendingCode, setSendingCode] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [codeSentAt, setCodeSentAt] = useState<Date | null>(null);
+
+  useEffect(() => {
+    if (!waLink) return;
+    let cancelled = false;
+    QRCode.toDataURL(waLink, { margin: 1, width: 220 })
+      .then((url) => {
+        if (!cancelled) setQrDataUrl(url);
+      })
+      .catch(() => {
+        if (!cancelled) setQrDataUrl(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [waLink]);
+
+  async function saveNumber(e: React.FormEvent) {
+    e.preventDefault();
+    if (!token) return;
+    setSavingNumber(true);
+    try {
+      const res = await api.adminSetCabinetWhatsapp(token, cabinet.id, phoneNumber);
+      setWaLink(res.waLink);
+      onUpdated(res.cabinet);
+      setStep("code");
+      toast.success("Numéro WhatsApp enregistré. Scannez le QR ou envoyez le code de vérification.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur lors de l'enregistrement du numéro");
+    } finally {
+      setSavingNumber(false);
+    }
+  }
+
+  async function sendCode() {
+    if (!token) return;
+    setSendingCode(true);
+    try {
+      await api.adminSendWhatsappCode(token, cabinet.id);
+      setCodeSentAt(new Date());
+      toast.success("Code de vérification envoyé sur WhatsApp");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erreur lors de l'envoi du code");
+    } finally {
+      setSendingCode(false);
+    }
+  }
+
+  async function confirmCode(e: React.FormEvent) {
+    e.preventDefault();
+    if (!token) return;
+    setConfirming(true);
+    try {
+      const res = await api.adminConfirmWhatsappCode(token, cabinet.id, code);
+      onUpdated(res.cabinet);
+      toast.success("Numéro WhatsApp vérifié avec succès");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Code invalide ou expiré");
+    } finally {
+      setConfirming(false);
+    }
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 16, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 16, scale: 0.98 }}
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-md rounded-2xl border border-border bg-surface-raised p-6 shadow-xl"
+      >
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-ink">Connecter WhatsApp</h2>
+            <p className="text-xs text-ink-soft">{cabinet.name}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fermer"
+            className="flex size-8 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-surface"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        {cabinet.whatsappVerifiedAt ? (
+          <div className="mb-4 flex items-center gap-2 rounded-xl bg-emerald-50 px-3.5 py-2.5 text-sm font-medium text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+            <ShieldCheck size={16} /> Numéro vérifié
+          </div>
+        ) : null}
+
+        {step === "number" || !cabinet.whatsappVerifiedAt ? (
+          <form onSubmit={saveNumber} className="mb-5 flex flex-col gap-2">
+            <label className="text-xs font-medium text-ink-muted" htmlFor="wa-phone">
+              Numéro WhatsApp complet (format international)
+            </label>
+            <div className="flex gap-2">
+              <input
+                id="wa-phone"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="+33612345678"
+                required
+                className="flex-1 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800"
+              />
+              <button
+                type="submit"
+                disabled={savingNumber}
+                className="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
+              >
+                {savingNumber ? <Loader2 className="animate-spin" size={16} /> : "Enregistrer"}
+              </button>
+            </div>
+          </form>
+        ) : null}
+
+        {waLink ? (
+          <div className="mb-5 flex flex-col items-center gap-3 rounded-xl border border-border bg-surface p-4">
+            {qrDataUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- data URL généré côté client, next/image inutile ici
+              <img src={qrDataUrl} alt="QR code de connexion WhatsApp" width={180} height={180} className="rounded-lg" />
+            ) : (
+              <div className="flex size-[180px] items-center justify-center">
+                <Loader2 className="animate-spin text-ink-soft" size={20} />
+              </div>
+            )}
+            <p className="text-center text-xs text-ink-soft">
+              Scannez ce QR code depuis le téléphone du cabinet pour ouvrir la discussion WhatsApp, ou utilisez le code de vérification ci-dessous.
+            </p>
+          </div>
+        ) : null}
+
+        {waLink ? (
+          <div className="flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={sendCode}
+              disabled={sendingCode}
+              className="flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-brand-300 disabled:opacity-50"
+            >
+              {sendingCode ? <Loader2 className="animate-spin" size={16} /> : <MessageCircle size={16} />}
+              {codeSentAt ? "Renvoyer le code" : "Envoyer le code de vérification"}
+            </button>
+
+            <form onSubmit={confirmCode} className="flex gap-2">
+              <input
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="Code à 6 chiffres"
+                maxLength={6}
+                required
+                className="flex-1 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800"
+              />
+              <button
+                type="submit"
+                disabled={confirming || code.length !== 6}
+                className="rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
+              >
+                {confirming ? <Loader2 className="animate-spin" size={16} /> : "Confirmer"}
+              </button>
+            </form>
+          </div>
+        ) : null}
+      </motion.div>
+    </motion.div>
   );
 }
 

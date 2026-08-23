@@ -5,7 +5,7 @@ import Image from "next/image";
 import {
   Loader2, Settings2, Save, ShieldCheck, Eye, EyeOff,
   Bell, Clock, Mail, ToggleLeft, ToggleRight, FileText, UserCircle,
-  Camera, Palette, Building2,
+  Camera, Palette, Building2, Sparkles, MessageCircle, CheckCircle2, AlertCircle,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
@@ -51,6 +51,105 @@ export default function SettingsPage() {
       {canManage && <ReminderRulesCard token={token} />}
       {canManage && <CabinetTemplatesCard token={token} />}
       {canManage && <ReportSettingsCard token={token} />}
+      {canManage && <AiRelanceCard token={token} />}
+    </div>
+  );
+}
+
+// ─── Relances par IA + statut de connexion WhatsApp ──────────────────────────
+function AiRelanceCard({ token }: { token: string | null }) {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [aiRelanceEnabled, setAiRelanceEnabled] = useState(false);
+  const [aiAvailable, setAiAvailable] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState<string | null>(null);
+  const [whatsappVerifiedAt, setWhatsappVerifiedAt] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!token) return;
+    api.getSettings(token)
+      .then((r) => {
+        setAiRelanceEnabled(r.settings.aiRelanceEnabled);
+        setAiAvailable(r.aiAvailable);
+        setWhatsappNumber(r.settings.whatsappPhoneNumber);
+        setWhatsappVerifiedAt(r.settings.whatsappVerifiedAt ?? null);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [token]);
+
+  async function handleToggle() {
+    if (!token || !aiAvailable) return;
+    const next = !aiRelanceEnabled;
+    setSaving(true);
+    try {
+      await api.updateSettings(token, { aiRelanceEnabled: next });
+      setAiRelanceEnabled(next);
+      toast.success(next ? "Relances par IA activées" : "Relances par IA désactivées");
+    } catch {
+      toast.error("Erreur lors de la mise à jour");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading) return null;
+
+  return (
+    <div className="rounded-2xl border border-border bg-surface-raised p-6 flex flex-col gap-5">
+      <div className="flex items-center gap-3">
+        <span className="flex size-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10">
+          <Sparkles size={18} />
+        </span>
+        <div>
+          <h2 className="text-base font-semibold text-ink">Relances par IA</h2>
+          <p className="text-sm text-ink-muted">
+            Message de relance personnalisé généré automatiquement (nom du patient, dernière visite) au lieu du template statique.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between rounded-xl border border-border p-3">
+        <div>
+          <span className="text-sm text-ink">Activer les relances personnalisées par IA</span>
+          {!aiAvailable && (
+            <p className="mt-0.5 flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
+              <AlertCircle size={12} /> IA non configurée côté serveur (ANTHROPIC_API_KEY manquante) — le template statique reste utilisé.
+            </p>
+          )}
+        </div>
+        <button type="button" onClick={handleToggle} disabled={saving || !aiAvailable}>
+          {aiRelanceEnabled
+            ? <ToggleRight size={26} className="text-brand-600" />
+            : <ToggleLeft size={26} className="text-ink-soft" />}
+        </button>
+      </div>
+
+      <div className="flex items-center justify-between rounded-xl border border-border p-3">
+        <div className="flex items-center gap-3">
+          <span className="flex size-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10">
+            <MessageCircle size={16} />
+          </span>
+          <div>
+            <p className="text-sm text-ink">Numéro WhatsApp du cabinet</p>
+            <p className="text-xs text-ink-soft">{whatsappNumber ?? "Non connecté"}</p>
+          </div>
+        </div>
+        {whatsappNumber && (
+          whatsappVerifiedAt ? (
+            <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+              <CheckCircle2 size={12} /> Vérifié
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
+              <AlertCircle size={12} /> Non vérifié
+            </span>
+          )
+        )}
+      </div>
+      <p className="-mt-2 text-xs text-ink-soft">
+        La connexion/modification du numéro WhatsApp se fait depuis le panneau SuperAdmin Ecotocare — contactez-nous si besoin.
+      </p>
     </div>
   );
 }

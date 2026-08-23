@@ -64,6 +64,8 @@ export type Cabinet = {
   city: string | null;
   status: CabinetStatus;
   whatsappPhoneNumber: string | null;
+  whatsappVerifiedAt?: string | null;
+  aiRelanceEnabled?: boolean;
   logoUrl?: string | null;
   primaryColor?: string | null;
   defaultRelanceMonths: number;
@@ -211,6 +213,9 @@ export type CabinetSettings = {
   reportWeeklyEnabled: boolean;
   reportMonthlyEnabled: boolean;
   reportEmail: string | null;
+  aiRelanceEnabled: boolean;
+  whatsappPhoneNumber: string | null;
+  whatsappVerifiedAt: string | null;
 };
 
 export type Availability = {
@@ -371,7 +376,7 @@ export const api = {
 
   // Settings
   getSettings: (token: string) =>
-    authed<{ settings: CabinetSettings }>(token, "/api/settings"),
+    authed<{ settings: CabinetSettings; aiAvailable: boolean }>(token, "/api/settings"),
 
   updateSettings: (token: string, input: Partial<CabinetSettings>) =>
     authed<{ settings: CabinetSettings }>(token, "/api/settings", { method: "PUT", body: input }),
@@ -430,6 +435,24 @@ export const api = {
 
   adminStats: (token: string) =>
     authed<{ stats: PlatformStats }>(token, "/api/admin/stats"),
+
+  adminSetCabinetWhatsapp: (token: string, cabinetId: string, phoneNumber: string) =>
+    authed<{ cabinet: Cabinet; waLink: string }>(
+      token,
+      `/api/admin/cabinets/${cabinetId}/whatsapp`,
+      { method: "PATCH", body: { phoneNumber } }
+    ),
+
+  adminSendWhatsappCode: (token: string, cabinetId: string) =>
+    authed<{ expiresAt: string }>(token, `/api/admin/cabinets/${cabinetId}/whatsapp/send-code`, {
+      method: "POST",
+    }),
+
+  adminConfirmWhatsappCode: (token: string, cabinetId: string, code: string) =>
+    authed<{ cabinet: Cabinet }>(token, `/api/admin/cabinets/${cabinetId}/whatsapp/confirm`, {
+      method: "POST",
+      body: { code },
+    }),
 
   // Contact
   submitContactMessage: (input: { fullName: string; email: string; clinic?: string; phone?: string; subject?: string; message: string }) =>
