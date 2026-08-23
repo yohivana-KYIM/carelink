@@ -16,6 +16,7 @@ import { enablePushNotifications } from "@/lib/push";
 import { HelpWidget } from "./HelpWidget";
 import { OnboardingTour } from "./OnboardingTour";
 import { CabinetTheme } from "@/components/providers/CabinetTheme";
+import { useSocket } from "@/lib/socket";
 
 export type DashboardNavItem = {
   label: string;
@@ -40,6 +41,7 @@ export function DashboardShell({
   const [unreadCount, setUnreadCount] = useState(0);
   const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const socket = useSocket(token);
 
   useEffect(() => {
     const stored = window.localStorage.getItem("ecotocare_sidebar_collapsed");
@@ -95,6 +97,28 @@ export function DashboardShell({
     const interval = setInterval(checkNotifications, 30000);
     return () => clearInterval(interval);
   }, [token, pathname]);
+
+  // Notifications instantanées via WebSocket (le polling ci-dessus reste un
+  // filet de sécurité en cas de coupure de connexion temps réel).
+  useEffect(() => {
+    if (!socket) return;
+
+    const onNewNotification = () => {
+      setUnreadCount((c) => c + 1);
+      if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+        new Notification("Nouvelle notification", {
+          body: "Vous avez des notifications non lues sur Ecotocare.",
+          icon: "/images/ecotocare-icon.png",
+        });
+      }
+      toast("Vous avez une nouvelle notification.", { icon: "🔔" });
+    };
+
+    socket.on("notification:new", onNewNotification);
+    return () => {
+      socket.off("notification:new", onNewNotification);
+    };
+  }, [socket]);
 
   function startLogout() {
     setConfirmLogoutOpen(true);

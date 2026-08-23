@@ -22,9 +22,12 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   keywords: [...siteConfig.keywords],
-  authors: [{ name: "MarketYou" }],
-  creator: "MarketYou",
+  authors: [{ name: siteConfig.name }],
+  creator: siteConfig.name,
   alternates: { canonical: "/" },
+  verification: {
+    google: "xUZllvkkIBqztYxOWWA4SFwm3LnRU3GZeUUb2Wqvetg",
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,

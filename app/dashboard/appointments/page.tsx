@@ -6,6 +6,7 @@ import { Loader2, Plus, Calendar as CalendarIcon, Edit, X, List, Grid, Download 
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
 import { api, type Appointment, type Patient, type Practitioner } from "@/lib/api";
+import { useSocket } from "@/lib/socket";
 
 import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
@@ -100,6 +101,19 @@ export default function AppointmentsPage() {
   useEffect(() => {
     void load();
   }, [token, year]);
+
+  // Mise à jour temps réel : un patient répond sur WhatsApp, ou un membre de
+  // l'équipe modifie un RDV ailleurs → la liste/calendrier se rafraîchit seule.
+  const socket = useSocket(token);
+  useEffect(() => {
+    if (!socket) return;
+    const onUpdated = () => void load();
+    socket.on("appointment:updated", onUpdated);
+    return () => {
+      socket.off("appointment:updated", onUpdated);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket]);
 
   function handleExportCSV() {
     const headers = ["Patient", "Praticien", "Date", "Heure", "Statut", "Motif"];
