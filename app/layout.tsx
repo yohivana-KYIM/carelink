@@ -3,6 +3,7 @@ import { Figtree } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { MotionProvider } from "@/components/providers/MotionProvider";
+import { PostHogProvider } from "@/components/providers/PostHogProvider";
 import { siteConfig } from "@/lib/site-config";
 import { Toaster } from "react-hot-toast";
 import { LocaleProvider } from "@/lib/i18n";
@@ -110,14 +111,16 @@ export default function RootLayout({
             __html: JSON.stringify(softwareJsonLd).replace(/</g, "\\u003c"),
           }}
         />
-        <ThemeProvider>
-          <LocaleProvider>
-            <MotionProvider>
-              {children}
-              <Toaster position="top-right" />
-            </MotionProvider>
-          </LocaleProvider>
-        </ThemeProvider>
+        <PostHogProvider>
+          <ThemeProvider>
+            <LocaleProvider>
+              <MotionProvider>
+                {children}
+                <Toaster position="top-right" />
+              </MotionProvider>
+            </LocaleProvider>
+          </ThemeProvider>
+        </PostHogProvider>
       </body>
     </html>
   );
