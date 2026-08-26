@@ -394,6 +394,16 @@ export const api = {
   cancelAppointment: (token: string, id: string) =>
     authed<{ appointment: Appointment }>(token, `/api/appointments/${id}`, { method: "DELETE" }),
 
+  bulkCreateAppointments: (
+    token: string,
+    appointments: Array<{ patientPhoneNumber: string; scheduledAt: string; practitionerId?: string; careType?: string; notes?: string }>
+  ) =>
+    authed<{ createdCount: number; skipped: Array<{ line: number; reason: string }> }>(
+      token,
+      "/api/appointments/bulk",
+      { method: "POST", body: { appointments } }
+    ),
+
   // Settings
   getSettings: (token: string) =>
     authed<{ settings: CabinetSettings; aiAvailable: boolean }>(token, "/api/settings"),

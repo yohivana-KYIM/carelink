@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, FormEvent, useMemo } from "react";
+import { useEffect, useState, FormEvent, useMemo, useRef } from "react";
 import { motion } from "motion/react";
-import { Loader2, Plus, Calendar as CalendarIcon, Edit, X, List, Grid, Download } from "lucide-react";
+import { Loader2, Plus, Calendar as CalendarIcon, Edit, X, List, Grid, Download, Upload } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
 import { api, type Appointment, type Patient, type Practitioner } from "@/lib/api";
@@ -78,6 +78,7 @@ export default function AppointmentsPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({ patientId: "", practitionerId: "", scheduledAt: "", careType: "", notes: "", status: "PENDING" });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function load() {
     if (!token) return;
@@ -138,6 +139,51 @@ export default function AppointmentsPage() {
     link.click();
     document.body.removeChild(link);
     toast.success(`${appointments.length} rendez-vous exportés`);
+  }
+
+  // CSV attendu : Téléphone patient, Date (AAAA-MM-JJTHH:mm ou équivalent ISO), Motif (optionnel)
+  function handleImportCSV(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      const text = evt.target?.result as string;
+      if (!text) return;
+      const lines = text.split("\n").filter((l) => l.trim());
+      if (lines.length <= 1) {
+        toast.error("Fichier vide.");
+        return;
+      }
+      const parsed = lines
+        .slice(1)
+        .map((row) => {
+          const cols = row.split(",").map((c) => c.replace(/^"|"$/g, "").trim());
+          if (cols.length >= 2 && cols[0] && cols[1]) {
+            return { patientPhoneNumber: cols[0], scheduledAt: new Date(cols[1]).toISOString(), careType: cols[2] || undefined };
+          }
+          return null;
+        })
+        .filter(Boolean) as Array<{ patientPhoneNumber: string; scheduledAt: string; careType?: string }>;
+
+      if (!parsed.length) {
+        toast.error("Aucun rendez-vous valide dans le fichier.");
+        return;
+      }
+      try {
+        setLoading(true);
+        const res = await api.bulkCreateAppointments(token, parsed);
+        if (res.createdCount > 0) toast.success(`${res.createdCount} rendez-vous importés`);
+        if (res.skipped.length > 0) {
+          toast.error(`${res.skipped.length} ligne(s) ignorée(s) — ${res.skipped[0].reason}`);
+        }
+        await load();
+      } catch {
+        toast.error("Erreur d'importation");
+        setLoading(false);
+      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    };
+    reader.readAsText(file);
   }
 
   // Calcul des métriques
@@ -342,6 +388,14 @@ export default function AppointmentsPage() {
             className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink hover:bg-surface-raised"
           >
             <Download size={15} /> Exporter
+          </button>
+          <input type="file" accept=".csv" className="hidden" ref={fileInputRef} onChange={handleImportCSV} />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            title="Format CSV : Téléphone patient, Date (ISO), Motif (optionnel)"
+            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink hover:bg-surface-raised"
+          >
+            <Upload size={15} /> Importer
           </button>
         </div>
       </div>
