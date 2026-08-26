@@ -5,7 +5,7 @@ import Image from "next/image";
 import {
   Loader2, Settings2, Save, ShieldCheck, Eye, EyeOff,
   Bell, Clock, Mail, ToggleLeft, ToggleRight, FileText, UserCircle,
-  Camera, Palette, Building2, Sparkles, MessageCircle, CheckCircle2, AlertCircle,
+  Camera, Palette, Building2, Sparkles, MessageCircle, CheckCircle2, AlertCircle, QrCode,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
@@ -147,9 +147,88 @@ function AiRelanceCard({ token }: { token: string | null }) {
           )
         )}
       </div>
+
+      <WhatsappConnectSection token={token} connected={Boolean(whatsappVerifiedAt)} />
+    </div>
+  );
+}
+
+function WhatsappConnectSection({ token, connected }: { token: string | null; connected: boolean }) {
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [loadingQr, setLoadingQr] = useState(false);
+  const [checking, setChecking] = useState(false);
+
+  async function loadQrCode() {
+    if (!token) return;
+    setLoadingQr(true);
+    try {
+      const res = await api.getWhatsappQr(token);
+      setQrDataUrl(res.qrCodeDataUrl);
+      toast.success("QR code généré — scannez-le avec WhatsApp sur le téléphone du cabinet.");
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Erreur lors de la génération du QR code");
+    } finally {
+      setLoadingQr(false);
+    }
+  }
+
+  async function checkConnection() {
+    if (!token) return;
+    setChecking(true);
+    try {
+      const res = await api.checkWhatsappStatus(token);
+      if (res.state === "open") {
+        toast.success("Numéro connecté avec succès !");
+        window.location.reload();
+      } else {
+        toast("QR pas encore scanné — réessayez après avoir scanné.", { icon: "⏳" });
+      }
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Erreur lors de la vérification");
+    } finally {
+      setChecking(false);
+    }
+  }
+
+  if (connected) {
+    return (
       <p className="-mt-2 text-xs text-ink-soft">
-        La connexion/modification du numéro WhatsApp se fait depuis le panneau SuperAdmin Ecotocare — contactez-nous si besoin.
+        Numéro connecté et vérifié. Pour changer de numéro, contactez le support Ecotocare.
       </p>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3 rounded-xl border border-dashed border-border p-4">
+      <p className="text-xs text-ink-soft">
+        Scannez ce QR code avec WhatsApp (téléphone du cabinet) pour connecter votre numéro et activer les rappels/relances automatiques.
+      </p>
+      {qrDataUrl && (
+        // eslint-disable-next-line @next/next/no-img-element -- data URL générée côté client
+        <img src={qrDataUrl} alt="QR code de connexion WhatsApp" width={200} height={200} className="mx-auto rounded-lg" />
+      )}
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={loadQrCode}
+          disabled={loadingQr}
+          className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-brand-300 disabled:opacity-50"
+        >
+          {loadingQr ? <Loader2 size={15} className="animate-spin" /> : <QrCode size={15} />}
+          {qrDataUrl ? "Régénérer le QR" : "Générer le QR"}
+        </button>
+        {qrDataUrl && (
+          <button
+            type="button"
+            onClick={checkConnection}
+            disabled={checking}
+            className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
+          >
+            {checking ? <Loader2 size={15} className="animate-spin" /> : <ShieldCheck size={15} />}
+            Vérifier la connexion
+          </button>
+        )}
+      </div>
     </div>
   );
 }

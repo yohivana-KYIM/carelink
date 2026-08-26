@@ -258,6 +258,7 @@ export type CabinetSettings = {
   aiRelanceEnabled: boolean;
   whatsappPhoneNumber: string | null;
   whatsappVerifiedAt: string | null;
+  evolutionConnectedAt?: string | null;
 };
 
 export type Availability = {
@@ -435,6 +436,15 @@ export const api = {
 
   updateSettings: (token: string, input: Partial<CabinetSettings>) =>
     authed<{ settings: CabinetSettings }>(token, "/api/settings", { method: "PUT", body: input }),
+
+  getWhatsappQr: (token: string) =>
+    authed<{ instanceName: string; qrCodeDataUrl: string | null }>(token, "/api/settings/whatsapp/qr"),
+
+  checkWhatsappStatus: (token: string) =>
+    authed<{ state: "open" | "connecting" | "close" | "unknown"; cabinet: Cabinet }>(
+      token,
+      "/api/settings/whatsapp/status"
+    ),
 
   // Team
   listTeam: (token: string) => authed<{ members: TeamMember[] }>(token, "/api/team"),
