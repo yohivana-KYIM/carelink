@@ -125,6 +125,8 @@ export type MessageLog = {
   createdAt: string;
 };
 
+export type RelanceStatus = "SENT" | "REPLIED" | "REBOOKED";
+
 export type Relance = {
   id: string;
   patientId: string;
@@ -132,6 +134,8 @@ export type Relance = {
   aiGenerated: boolean;
   createdAt: string;
   replied: boolean;
+  rebooked: boolean;
+  status: RelanceStatus;
   patient: { id: string; fullName: string; phoneNumber: string };
 };
 

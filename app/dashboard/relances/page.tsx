@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, MessageSquareHeart, Sparkles, CheckCircle2, Clock3 } from "lucide-react";
+import { Loader2, MessageSquareHeart, Sparkles, CheckCircle2, Clock3, CalendarCheck2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
-import { api, type Relance } from "@/lib/api";
+import { api, type Relance, type RelanceStatus } from "@/lib/api";
 
 export default function RelancesPage() {
   const { token } = useSession();
@@ -20,7 +20,8 @@ export default function RelancesPage() {
       .finally(() => setLoading(false));
   }, [token]);
 
-  const repliedCount = relances.filter((r) => r.replied).length;
+  const rebookedCount = relances.filter((r) => r.status === "REBOOKED").length;
+  const repliedOnlyCount = relances.filter((r) => r.status === "REPLIED").length;
 
   return (
     <div className="flex flex-col gap-6 max-w-4xl">
@@ -32,18 +33,22 @@ export default function RelancesPage() {
       </div>
 
       {!loading && relances.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="rounded-2xl border border-border bg-surface-raised p-4">
             <p className="text-2xl font-semibold text-ink">{relances.length}</p>
             <p className="text-sm text-ink-soft">Relances envoyées</p>
           </div>
           <div className="rounded-2xl border border-border bg-surface-raised p-4">
-            <p className="text-2xl font-semibold text-ink">{repliedCount}</p>
+            <p className="text-2xl font-semibold text-ink">{repliedOnlyCount}</p>
             <p className="text-sm text-ink-soft">Ont répondu</p>
           </div>
           <div className="rounded-2xl border border-border bg-surface-raised p-4">
+            <p className="text-2xl font-semibold text-ink">{rebookedCount}</p>
+            <p className="text-sm text-ink-soft">RDV repris</p>
+          </div>
+          <div className="rounded-2xl border border-border bg-surface-raised p-4">
             <p className="text-2xl font-semibold text-ink">
-              {relances.length > 0 ? Math.round((repliedCount / relances.length) * 100) : 0}%
+              {relances.length > 0 ? Math.round(((rebookedCount + repliedOnlyCount) / relances.length) * 100) : 0}%
             </p>
             <p className="text-sm text-ink-soft">Taux de réponse</p>
           </div>
@@ -67,7 +72,7 @@ export default function RelancesPage() {
                 <th className="px-5 py-3">Patient</th>
                 <th className="px-5 py-3">Message</th>
                 <th className="px-5 py-3">Envoyée le</th>
-                <th className="px-5 py-3">Réponse</th>
+                <th className="px-5 py-3">Statut</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -91,15 +96,7 @@ export default function RelancesPage() {
                     {new Date(r.createdAt).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" })}
                   </td>
                   <td className="px-5 py-3.5">
-                    {r.replied ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400">
-                        <CheckCircle2 size={12} /> A répondu
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-500/15 dark:text-amber-400">
-                        <Clock3 size={12} /> En attente
-                      </span>
-                    )}
+                    <RelanceStatusBadge status={r.status} />
                   </td>
                 </tr>
               ))}
@@ -108,5 +105,27 @@ export default function RelancesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+function RelanceStatusBadge({ status }: { status: RelanceStatus }) {
+  if (status === "REBOOKED") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400">
+        <CalendarCheck2 size={12} /> RDV repris
+      </span>
+    );
+  }
+  if (status === "REPLIED") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-500/15 dark:text-brand-400">
+        <CheckCircle2 size={12} /> A répondu
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:bg-amber-500/15 dark:text-amber-400">
+      <Clock3 size={12} /> Envoyée
+    </span>
   );
 }
