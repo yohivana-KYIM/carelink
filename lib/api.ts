@@ -206,6 +206,31 @@ export type PaginatedCabinets = {
   totalPages: number;
 };
 
+export type WhatsappQueueStatus = "PENDING" | "SENT" | "FAILED";
+
+export type WhatsappQueueItem = {
+  id: string;
+  cabinetId: string;
+  instanceName: string;
+  toNumber: string;
+  text: string;
+  status: WhatsappQueueStatus;
+  attempts: number;
+  lastError: string | null;
+  providerRef: string | null;
+  sentAt: string | null;
+  createdAt: string;
+  cabinet: { id: string; name: string };
+};
+
+export type PaginatedWhatsappQueue = {
+  items: WhatsappQueueItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
 export type PlatformStats = {
   totalCabinets: number;
   pendingCabinets: number;
@@ -495,6 +520,17 @@ export const api = {
       token,
       `/api/admin/cabinets/${cabinetId}/whatsapp/evolution-status`
     ),
+
+  adminListWhatsappQueue: (token: string, params: { page?: number; status?: WhatsappQueueStatus } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.page) qs.set("page", String(params.page));
+    if (params.status) qs.set("status", params.status);
+    const q = qs.toString();
+    return authed<PaginatedWhatsappQueue>(token, `/api/admin/whatsapp-queue${q ? `?${q}` : ""}`);
+  },
+
+  adminRetryWhatsappQueueItem: (token: string, id: string) =>
+    authed<{ item: WhatsappQueueItem }>(token, `/api/admin/whatsapp-queue/${id}/retry`, { method: "POST" }),
 
   // Contact
   submitContactMessage: (input: { fullName: string; email: string; clinic?: string; phone?: string; subject?: string; message: string }) =>

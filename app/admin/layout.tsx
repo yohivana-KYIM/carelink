@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, Loader2, Bell, Mail, MessageCircle, Star } from "lucide-react";
+import { Building2, Loader2, Bell, Mail, MessageCircle, MessageSquareWarning, Star } from "lucide-react";
 import { SessionProvider, useSession } from "@/lib/session";
 import { DashboardShell, type DashboardNavItem } from "@/components/dashboard/DashboardShell";
 
@@ -11,6 +11,7 @@ const navItems: DashboardNavItem[] = [
   { label: "Contacts", href: "/admin/contacts", icon: MessageCircle },
   { label: "Newsletter", href: "/admin/newsletter", icon: Mail },
   { label: "Avis", href: "/admin/reviews", icon: Star },
+  { label: "File WhatsApp", href: "/admin/whatsapp-queue", icon: MessageSquareWarning },
   { label: "Notifications", href: "/admin/notifications", icon: Bell },
 ];
 
