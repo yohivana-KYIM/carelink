@@ -157,6 +157,21 @@ function WhatsappConnectSection({ token, connected }: { token: string | null; co
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [loadingQr, setLoadingQr] = useState(false);
   const [checking, setChecking] = useState(false);
+  const [testNumber, setTestNumber] = useState("");
+  const [sendingTest, setSendingTest] = useState(false);
+
+  async function sendTest() {
+    if (!token || !testNumber.trim()) return;
+    setSendingTest(true);
+    try {
+      await api.sendWhatsappTest(token, testNumber.trim());
+      toast.success("Message de test envoyé — vérifiez le téléphone destinataire.");
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Erreur lors de l'envoi du test");
+    } finally {
+      setSendingTest(false);
+    }
+  }
 
   async function loadQrCode() {
     if (!token) return;
@@ -190,11 +205,41 @@ function WhatsappConnectSection({ token, connected }: { token: string | null; co
     }
   }
 
+  const testSendBlock = (
+    <div className="flex flex-col gap-2 rounded-xl border border-border p-4">
+      <p className="text-sm text-ink">Envoyer un message de test</p>
+      <p className="text-xs text-ink-soft">
+        Format international : <code className="rounded bg-surface px-1 py-0.5">+33612345678</code> (indicatif pays + numéro, espaces tolérés).
+      </p>
+      <div className="flex flex-wrap gap-2">
+        <input
+          type="tel"
+          value={testNumber}
+          onChange={(e) => setTestNumber(e.target.value)}
+          placeholder="+33612345678"
+          className="flex-1 min-w-[180px] rounded-full border border-border bg-background px-4 py-2 text-sm text-ink focus:border-brand-400 focus:outline-none"
+        />
+        <button
+          type="button"
+          onClick={sendTest}
+          disabled={sendingTest || !testNumber.trim()}
+          className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink transition-colors hover:border-brand-300 disabled:opacity-50"
+        >
+          {sendingTest ? <Loader2 size={15} className="animate-spin" /> : <MessageCircle size={15} />}
+          Envoyer un test
+        </button>
+      </div>
+    </div>
+  );
+
   if (connected) {
     return (
-      <p className="-mt-2 text-xs text-ink-soft">
-        Numéro connecté et vérifié. Pour changer de numéro, contactez le support Ecotocare.
-      </p>
+      <div className="flex flex-col gap-3">
+        <p className="-mt-2 text-xs text-ink-soft">
+          Numéro connecté et vérifié. Pour changer de numéro, contactez le support Ecotocare.
+        </p>
+        {testSendBlock}
+      </div>
     );
   }
 
@@ -229,6 +274,7 @@ function WhatsappConnectSection({ token, connected }: { token: string | null; co
           </button>
         )}
       </div>
+      {qrDataUrl && testSendBlock}
     </div>
   );
 }

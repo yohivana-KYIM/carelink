@@ -446,6 +446,12 @@ export const api = {
       "/api/settings/whatsapp/status"
     ),
 
+  sendWhatsappTest: (token: string, phoneNumber: string) =>
+    authed<{ sent: boolean; providerMessageId: string }>(token, "/api/settings/whatsapp/test", {
+      method: "POST",
+      body: { phoneNumber },
+    }),
+
   // Team
   listTeam: (token: string) => authed<{ members: TeamMember[] }>(token, "/api/team"),
 
