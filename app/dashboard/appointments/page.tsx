@@ -5,14 +5,14 @@ import { motion } from "motion/react";
 import {
   Loader2, Plus, Edit, X, List, Grid, Download, Upload,
   CalendarClock, CalendarCheck, RefreshCw, Search, Phone,
-  CheckCircle2, Clock3, AlertCircle, Ban, PauseCircle,
+  CheckCircle2, Clock3, AlertCircle, Ban, PauseCircle, ArrowRight,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
 import { api, type Appointment, type Patient, type Practitioner } from "@/lib/api";
 import { useSocket } from "@/lib/socket";
 
-import { Calendar, dateFnsLocalizer, Views, type EventProps } from "react-big-calendar";
+import { Calendar, dateFnsLocalizer, Views, type EventProps, type View } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -129,6 +129,8 @@ export default function AppointmentsPage() {
   const [loading, setLoading] = useState(true);
 
   const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
+  const [calendarDate, setCalendarDate] = useState(new Date());
+  const [calendarView, setCalendarView] = useState<View>(Views.MONTH);
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [year, setYear] = useState("");
@@ -380,6 +382,20 @@ export default function AppointmentsPage() {
     });
   }, [filteredAppointments]);
 
+  // Quand la période affichée (mois/semaine/jour courant) ne contient aucun
+  // RDV, on propose de sauter directement au RDV filtré le plus proche dans
+  // le temps — évite de se demander "pourquoi je ne vois rien" en pensant
+  // qu'il n'y a pas de RDV du tout, alors qu'ils sont juste ailleurs dans le calendrier.
+  const nearestEvent = useMemo(() => {
+    if (events.length === 0) return null;
+    const windowDays = calendarView === Views.DAY ? 0 : calendarView === Views.WEEK ? 6 : 31;
+    const inWindow = events.some((e) => Math.abs(e.start.getTime() - calendarDate.getTime()) <= windowDays * 86_400_000);
+    if (inWindow) return null;
+    return events.reduce((closest, e) =>
+      Math.abs(e.start.getTime() - calendarDate.getTime()) < Math.abs(closest.start.getTime() - calendarDate.getTime()) ? e : closest
+    );
+  }, [events, calendarDate, calendarView]);
+
   return (
     <div className="flex flex-col gap-6">
       {/* En-tête */}
@@ -537,6 +553,34 @@ export default function AppointmentsPage() {
         <div className="flex min-h-[30vh] items-center justify-center text-ink-soft"><Loader2 className="animate-spin" size={24} /></div>
       ) : viewMode === "calendar" ? (
         <div className="flex flex-col gap-3">
+          {/* Sauter à une date précise — le libellé du calendrier (ex: "28 sept. — 4 oct.") n'est pas cliquable */}
+          <div className="flex items-center gap-2 self-end">
+            <label htmlFor="calendar-jump-date" className="text-xs font-medium text-ink-muted">Aller à la date :</label>
+            <input
+              id="calendar-jump-date"
+              type="date"
+              value={format(calendarDate, "yyyy-MM-dd")}
+              onChange={(e) => {
+                if (!e.target.value) return;
+                setCalendarDate(parse(e.target.value, "yyyy-MM-dd", new Date()));
+              }}
+              className="rounded-full border border-border bg-background px-3 py-1.5 text-sm text-ink focus:border-brand-400 focus:outline-none"
+            />
+          </div>
+
+          {nearestEvent && (
+            <button
+              onClick={() => setCalendarDate(nearestEvent.start)}
+              className="flex items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-left text-sm text-brand-700 transition-colors hover:bg-brand-100 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300 dark:hover:bg-brand-500/15"
+            >
+              <span>
+                Aucun rendez-vous sur cette période. Le plus proche est <strong>{nearestEvent.resource.patient?.fullName}</strong> le{" "}
+                {nearestEvent.start.toLocaleDateString("fr-FR", { dateStyle: "long" })}.
+              </span>
+              <span className="flex shrink-0 items-center gap-1 font-semibold">Y aller <ArrowRight size={14} /></span>
+            </button>
+          )}
+
           <div className="rounded-2xl border border-border bg-surface-raised p-4 shadow-sm">
             <Calendar
               localizer={localizer}
@@ -558,7 +602,10 @@ export default function AppointmentsPage() {
                 noEventsInRange: "Aucun rendez-vous sur cette période.",
                 showMore: (total) => `+ ${total} autre(s)`,
               }}
-              defaultView={Views.WEEK}
+              date={calendarDate}
+              onNavigate={(date) => setCalendarDate(date)}
+              view={calendarView}
+              onView={(view) => setCalendarView(view)}
               views={["month", "week", "day", "agenda"]}
               onSelectEvent={(event) => openEditModal(event.resource)}
               onSelectSlot={(slotInfo) => openCreateModal(slotInfo.start)}
