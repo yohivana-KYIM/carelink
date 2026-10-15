@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { api } from "@/lib/api";
 import { siteConfig } from "@/lib/site-config";
+import { useLocale } from "@/lib/i18n";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 
@@ -14,16 +15,19 @@ type Status = "idle" | "loading" | "success" | "error";
 
 const infoPoints = [
   {
+    key: "email",
     icon: Mail,
     title: "Par email",
     detail: siteConfig.contactEmail,
   },
   {
+    key: "responseTime",
     icon: MessageCircle,
     title: "Délai de réponse",
     detail: "Sous 24h ouvrées",
   },
   {
+    key: "zone",
     icon: MapPin,
     title: "Zone d'intervention",
     detail: "Établissements de santé, France",
@@ -31,6 +35,7 @@ const infoPoints = [
 ];
 
 export function ContactForm() {
+  const { t } = useLocale();
   const [status, setStatus] = useState<Status>("idle");
   const [values, setValues] = useState({
     name: "",
@@ -81,32 +86,33 @@ export function ContactForm() {
           <Reveal>
             <div className="flex flex-col gap-4">
               <span className="text-sm font-semibold uppercase tracking-[0.14em] text-brand-600 dark:text-brand-400">
-                Contact
+                {t("contact.eyebrow", "Contact")}
               </span>
               <h2 className="text-balance text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-                Parlons de votre cabinet
+                {t("contact.title", "Parlons de votre cabinet")}
               </h2>
               <p className="max-w-md text-balance text-base leading-relaxed text-ink-muted">
-                Une question, une démo à planifier, un besoin spécifique ?
-                Décrivez-nous votre cabinet, notre équipe vous répond
-                rapidement.
+                {t(
+                  "contact.description",
+                  "Une question, une démo à planifier, un besoin spécifique ? Décrivez-nous votre cabinet, notre équipe vous répond rapidement."
+                )}
               </p>
             </div>
           </Reveal>
 
           <ul className="flex flex-col gap-5">
             {infoPoints.map((point, index) => (
-              <Reveal key={point.title} delay={index * 0.06}>
+              <Reveal key={point.key} delay={index * 0.06}>
                 <li className="flex items-start gap-4">
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
                     <point.icon size={19} />
                   </span>
                   <div>
                     <p className="text-sm font-semibold text-ink">
-                      {point.title}
+                      {t(`contact.${point.key}.title`, point.title)}
                     </p>
                     <p className="mt-0.5 text-sm text-ink-muted">
-                      {point.detail}
+                      {point.key === "email" ? point.detail : t(`contact.${point.key}.detail`, point.detail)}
                     </p>
                   </div>
                 </li>
@@ -127,15 +133,15 @@ export function ContactForm() {
             <div className="relative z-10 grid gap-5 sm:grid-cols-2">
               <Field
                 id="name"
-                label="Nom complet"
+                label={t("contact.field.name", "Nom complet")}
                 required
                 value={values.name}
                 onChange={updateField("name")}
-                placeholder="Dr. Amina Kader"
+                placeholder={t("contact.placeholder.name", "Dr. Amina Kader")}
               />
               <Field
                 id="email"
-                label="Email professionnel"
+                label={t("contact.field.email", "Email professionnel")}
                 type="email"
                 required
                 value={values.email}
@@ -147,14 +153,14 @@ export function ContactForm() {
             <div className="relative z-10 grid gap-5 sm:grid-cols-2">
               <Field
                 id="clinic"
-                label="Nom de l'établissement"
+                label={t("contact.field.clinic", "Nom de l'établissement")}
                 value={values.clinic}
                 onChange={updateField("clinic")}
-                placeholder="Centre de santé du Parc"
+                placeholder={t("contact.placeholder.clinic", "Centre de santé du Parc")}
               />
               <div className="flex flex-col gap-2">
                 <label htmlFor="phone" className="text-sm font-medium text-ink flex items-center gap-1.5">
-                  <Phone size={14} /> Téléphone (optionnel)
+                  <Phone size={14} /> {t("contact.field.phone", "Téléphone (optionnel)")}
                 </label>
                 <div className="phone-input-container">
                   <PhoneInput
@@ -193,15 +199,15 @@ export function ContactForm() {
             <Field
               className="relative z-10"
               id="subject"
-              label="Objet"
+              label={t("contact.field.subject", "Objet")}
               value={values.subject}
               onChange={updateField("subject")}
-              placeholder="Demande de démo, question produit..."
+              placeholder={t("contact.placeholder.subject", "Demande de démo, question produit...")}
             />
 
             <div className="flex flex-col gap-2">
               <label htmlFor="message" className="text-sm font-medium text-ink">
-                Message <span className="text-brand-600">*</span>
+                {t("contact.field.message", "Message")} <span className="text-brand-600">*</span>
               </label>
               <textarea
                 id="message"
@@ -209,7 +215,10 @@ export function ContactForm() {
                 rows={5}
                 value={values.message}
                 onChange={updateField("message")}
-                placeholder="Parlez-nous de votre cabinet et de vos besoins en rappels de rendez-vous..."
+                placeholder={t(
+                  "contact.placeholder.message",
+                  "Parlez-nous de votre cabinet et de vos besoins en rappels de rendez-vous..."
+                )}
                 className="w-full resize-none rounded-2xl border border-border bg-background px-4 py-3 text-sm text-ink placeholder:text-ink-soft focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800"
               />
             </div>
@@ -228,7 +237,7 @@ export function ContactForm() {
                   <Loader2 size={16} />
                 </motion.span>
               ) : null}
-              {status === "loading" ? "Envoi..." : "Envoyer le message"}
+              {status === "loading" ? t("contact.sending", "Envoi...") : t("contact.send", "Envoyer le message")}
             </button>
 
             <div aria-live="polite" className="min-h-[1.25rem] text-sm">
@@ -239,13 +248,12 @@ export function ContactForm() {
                   className="flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400"
                 >
                   <CheckCircle2 size={15} />
-                  Merci ! Nous revenons vers vous sous 24h ouvrées.
+                  {t("contact.success", "Merci ! Nous revenons vers vous sous 24h ouvrées.")}
                 </motion.p>
               ) : null}
               {status === "error" ? (
                 <p className="font-medium text-red-600 dark:text-red-400">
-                  Merci de renseigner votre nom, un email valide et un
-                  message.
+                  {t("contact.error", "Merci de renseigner votre nom, un email valide et un message.")}
                 </p>
               ) : null}
             </div>

@@ -5,10 +5,12 @@ import { motion } from "motion/react";
 import { CheckCircle2, Loader2, Mail } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
+import { useLocale } from "@/lib/i18n";
 
 type Status = "idle" | "loading" | "success" | "error";
 
 export function NewsletterBanner() {
+  const { t } = useLocale();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -16,7 +18,7 @@ export function NewsletterBanner() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!email.includes("@")) {
-      setErrorMsg("Merci de renseigner un email valide.");
+      setErrorMsg(t("newsletter.invalidEmail", "Merci de renseigner un email valide."));
       setStatus("error");
       return;
     }
@@ -32,14 +34,14 @@ export function NewsletterBanner() {
       );
       const data = await res.json().catch(() => null);
       if (!res.ok) {
-        setErrorMsg(data?.error ?? "Une erreur est survenue.");
+        setErrorMsg(data?.error ?? t("newsletter.genericError", "Une erreur est survenue."));
         setStatus("error");
         return;
       }
       setStatus("success");
       setEmail("");
     } catch {
-      setErrorMsg("Impossible de contacter le serveur. Réessayez.");
+      setErrorMsg(t("newsletter.serverError", "Impossible de contacter le serveur. Réessayez."));
       setStatus("error");
     }
   }
@@ -60,10 +62,13 @@ export function NewsletterBanner() {
 
               <div>
                 <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                  Restez informé des nouveautés Ecotocare
+                  {t("newsletter.title", "Restez informé des nouveautés Ecotocare")}
                 </h2>
                 <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/70 sm:text-base">
-                  Conseils pratiques, nouvelles fonctionnalités et bonnes pratiques pour votre cabinet — directement dans votre boîte mail.
+                  {t(
+                    "newsletter.description",
+                    "Conseils pratiques, nouvelles fonctionnalités et bonnes pratiques pour votre cabinet — directement dans votre boîte mail."
+                  )}
                 </p>
               </div>
 
@@ -74,7 +79,7 @@ export function NewsletterBanner() {
                   className="flex items-center gap-2 rounded-full bg-white/20 px-5 py-3 text-sm font-semibold text-white"
                 >
                   <CheckCircle2 size={18} />
-                  Inscription confirmée — merci !
+                  {t("newsletter.success", "Inscription confirmée — merci !")}
                 </motion.div>
               ) : (
                 <form
@@ -112,7 +117,7 @@ export function NewsletterBanner() {
                         <Loader2 size={16} />
                       </motion.span>
                     ) : null}
-                    {status === "loading" ? "Envoi..." : "S'inscrire"}
+                    {status === "loading" ? t("newsletter.sending", "Envoi...") : t("newsletter.subscribe", "S'inscrire")}
                   </button>
                 </form>
               )}
@@ -122,7 +127,7 @@ export function NewsletterBanner() {
               ) : null}
 
               <p className="text-xs text-white/40">
-                Pas de spam. Désinscription possible à tout moment.
+                {t("newsletter.disclaimer", "Pas de spam. Désinscription possible à tout moment.")}
               </p>
             </div>
           </div>

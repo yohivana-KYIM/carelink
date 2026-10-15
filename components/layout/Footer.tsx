@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/SocialIcons";
 import { footerLinks, siteConfig } from "@/lib/site-config";
 import { api, ApiError } from "@/lib/api";
+import { useLocale } from "@/lib/i18n";
 
 const socialLinks = [
   { href: siteConfig.social.facebook, label: "Facebook", Icon: FacebookIcon },
@@ -25,6 +26,7 @@ const socialLinks = [
 type Status = "idle" | "loading" | "success" | "error";
 
 export function Footer() {
+  const { t } = useLocale();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -33,7 +35,7 @@ export function Footer() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!email.trim() || !email.includes("@")) {
-      setErrorMsg("Merci de renseigner une adresse email valide.");
+      setErrorMsg(t("footer.newsletter.invalidEmail", "Merci de renseigner une adresse email valide."));
       setStatus("error");
       return;
     }
@@ -59,11 +61,13 @@ export function Footer() {
           <div className="flex flex-col gap-10 border-b border-white/10 pb-12 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                Suivez les actualités {siteConfig.name}
+                {t("footer.newsletter.title", "Suivez les actualités {name}", { name: siteConfig.name })}
               </h2>
               <p className="mt-2 max-w-md text-sm text-white/60">
-                Laissez votre email professionnel, nous vous recontacterons
-                rapidement pour organiser une démonstration.
+                {t(
+                  "footer.newsletter.description",
+                  "Laissez votre email professionnel, nous vous recontacterons rapidement pour organiser une démonstration."
+                )}
               </p>
             </div>
 
@@ -73,7 +77,7 @@ export function Footer() {
               noValidate
             >
               <label htmlFor="footer-newsletter-email" className="sr-only">
-                Adresse email professionnelle
+                {t("footer.newsletter.emailLabel", "Adresse email professionnelle")}
               </label>
               <input
                 id="footer-newsletter-email"
@@ -101,7 +105,7 @@ export function Footer() {
                     <Loader2 size={16} />
                   </motion.span>
                 ) : null}
-                {status === "loading" ? "Envoi..." : "M'informer"}
+                {status === "loading" ? t("footer.newsletter.sending", "Envoi...") : t("footer.newsletter.subscribe", "M'informer")}
               </button>
             </form>
           </div>
@@ -114,7 +118,7 @@ export function Footer() {
                 className="flex items-center gap-1.5 font-medium text-emerald-400"
               >
                 <CheckCircle2 size={15} />
-                Merci ! Nous revenons vers vous très vite.
+                {t("footer.newsletter.success", "Merci ! Nous revenons vers vous très vite.")}
               </motion.p>
             ) : null}
             {status === "error" ? (
@@ -155,19 +159,29 @@ export function Footer() {
               </div>
             </div>
 
-            <FooterColumn title="Produit" links={footerLinks.produit} />
-            <FooterColumn title="Ressources" links={footerLinks.ressources} />
-            <FooterColumn title="Légal" links={footerLinks.legal} />
+            <FooterColumn
+              title={t("footer.column.product", "Produit")}
+              links={footerLinks.produit.map((l) => ({ ...l, label: t(`footer.links.${l.key}`, l.label) }))}
+            />
+            <FooterColumn
+              title={t("footer.column.resources", "Ressources")}
+              links={footerLinks.ressources.map((l) => ({ ...l, label: t(`footer.links.${l.key}`, l.label) }))}
+            />
+            <FooterColumn
+              title={t("footer.column.legal", "Légal")}
+              links={footerLinks.legal.map((l) => ({ ...l, label: t(`footer.legal.${l.key}`, l.label) }))}
+            />
           </div>
 
           <div className="mt-14 flex flex-col gap-3 border-t border-white/10 pt-8 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between">
             <p>
-              © {new Date().getFullYear()} {siteConfig.name}. Tous droits
-              réservés.
+              © {new Date().getFullYear()} {siteConfig.name}. {t("footer.rights", "Tous droits réservés.")}
             </p>
             <p>
-              Solution développée par MarketYou · Messagerie via un
-              fournisseur WhatsApp Business (BSP) certifié Meta.
+              {t(
+                "footer.poweredBy",
+                "Solution développée par MarketYou · Messagerie via un fournisseur WhatsApp Business (BSP) certifié Meta."
+              )}
             </p>
           </div>
         </div>

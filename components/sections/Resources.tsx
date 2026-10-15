@@ -1,11 +1,15 @@
+"use client";
+
 import { ArrowUpRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { RevealGroup, RevealItem } from "@/components/ui/RevealGroup";
 import { ArcRing, SoftOrb } from "@/components/ui/GeometricDecor";
 import { resources } from "@/lib/site-config";
+import { useLocale } from "@/lib/i18n";
 
 export function Resources() {
+  const { t } = useLocale();
   return (
     <section id="ressources" className="relative scroll-mt-24 overflow-hidden py-20 sm:py-28">
       <SoftOrb className="absolute -right-20 bottom-0 hidden h-64 w-64 bg-brand-200/40 dark:bg-brand-800/20 lg:block" />
@@ -13,28 +17,31 @@ export function Resources() {
 
       <Container className="relative flex flex-col gap-14">
         <SectionHeading
-          eyebrow="Ressources"
-          title="Pour aller plus loin"
-          description="Des repères pratiques sur la gestion de cabinet, la conformité et WhatsApp Business, à venir sur notre centre de ressources."
+          eyebrow={t("resources.eyebrow", "Ressources")}
+          title={t("resources.title", "Pour aller plus loin")}
+          description={t(
+            "resources.description",
+            "Des repères pratiques sur la gestion de cabinet, la conformité et WhatsApp Business, à venir sur notre centre de ressources."
+          )}
         />
 
         <RevealGroup className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {resources.map((resource) => (
-            <RevealItem key={resource.title}>
+            <RevealItem key={resource.key}>
               <article className="group relative flex h-full flex-col gap-4 overflow-hidden rounded-2xl border border-border bg-surface-raised p-6 shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-200/80 hover:shadow-xl dark:hover:border-brand-800/80">
                 {/* Fond gradient au hover */}
                 <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-brand-50/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-brand-500/8" />
                 <span className="relative w-fit rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-400">
-                  {resource.tag}
+                  {t(`resources.${resource.key}.tag`, resource.tag)}
                 </span>
                 <h3 className="relative text-lg font-semibold leading-snug text-ink">
-                  {resource.title}
+                  {t(`resources.${resource.key}.title`, resource.title)}
                 </h3>
                 <p className="relative text-sm leading-relaxed text-ink-muted">
-                  {resource.excerpt}
+                  {t(`resources.${resource.key}.excerpt`, resource.excerpt)}
                 </p>
                 <span className="relative mt-auto flex items-center gap-1 text-sm font-medium text-brand-600 dark:text-brand-400">
-                  Bientôt disponible
+                  {t("resources.comingSoon", "Bientôt disponible")}
                   <ArrowUpRight
                     size={15}
                     className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"

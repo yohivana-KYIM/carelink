@@ -1,9 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
+import { useLocale } from "@/lib/i18n";
 
 export function CtaBanner() {
+  const { t } = useLocale();
   return (
     <section id="contact" className="scroll-mt-24 py-20 sm:py-28">
       <Container>
@@ -21,14 +25,15 @@ export function CtaBanner() {
           <div className="relative flex flex-col items-center gap-6">
             <Reveal>
               <h2 className="text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-[2.75rem]">
-                Prêt à réduire vos rendez-vous manqués ?
+                {t("cta.title", "Prêt à réduire vos rendez-vous manqués ?")}
               </h2>
             </Reveal>
             <Reveal delay={0.08}>
               <p className="max-w-xl text-balance text-base text-brand-100 sm:text-lg">
-                Demandez une démo personnalisée et découvrez comment Ecotocare
-                s&apos;intègre à votre agenda et à votre numéro WhatsApp
-                Business en quelques jours.
+                {t(
+                  "cta.description",
+                  "Demandez une démo personnalisée et découvrez comment Ecotocare s'intègre à votre agenda et à votre numéro WhatsApp Business en quelques jours."
+                )}
               </p>
             </Reveal>
             <Reveal delay={0.16}>
@@ -38,14 +43,14 @@ export function CtaBanner() {
                   variant="primary"
                   className="bg-white text-brand-800 hover:bg-brand-50 hover:text-brand-900 dark:bg-white dark:text-brand-900 dark:hover:bg-white/90"
                 >
-                  Demander une démo
+                  {t("hero.cta.demo", "Demander une démo")}
                 </Button>
                 <Button
                   href="#faq"
                   variant="secondary"
                   className="border-white/30 bg-transparent text-white hover:border-white hover:text-white"
                 >
-                  Consulter la FAQ
+                  {t("cta.secondaryButton", "Consulter la FAQ")}
                 </Button>
               </div>
             </Reveal>

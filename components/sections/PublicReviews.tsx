@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { api, type Testimonial } from "@/lib/api";
+import { useLocale } from "@/lib/i18n";
 
 function Stars({ rating }: { rating: number | null }) {
   if (!rating) return null;
@@ -23,6 +24,7 @@ function Stars({ rating }: { rating: number | null }) {
 }
 
 export function PublicReviews() {
+  const { t } = useLocale();
   const [reviews, setReviews] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [reactedIds, setReactedIds] = useState<Set<string>>(new Set());
@@ -45,7 +47,7 @@ export function PublicReviews() {
       const res = kind === "like" ? await api.likeTestimonial(id) : await api.dislikeTestimonial(id);
       setReviews((prev) => prev.map((t) => (t.id === id ? res.testimonial : t)));
     } catch {
-      toast.error("Impossible d'enregistrer votre réaction");
+      toast.error(t("reviews.reactError", "Impossible d'enregistrer votre réaction"));
     }
   }
 
@@ -57,7 +59,7 @@ export function PublicReviews() {
       setSubmitted(true);
       setForm({ authorName: "", authorRole: "", rating: 5, message: "" });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Échec de l'envoi de votre avis");
+      toast.error(err instanceof Error ? err.message : t("reviews.submitError", "Échec de l'envoi de votre avis"));
     } finally {
       setSubmitting(false);
     }
@@ -68,10 +70,10 @@ export function PublicReviews() {
       <Container className="flex flex-col gap-10">
         <Reveal className="flex flex-col items-center gap-3 text-center">
           <h2 className="text-balance text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-4xl">
-            Avis de nos utilisateurs
+            {t("reviews.title", "Avis de nos utilisateurs")}
           </h2>
           <p className="max-w-xl text-balance text-base text-ink-muted">
-            Des retours vérifiés de cabinets qui utilisent Ecotocare au quotidien.
+            {t("reviews.subtitle", "Des retours vérifiés de cabinets qui utilisent Ecotocare au quotidien.")}
           </p>
         </Reveal>
 
@@ -113,26 +115,26 @@ export function PublicReviews() {
             ))}
           </div>
         ) : (
-          <p className="text-center text-sm text-ink-soft">Aucun avis publié pour le moment.</p>
+          <p className="text-center text-sm text-ink-soft">{t("reviews.empty", "Aucun avis publié pour le moment.")}</p>
         )}
 
         <Reveal className="mx-auto w-full max-w-lg">
           {submitted ? (
             <p className="rounded-2xl border border-border bg-surface-raised p-6 text-center text-sm text-ink-muted">
-              Merci pour votre avis ! Il sera visible ici après validation par notre équipe.
+              {t("reviews.thanks", "Merci pour votre avis ! Il sera visible ici après validation par notre équipe.")}
             </p>
           ) : formOpen ? (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-2xl border border-border bg-surface-raised p-6">
               <div className="grid gap-3 sm:grid-cols-2">
                 <input
                   required
-                  placeholder="Votre nom"
+                  placeholder={t("reviews.placeholderName", "Votre nom")}
                   value={form.authorName}
                   onChange={(e) => setForm((f) => ({ ...f, authorName: e.target.value }))}
                   className="rounded-full border border-border bg-background px-4 py-2.5 text-sm text-ink placeholder:text-ink-soft focus:border-brand-400 focus:outline-none"
                 />
                 <input
-                  placeholder="Rôle / cabinet (optionnel)"
+                  placeholder={t("reviews.placeholderRole", "Rôle / cabinet (optionnel)")}
                   value={form.authorRole}
                   onChange={(e) => setForm((f) => ({ ...f, authorRole: e.target.value }))}
                   className="rounded-full border border-border bg-background px-4 py-2.5 text-sm text-ink placeholder:text-ink-soft focus:border-brand-400 focus:outline-none"
@@ -152,7 +154,7 @@ export function PublicReviews() {
                 required
                 rows={4}
                 minLength={10}
-                placeholder="Votre avis..."
+                placeholder={t("reviews.placeholderMessage", "Votre avis...")}
                 value={form.message}
                 onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
                 className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-ink placeholder:text-ink-soft focus:border-brand-400 focus:outline-none"
@@ -163,7 +165,7 @@ export function PublicReviews() {
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-70"
               >
                 {submitting ? <Loader2 size={14} className="animate-spin" /> : null}
-                Envoyer mon avis
+                {t("reviews.submit", "Envoyer mon avis")}
               </button>
             </form>
           ) : (
@@ -172,7 +174,7 @@ export function PublicReviews() {
               onClick={() => setFormOpen(true)}
               className="mx-auto inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-surface-raised"
             >
-              <MessageSquarePlus size={16} /> Laisser un avis
+              <MessageSquarePlus size={16} /> {t("reviews.leave", "Laisser un avis")}
             </button>
           )}
         </Reveal>

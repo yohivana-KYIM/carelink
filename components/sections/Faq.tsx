@@ -8,8 +8,10 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { DotGrid, QuarterArc } from "@/components/ui/GeometricDecor";
 import { faqItems } from "@/lib/site-config";
+import { useLocale } from "@/lib/i18n";
 
 export function Faq() {
+  const { t } = useLocale();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
@@ -19,16 +21,19 @@ export function Faq() {
 
       <Container className="relative flex flex-col gap-14">
         <SectionHeading
-          eyebrow="Questions fréquentes"
-          title="Ce que les cabinets nous demandent le plus"
-          description="Consentement patient, conformité, coûts WhatsApp : les réponses aux questions les plus courantes avant de démarrer."
+          eyebrow={t("faq.eyebrow", "Questions fréquentes")}
+          title={t("faq.title", "Ce que les cabinets nous demandent le plus")}
+          description={t(
+            "faq.description",
+            "Consentement patient, conformité, coûts WhatsApp : les réponses aux questions les plus courantes avant de démarrer."
+          )}
         />
 
         <div className="mx-auto flex w-full max-w-3xl flex-col divide-y divide-border">
           {faqItems.map((item, index) => {
             const isOpen = openIndex === index;
             return (
-              <Reveal key={item.question} delay={index * 0.03}>
+              <Reveal key={item.key} delay={index * 0.03}>
                 <div className="py-2">
                   <button
                     type="button"
@@ -37,7 +42,7 @@ export function Faq() {
                     className="flex w-full items-center justify-between gap-4 py-4 text-left"
                   >
                     <span className="text-base font-semibold text-ink sm:text-lg">
-                      {item.question}
+                      {t(`faq.${item.key}.question`, item.question)}
                     </span>
                     <motion.span
                       animate={{ rotate: isOpen ? 45 : 0 }}
@@ -57,7 +62,7 @@ export function Faq() {
                     className="overflow-hidden"
                   >
                     <p className="pb-5 pr-10 text-sm leading-relaxed text-ink-muted sm:text-base">
-                      {item.answer}
+                      {t(`faq.${item.key}.answer`, item.answer)}
                     </p>
                   </motion.div>
                 </div>

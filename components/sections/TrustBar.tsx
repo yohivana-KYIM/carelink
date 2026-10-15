@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Container } from "@/components/ui/Container";
 import { RevealGroup, RevealItem } from "@/components/ui/RevealGroup";
 import { trustPoints } from "@/lib/site-config";
+import { useLocale } from "@/lib/i18n";
 
 const cards = [
   {
@@ -43,6 +44,7 @@ const glowColors: Record<string, string> = {
 };
 
 export function TrustBar() {
+  const { t } = useLocale();
   return (
     <section id="securite" className="scroll-mt-24 py-12">
       <Container>
@@ -51,26 +53,35 @@ export function TrustBar() {
           <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-400">
-                API WhatsApp Business (Meta)
+                {t("trust.eyebrow", "API WhatsApp Business (Meta)")}
               </p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-                Messagerie sécurisée,{" "}
+                {t("trust.title.part1", "Messagerie sécurisée,")}{" "}
                 <span className="bg-gradient-to-r from-brand-600 to-brand-400 bg-clip-text text-transparent">
-                  conforme
+                  {t("trust.title.part2", "conforme")}
                 </span>{" "}
-                et sans engagement
+                {t("trust.title.part3", "et sans engagement")}
               </h2>
             </div>
             <p className="max-w-xl text-sm leading-relaxed text-ink-muted sm:text-base">
-              Un encadrement clair de votre service : sécurité des données,
-              conformité RGPD, et compatibilité sur tous les navigateurs.
+              {t(
+                "trust.description",
+                "Un encadrement clair de votre service : sécurité des données, conformité RGPD, et compatibilité sur tous les navigateurs."
+              )}
             </p>
           </div>
 
           {/* Cards */}
           <RevealGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {trustPoints.map((point, index) => (
-              <TrustCard key={point.title} point={point} meta={cards[index % cards.length]} />
+              <TrustCard
+                key={point.key}
+                point={{
+                  title: t(`trust.${point.key}.title`, point.title),
+                  description: t(`trust.${point.key}.description`, point.description),
+                }}
+                meta={cards[index % cards.length]}
+              />
             ))}
           </RevealGroup>
         </div>
@@ -86,6 +97,7 @@ function TrustCard({
   point: { title: string; description: string };
   meta: (typeof cards)[number];
 }) {
+  const { t } = useLocale();
   const [hovered, setHovered] = useState(false);
   const Icon = meta.icon;
 
@@ -174,7 +186,7 @@ function TrustCard({
             className="flex items-center gap-1.5 text-xs font-semibold text-white/80"
           >
             <span className={`h-1 w-4 rounded-full bg-gradient-to-r ${meta.accent}`} />
-            Sécurisé &amp; certifié
+            {t("trust.badge", "Sécurisé & certifié")}
           </motion.div>
 
           {/* Barre de progression bas */}
