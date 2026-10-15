@@ -26,7 +26,7 @@ const infoPoints = [
   {
     icon: MapPin,
     title: "Zone d'intervention",
-    detail: "Cabinets dentaires, France",
+    detail: "Établissements de santé, France",
   },
 ];
 
@@ -140,17 +140,17 @@ export function ContactForm() {
                 required
                 value={values.email}
                 onChange={updateField("email")}
-                placeholder="vous@cabinet-dentaire.fr"
+                placeholder="vous@etablissement-sante.fr"
               />
             </div>
 
             <div className="relative z-10 grid gap-5 sm:grid-cols-2">
               <Field
                 id="clinic"
-                label="Nom du cabinet"
+                label="Nom de l'établissement"
                 value={values.clinic}
                 onChange={updateField("clinic")}
-                placeholder="Cabinet dentaire du Parc"
+                placeholder="Centre de santé du Parc"
               />
               <div className="flex flex-col gap-2">
                 <label htmlFor="phone" className="text-sm font-medium text-ink flex items-center gap-1.5">

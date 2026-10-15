@@ -13,6 +13,7 @@ import {
   XIcon,
 } from "@/components/ui/SocialIcons";
 import { footerLinks, siteConfig } from "@/lib/site-config";
+import { api, ApiError } from "@/lib/api";
 
 const socialLinks = [
   { href: siteConfig.social.facebook, label: "Facebook", Icon: FacebookIcon },
@@ -26,20 +27,25 @@ type Status = "idle" | "loading" | "success" | "error";
 export function Footer() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMsg, setErrorMsg] = useState("");
   const footerRef = useRef<HTMLElement>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!email.trim() || !email.includes("@")) {
+      setErrorMsg("Merci de renseigner une adresse email valide.");
       setStatus("error");
       return;
     }
     setStatus("loading");
-    // Le backend Ecotocare (Node.js/Express) n'est pas encore branché.
-    // Prêt à pointer vers NEXT_PUBLIC_API_URL une fois l'API disponible.
-    await new Promise((resolve) => setTimeout(resolve, 700));
-    setStatus("success");
-    setEmail("");
+    try {
+      await api.subscribeNewsletter(email.trim());
+      setStatus("success");
+      setEmail("");
+    } catch (err) {
+      setErrorMsg(err instanceof ApiError ? err.message : "Impossible de contacter le serveur. Réessayez.");
+      setStatus("error");
+    }
   }
 
   return (
@@ -73,7 +79,7 @@ export function Footer() {
                 id="footer-newsletter-email"
                 type="email"
                 required
-                placeholder="vous@cabinet-dentaire.fr"
+                placeholder="vous@etablissement-sante.fr"
                 value={email}
                 onChange={(event) => {
                   setEmail(event.target.value);
@@ -112,9 +118,7 @@ export function Footer() {
               </motion.p>
             ) : null}
             {status === "error" ? (
-              <p className="font-medium text-red-400">
-                Merci de renseigner une adresse email valide.
-              </p>
+              <p className="font-medium text-red-400">{errorMsg}</p>
             ) : null}
           </div>
 

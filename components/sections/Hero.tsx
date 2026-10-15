@@ -46,7 +46,7 @@ export function Hero() {
           >
             {t(
               "hero.subtitle",
-              `${siteConfig.name}, le logiciel de rappel de rendez-vous par WhatsApp pour cabinets dentaires : rappels automatiques et relance des patients inactifs, sur le canal que vos patients consultent déjà tous les jours.`,
+              `${siteConfig.name}, le logiciel de rappel de rendez-vous par WhatsApp pour établissements de santé : rappels automatiques et relance des patients inactifs, sur le canal que vos patients consultent déjà tous les jours.`,
               { name: siteConfig.name }
             )}
           </motion.p>

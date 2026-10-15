@@ -1,7 +1,7 @@
 {
   "name": "Ecotocare",
   "short_name": "Ecotocare",
-  "description": "Rappels et relances patients par WhatsApp pour cabinets dentaires",
+  "description": "Rappels et relances patients par WhatsApp pour établissements de santé",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#ffffff",

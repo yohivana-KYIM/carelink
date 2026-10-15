@@ -70,7 +70,7 @@ export default function Image() {
             maxWidth: 820,
           }}
         >
-          Rappels et relances patients automatiques par WhatsApp, pour cabinets dentaires.
+          Rappels et relances patients automatiques par WhatsApp, pour établissements de santé.
         </div>
       </div>
     ),

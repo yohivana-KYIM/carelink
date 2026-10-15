@@ -1,18 +1,18 @@
 export const siteConfig = {
   name: "Ecotocare",
-  tagline: "Logiciel de rappel de rendez-vous WhatsApp pour cabinets dentaires",
+  tagline: "Logiciel de rappel de rendez-vous WhatsApp pour établissements de santé",
   description:
-    "Ecotocare est le logiciel de rappel de rendez-vous par WhatsApp pour cabinets dentaires : rappels automatiques, relance des patients inactifs, moins de rendez-vous manqués, dashboard cabinet dentaire sans installation.",
+    "Ecotocare est le logiciel de rappel de rendez-vous par WhatsApp pour établissements de santé (cabinets dentaires, médicaux, paramédicaux...) : rappels automatiques, relance des patients inactifs, moins de rendez-vous manqués, dashboard sans installation.",
   url: "https://ecotocare.com",
   locale: "fr_FR",
   keywords: [
-    "rappel rendez-vous WhatsApp dentiste",
-    "logiciel de rappel de rendez-vous pour dentiste",
-    "réduire les rendez-vous manqués cabinet dentaire",
+    "rappel rendez-vous WhatsApp établissement de santé",
+    "logiciel de rappel de rendez-vous médical",
+    "réduire les rendez-vous manqués cabinet médical",
     "relance patients inactifs WhatsApp",
-    "no-show dentiste",
-    "WhatsApp Business API cabinet dentaire",
-    "dashboard cabinet dentaire sans installation",
+    "no-show cabinet médical",
+    "WhatsApp Business API santé",
+    "dashboard établissement de santé sans installation",
   ],
   contactEmail: "contact@ecotocare.com",
   social: {
@@ -136,7 +136,7 @@ export const faqItems = [
   {
     question: "Est-ce conforme au RGPD et aux données de santé ?",
     answer:
-      "Oui. Les données patients sont chiffrées au repos et en transit (HTTPS), l'accès est contrôlé par rôle (secrétaire / dentiste), et chaque envoi WhatsApp nécessite le consentement préalable (opt-in) du patient, condition imposée par Meta.",
+      "Oui. Les données patients sont chiffrées au repos et en transit (HTTPS), l'accès est contrôlé par rôle (secrétaire / praticien), et chaque envoi WhatsApp nécessite le consentement préalable (opt-in) du patient, condition imposée par Meta.",
   },
   {
     question: "Combien de temps faut-il pour démarrer ?",
@@ -157,61 +157,6 @@ export const faqItems = [
     question: "Que se passe-t-il si un patient ne répond pas ?",
     answer:
       "Le rendez-vous reste visible avec une alerte visuelle dans le dashboard dès J-1 sans réponse, afin que la secrétaire puisse effectuer un appel de suivi manuel si nécessaire.",
-  },
-] as const;
-
-export const testimonials = [
-  {
-    quote:
-      "Nos patients confirment leur rendez-vous en un tap, directement dans WhatsApp.",
-    name: "Dr. Bernard",
-    role: "Cabinet à Lyon",
-  },
-  {
-    quote:
-      "Les relances automatiques nous ont fait gagner un temps fou sur les rappels manuels.",
-    name: "Camille R.",
-    role: "Secrétaire médicale, Nantes",
-  },
-  {
-    quote:
-      "Le dashboard est tellement simple que toute l'équipe l'utilise sans formation.",
-    name: "Dr. Haddad",
-    role: "Cabinet à Marseille",
-  },
-  {
-    quote:
-      "Moins d'appels, moins de créneaux perdus, plus de sérénité au quotidien.",
-    name: "Sophie M.",
-    role: "Secrétaire médicale, Bordeaux",
-  },
-  {
-    quote:
-      "Voir en un coup d'œil les rendez-vous sans réponse change notre organisation.",
-    name: "Dr. Petit",
-    role: "Cabinet à Toulouse",
-  },
-  {
-    quote:
-      "Nos patients apprécient de ne plus rater d'appel en pleine journée de travail.",
-    name: "Léa D.",
-    role: "Secrétaire médicale, Lille",
-  },
-  {
-    quote: "La prise en main a pris moins d'une heure pour toute l'équipe.",
-    name: "Dr. Nguyen",
-    role: "Cabinet à Rennes",
-  },
-  {
-    quote:
-      "Les relances des patients inactifs nous ramènent des rendez-vous qu'on aurait perdus.",
-    name: "Julie B.",
-    role: "Secrétaire médicale, Strasbourg",
-  },
-  {
-    quote: "Un outil pensé pour un usage quotidien, sans complexité inutile.",
-    name: "Dr. Faure",
-    role: "Cabinet à Nice",
   },
 ] as const;
 

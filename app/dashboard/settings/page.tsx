@@ -944,7 +944,7 @@ function ReportSettingsCard({ token }: { token: string | null }) {
       <div className="flex flex-col gap-2">
         <label className="text-sm font-medium text-ink">Email destinataire des rapports (optionnel)</label>
         <input type="email" value={form.reportEmail} onChange={e => setForm(f => ({ ...f, reportEmail: e.target.value }))}
-          placeholder="direction@cabinet-dentaire.fr"
+          placeholder="direction@etablissement-sante.fr"
           className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-ink focus:border-brand-400 focus:outline-none" />
         <p className="text-xs text-ink-soft">En plus de l'email des administrateurs du cabinet.</p>
       </div>

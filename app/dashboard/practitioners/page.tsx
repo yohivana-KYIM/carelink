@@ -100,7 +100,7 @@ export default function PractitionersPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-ink">Praticiens</h1>
-          <p className="mt-1 text-sm text-ink-muted">Gérez la liste des médecins / dentistes du cabinet pour l'attribution des rendez-vous.</p>
+          <p className="mt-1 text-sm text-ink-muted">Gérez la liste des praticiens de l'établissement pour l'attribution des rendez-vous.</p>
         </div>
         {isAdmin && (
           <button onClick={openCreateModal} className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">

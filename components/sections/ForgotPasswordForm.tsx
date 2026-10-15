@@ -141,7 +141,7 @@ export function ForgotPasswordForm() {
                         setEmail(event.target.value);
                         if (status !== "idle") setStatus("idle");
                       }}
-                      placeholder="vous@cabinet-dentaire.fr"
+                      placeholder="vous@etablissement-sante.fr"
                       className="w-full rounded-full border border-border bg-background py-2.5 pl-11 pr-4 text-sm text-ink placeholder:text-ink-soft focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-800"
                     />
                   </div>

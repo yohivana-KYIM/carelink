@@ -165,10 +165,10 @@ export function SignupWizard() {
                         <>
                           <Field
                             id="cabinetName"
-                            label="Nom du cabinet"
+                            label="Nom de l'établissement"
                             value={data.cabinetName}
                             onChange={(v) => update("cabinetName", v)}
-                            placeholder="Cabinet dentaire du Parc"
+                            placeholder="Centre de santé du Parc"
                             required
                           />
                           <Field
@@ -215,7 +215,7 @@ export function SignupWizard() {
                             type="email"
                             value={data.email}
                             onChange={(v) => update("email", v)}
-                            placeholder="vous@cabinet-dentaire.fr"
+                            placeholder="vous@etablissement-sante.fr"
                             required
                           />
                           <div className="flex flex-col gap-2">

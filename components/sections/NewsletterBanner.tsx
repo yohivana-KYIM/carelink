@@ -94,7 +94,7 @@ export function NewsletterBanner() {
                         setEmail(e.target.value);
                         if (status !== "idle") setStatus("idle");
                       }}
-                      placeholder="vous@cabinet-dentaire.fr"
+                      placeholder="vous@etablissement-sante.fr"
                       className="w-full rounded-full bg-white/15 py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/40 outline-none focus:ring-2 focus:ring-white/40"
                     />
                   </div>

@@ -3,7 +3,7 @@ import { SignupWizard } from "@/components/sections/SignupWizard";
 
 export const metadata: Metadata = {
   title: "Créer un compte",
-  description: "Créez le compte Ecotocare de votre cabinet dentaire en quelques étapes.",
+  description: "Créez le compte Ecotocare de votre établissement de santé en quelques étapes.",
   alternates: {
     canonical: "/signup",
   },

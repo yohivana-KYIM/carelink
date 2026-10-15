@@ -6,7 +6,6 @@ import { Features } from "@/components/sections/Features";
 import { HowItWorks } from "@/components/sections/HowItWorks";
 import { FeatureHighlight } from "@/components/sections/FeatureHighlight";
 import { CtaBanner } from "@/components/sections/CtaBanner";
-import { Testimonials } from "@/components/sections/Testimonials";
 import { PublicReviews } from "@/components/sections/PublicReviews";
 import { Faq } from "@/components/sections/Faq";
 import { Resources } from "@/components/sections/Resources";
@@ -46,7 +45,6 @@ export default function Home() {
       <HowItWorks />
       <FeatureHighlight />
       <CtaBanner />
-      <Testimonials />
       <PublicReviews />
       <Faq />
       <Resources />
