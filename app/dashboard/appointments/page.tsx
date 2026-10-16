@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, FormEvent, useMemo, useRef } from "react";
+import { useEffect, useState, FormEvent, useMemo, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 import {
   Loader2, Plus, Edit, X, List, Grid, Download, Upload,
@@ -122,13 +123,23 @@ function CalendarEvent({ event }: EventProps<CalEvent>) {
 }
 
 export default function AppointmentsPage() {
+  return (
+    <Suspense fallback={null}>
+      <AppointmentsPageContent />
+    </Suspense>
+  );
+}
+
+function AppointmentsPageContent() {
   const { token } = useSession();
+  const searchParams = useSearchParams();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [practitioners, setPractitioners] = useState<Practitioner[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
+  const statusFromUrl = searchParams.get("status");
+  const [viewMode, setViewMode] = useState<"calendar" | "list">(statusFromUrl ? "list" : "calendar");
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [calendarView, setCalendarView] = useState<View>(Views.MONTH);
   const [page, setPage] = useState(1);
@@ -137,7 +148,7 @@ export default function AppointmentsPage() {
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: 6 }, (_, i) => String(currentYear - i));
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState(statusFromUrl ?? "");
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
