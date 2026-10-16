@@ -152,3 +152,14 @@ body {
 .text-balance {
   text-wrap: balance;
 }
+
+/* Le champ téléphone (react-international-phone) ouvre un menu de pays à
+   largeur fixe (300px par défaut) qui dépasse la colonne du formulaire sur
+   les mises en page étroites (grilles 2 colonnes, mobile) — on le contraint
+   à ne jamais sortir du viewport ni se superposer de façon incontrôlée. */
+.phone-input-container .react-international-phone-country-selector-dropdown {
+  width: max-content;
+  min-width: 100%;
+  max-width: min(260px, calc(100vw - 2.5rem));
+  z-index: 30;
+}
