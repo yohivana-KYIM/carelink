@@ -3,6 +3,7 @@ import { Hero } from "@/components/sections/Hero";
 import { TrustBar } from "@/components/sections/TrustBar";
 import { ValueProp } from "@/components/sections/ValueProp";
 import { Features } from "@/components/sections/Features";
+import { Specialties } from "@/components/sections/Specialties";
 import { HowItWorks } from "@/components/sections/HowItWorks";
 import { FeatureHighlight } from "@/components/sections/FeatureHighlight";
 import { CtaBanner } from "@/components/sections/CtaBanner";
@@ -42,6 +43,7 @@ export default function Home() {
       <TrustBar />
       <ValueProp />
       <Features />
+      <Specialties />
       <HowItWorks />
       <FeatureHighlight />
       <CtaBanner />

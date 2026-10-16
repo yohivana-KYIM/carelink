@@ -1,8 +1,10 @@
 export const siteConfig = {
   name: "Ecotocare",
-  tagline: "Logiciel de rappel de rendez-vous WhatsApp pour établissements de santé",
+  tagline: "Rappels de rendez-vous WhatsApp pour cabinets médicaux de toutes spécialités",
   description:
-    "Ecotocare est le logiciel de rappel de rendez-vous par WhatsApp pour établissements de santé (cabinets dentaires, médicaux, paramédicaux...) : rappels automatiques, relance des patients inactifs, moins de rendez-vous manqués, dashboard sans installation.",
+    "Rappels de rendez-vous et relance des patients par WhatsApp pour les cabinets médicaux de toutes spécialités : dentistes, pédiatres, ophtalmologues, gynécologues et plus.",
+  footerDescription:
+    "Ecotocare est le logiciel de rappel de rendez-vous par WhatsApp pour les cabinets médicaux et paramédicaux de toutes spécialités : rappels automatiques, relance des patients, moins de rendez-vous manqués.",
   url: "https://ecotocare.com",
   locale: "fr_FR",
   keywords: [
@@ -13,6 +15,10 @@ export const siteConfig = {
     "no-show cabinet médical",
     "WhatsApp Business API santé",
     "dashboard établissement de santé sans installation",
+    "logiciel rappel rendez-vous pédiatre",
+    "logiciel rappel rendez-vous ophtalmologue",
+    "logiciel cabinet médical WhatsApp",
+    "rappel rendez-vous spécialiste",
   ],
   contactEmail: "contact@ecotocare.com",
   social: {
@@ -23,6 +29,7 @@ export const siteConfig = {
 
 export const navLinks = [
   { label: "Fonctionnalités", href: "/#fonctionnalites", key: "nav.features" },
+  { label: "Spécialités", href: "/#specialites", key: "nav.specialties" },
   { label: "Comment ça marche", href: "/#comment-ca-marche", key: "nav.howItWorks" },
   { label: "Sécurité", href: "/#securite", key: "nav.security" },
   { label: "FAQ", href: "/#faq", key: "nav.faq" },
@@ -104,6 +111,97 @@ export const features = [
   },
 ] as const;
 
+// Section "Spécialités" — conçu pour, jamais "utilisé par" : aucun cabinet de
+// ces spécialités n'utilise encore Ecotocare. Pas de chiffres ("-30%", "98%")
+// ni de promesse de résultat médical dans cette section (cf. brief 2026-10-16).
+export const specialtyBlocks = [
+  {
+    key: "regularFollowUp",
+    title: "Suivi régulier",
+    tagline:
+      "Des patients à revoir à intervalles réguliers : la relance automatique les fait revenir au bon moment.",
+    specialties: [
+      "Dentistes et orthodontistes",
+      "Ophtalmologues",
+      "Gynécologues et obstétriciens",
+      "Pédiatres",
+      "Cardiologues",
+      "Endocrinologues et diabétologues",
+      "Dermatologues",
+      "Néphrologues",
+      "Pneumologues",
+      "Psychiatres et psychologues",
+      "Médecine physique et de réadaptation",
+      "Centres de PMA (fertilité)",
+      "Oncologues",
+    ],
+  },
+  {
+    key: "consultations",
+    title: "Consultations et suivi",
+    tagline:
+      "Des consultations variées, où chaque rendez-vous manqué est un créneau perdu : le rappel le protège.",
+    specialties: [
+      "Médecins généralistes",
+      "ORL",
+      "Gastro-entérologues",
+      "Urologues",
+      "Rhumatologues",
+      "Neurologues",
+      "Orthopédistes et médecine du sport",
+      "Allergologues",
+      "Chirurgie plastique et esthétique",
+    ],
+  },
+  {
+    key: "surgeryExams",
+    title: "Chirurgie et examens",
+    tagline:
+      "Des rendez-vous qui mobilisent du temps et du matériel : le rappel limite les créneaux perdus.",
+    specialties: [
+      "Chirurgiens (viscéral, vasculaire, etc.)",
+      "Imagerie médicale (radiologie, échographie)",
+      "Laboratoires d'analyses",
+    ],
+  },
+  {
+    key: "paramedical",
+    title: "Cabinets paramédicaux",
+    tagline: "Des séries de séances où une absence retarde tout le parcours de soin.",
+    specialties: [
+      "Kinésithérapeutes",
+      "Nutritionnistes et diététiciens",
+      "Orthophonistes",
+      "Ergothérapeutes",
+      "Podologues",
+      "Sages-femmes",
+      "Ostéopathes",
+    ],
+  },
+] as const;
+
+export const relanceExamples = [
+  { key: "dentists", specialty: "Dentistes", example: "Contrôle et détartrage, par exemple tous les 6 mois" },
+  {
+    key: "pediatricians",
+    specialty: "Pédiatres",
+    example: "Rendez-vous de vaccination ou de suivi de croissance prévus au calendrier",
+  },
+  { key: "ophthalmologists", specialty: "Ophtalmologues", example: "Contrôle de la vue annuel" },
+  { key: "gynecologists", specialty: "Gynécologues", example: "Suivi annuel et consultations prénatales" },
+  {
+    key: "chronicCare",
+    specialty: "Cardiologues, endocrinologues",
+    example: "Renouvellement du suivi des maladies chroniques",
+  },
+  {
+    key: "physiotherapists",
+    specialty: "Kinésithérapeutes",
+    example: "Rappel des séances de la série en cours",
+  },
+  { key: "psychiatrists", specialty: "Psychiatres, psychologues", example: "Rappel des séances" },
+] as const;
+
 export const howItWorksSteps = [
   {
     key: "create",
@@ -174,6 +272,12 @@ export const faqItems = [
     question: "Que se passe-t-il si un patient ne répond pas ?",
     answer:
       "Le rendez-vous reste visible avec une alerte visuelle dans le dashboard dès J-1 sans réponse, afin que la secrétaire puisse effectuer un appel de suivi manuel si nécessaire.",
+  },
+  {
+    key: "specialty",
+    question: "Ecotocare convient-il à ma spécialité ?",
+    answer:
+      "Oui, dès que votre cabinet travaille sur rendez-vous. Le rappel de rendez-vous convient à toutes les spécialités. La relance des patients se règle selon le rythme de suivi de votre discipline, par type de soin. Si votre spécialité ne figure pas dans la liste, contactez-nous.",
   },
 ] as const;
 

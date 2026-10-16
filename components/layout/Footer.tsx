@@ -134,7 +134,7 @@ export function Footer() {
                 </span>
               </Link>
               <p className="max-w-xs text-sm leading-relaxed text-white/50">
-                {siteConfig.description}
+                {t("footer.description", siteConfig.footerDescription)}
               </p>
               <div className="flex items-center gap-3 pt-2">
                 {socialLinks.map(({ href, label, Icon }) => (
