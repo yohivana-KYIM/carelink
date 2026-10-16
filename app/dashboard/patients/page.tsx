@@ -5,20 +5,22 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Loader2, Plus, Search, Edit, Download, Upload, Share2,
   Users, AlertTriangle, MessageCircle, UserPlus, Trash2, SlidersHorizontal, X, Send,
-  Link as LinkIcon,
+  Link as LinkIcon, FileWarning,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
 import { api, type Patient, type PatientStats } from "@/lib/api";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
+import { extractPdfText } from "@/lib/pdf-text";
+import { parsePatientRowsFromText, type ParsedPatientRow } from "@/lib/pdf-import-parsing";
 
-function Modal({ isOpen, onClose, title, children }: { isOpen: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
+function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-md" }: { isOpen: boolean; onClose: () => void; title: string; children: React.ReactNode; maxWidth?: string }) {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md rounded-2xl bg-surface-raised p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+        className={`w-full ${maxWidth} rounded-2xl bg-surface-raised p-6 shadow-xl max-h-[90vh] overflow-y-auto`}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-ink">{title}</h2>
           <button onClick={onClose} className="rounded-full p-1 text-ink-muted hover:bg-surface"><X size={20} /></button>
@@ -55,6 +57,12 @@ export default function PatientsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [relancingId, setRelancingId] = useState<string | null>(null);
   const [form, setForm] = useState({ fullName: "", phoneNumber: "", email: "", whatsappOptIn: false, relanceMonths: 6 });
+
+  const [pdfReviewOpen, setPdfReviewOpen] = useState(false);
+  const [pdfRows, setPdfRows] = useState<(ParsedPatientRow & { include: boolean })[]>([]);
+  const [pdfSkippedCount, setPdfSkippedCount] = useState(0);
+  const [pdfExtracting, setPdfExtracting] = useState(false);
+  const [pdfImporting, setPdfImporting] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isAdmin = user?.role === "ADMIN" || user?.role === "SUPERADMIN";
@@ -98,9 +106,18 @@ export default function PatientsPage() {
     } catch { toast.error("Erreur d'export"); }
   }
 
-  function handleImportCSV(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (!file || !token) return;
+    if (!file) return;
+    if (file.name.toLowerCase().endsWith(".pdf")) {
+      void handleImportPDF(file);
+    } else {
+      handleImportCSV(file);
+    }
+  }
+
+  function handleImportCSV(file: File) {
+    if (!token) return;
     const reader = new FileReader();
     reader.onload = async (evt) => {
       const text = evt.target?.result as string;
@@ -124,6 +141,63 @@ export default function PatientsPage() {
       if (fileInputRef.current) fileInputRef.current.value = "";
     };
     reader.readAsText(file);
+  }
+
+  // Un PDF n'a pas de colonnes garanties : on extrait le texte, on détecte
+  // des lignes candidates (nom + téléphone), puis on les soumet à relecture
+  // dans une fenêtre de confirmation avant tout import réel.
+  async function handleImportPDF(file: File) {
+    setPdfExtracting(true);
+    try {
+      const text = await extractPdfText(file);
+      const { rows, skippedLines } = parsePatientRowsFromText(text);
+      if (!rows.length) {
+        toast.error("Aucun patient détecté dans ce PDF. Vérifiez qu'il contient du texte (pas une image scannée).");
+        return;
+      }
+      setPdfRows(rows.map((r) => ({ ...r, include: true })));
+      setPdfSkippedCount(skippedLines);
+      setPdfReviewOpen(true);
+    } catch {
+      toast.error("Impossible de lire ce fichier PDF.");
+    } finally {
+      setPdfExtracting(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  async function confirmPdfImport() {
+    if (!token) return;
+    const toImport = pdfRows.filter((r) => r.include && r.fullName.trim() && r.phoneNumber.trim());
+    if (!toImport.length) {
+      toast.error("Aucune ligne sélectionnée.");
+      return;
+    }
+    setPdfImporting(true);
+    try {
+      const res = await api.bulkCreatePatients(
+        token,
+        toImport.map((r) => ({
+          fullName: r.fullName.trim(),
+          phoneNumber: r.phoneNumber.trim(),
+          email: r.email?.trim() || undefined,
+          whatsappOptIn: false,
+          relanceMonths: 6,
+        }))
+      );
+      toast.success(`${res.count} patients importés`);
+      setPdfReviewOpen(false);
+      setPdfRows([]);
+      await load();
+    } catch {
+      toast.error("Erreur d'importation");
+    } finally {
+      setPdfImporting(false);
+    }
+  }
+
+  function updatePdfRow(index: number, patch: Partial<ParsedPatientRow & { include: boolean }>) {
+    setPdfRows((rows) => rows.map((r, i) => (i === index ? { ...r, ...patch } : r)));
   }
 
   function copyBookingLink() {
@@ -203,10 +277,13 @@ export default function PatientsPage() {
           <p className="mt-1 text-sm text-ink-muted">Gérez votre base de patients et leurs préférences.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <input type="file" accept=".csv" className="hidden" ref={fileInputRef} onChange={handleImportCSV} />
+          <input type="file" accept=".csv,.pdf" className="hidden" ref={fileInputRef} onChange={handleFileSelected} />
           <button onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink hover:bg-surface-raised">
-            <Upload size={15} /> Importer
+            disabled={pdfExtracting}
+            title="Importer un fichier CSV ou PDF"
+            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink hover:bg-surface-raised disabled:opacity-60">
+            {pdfExtracting ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
+            {pdfExtracting ? "Lecture du PDF..." : "Importer"}
           </button>
           <button onClick={handleExportCSV}
             className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink hover:bg-surface-raised">
@@ -435,6 +512,96 @@ export default function PatientsPage() {
             {submitting ? "Enregistrement..." : editingPatient ? "Enregistrer" : "Créer"}
           </button>
         </form>
+      </Modal>
+
+      <Modal
+        isOpen={pdfReviewOpen}
+        onClose={() => { setPdfReviewOpen(false); setPdfRows([]); }}
+        title="Vérifier les patients détectés"
+        maxWidth="max-w-2xl"
+      >
+        <div className="flex flex-col gap-4">
+          <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
+            <FileWarning size={15} className="mt-0.5 shrink-0" />
+            L&apos;extraction depuis un PDF n&apos;est pas toujours fiable à 100% — vérifiez et corrigez chaque ligne avant de confirmer.
+            {pdfSkippedCount > 0 ? ` ${pdfSkippedCount} ligne(s) du document ont été ignorées (aucun numéro de téléphone reconnu).` : ""}
+          </p>
+
+          <div className="max-h-[50vh] overflow-y-auto rounded-xl border border-border">
+            <table className="w-full text-left text-sm">
+              <thead className="sticky top-0 bg-surface text-xs font-semibold uppercase tracking-wide text-ink-soft">
+                <tr>
+                  <th className="w-10 px-3 py-2"></th>
+                  <th className="px-3 py-2">Nom</th>
+                  <th className="px-3 py-2">Téléphone</th>
+                  <th className="w-10 px-3 py-2"></th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border bg-surface-raised">
+                {pdfRows.map((row, index) => (
+                  <tr key={index} className={row.include ? "" : "opacity-50"}>
+                    <td className="px-3 py-2">
+                      <input
+                        type="checkbox"
+                        checked={row.include}
+                        onChange={(e) => updatePdfRow(index, { include: e.target.checked })}
+                        className="size-4 rounded border-border text-brand-600 focus:ring-brand-500"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        value={row.fullName}
+                        onChange={(e) => updatePdfRow(index, { fullName: e.target.value })}
+                        className="w-full rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm text-ink focus:border-brand-400 focus:outline-none"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input
+                        value={row.phoneNumber}
+                        onChange={(e) => updatePdfRow(index, { phoneNumber: e.target.value })}
+                        className="w-full rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm text-ink focus:border-brand-400 focus:outline-none"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <button
+                        type="button"
+                        onClick={() => setPdfRows((rows) => rows.filter((_, i) => i !== index))}
+                        className="rounded-full p-1.5 text-ink-soft hover:bg-surface hover:text-red-600"
+                        aria-label="Retirer cette ligne"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs text-ink-soft">
+              {pdfRows.filter((r) => r.include).length} ligne(s) sélectionnée(s) sur {pdfRows.length}
+            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => { setPdfReviewOpen(false); setPdfRows([]); }}
+                className="rounded-full border border-border px-4 py-2 text-sm font-semibold text-ink hover:bg-surface"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={() => void confirmPdfImport()}
+                disabled={pdfImporting}
+                className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-70"
+              >
+                {pdfImporting ? <Loader2 size={14} className="animate-spin" /> : null}
+                {pdfImporting ? "Import..." : "Confirmer l'import"}
+              </button>
+            </div>
+          </div>
+        </div>
       </Modal>
     </div>
   );

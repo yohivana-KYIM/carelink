@@ -2,13 +2,14 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, Loader2, UsersRound, Bell, Calendar, UserSquare2, Settings, Stethoscope, Clock, FileText, MessageSquareHeart } from "lucide-react";
+import { LayoutDashboard, Loader2, UsersRound, Bell, Calendar, UserSquare2, Settings, Stethoscope, Clock, FileText, MessageSquareHeart, ClipboardList } from "lucide-react";
 import { SessionProvider, useSession } from "@/lib/session";
 import { DashboardShell, type DashboardNavItem } from "@/components/dashboard/DashboardShell";
 
 const baseNavItems: (DashboardNavItem & { adminOnly?: boolean })[] = [
   { label: "Vue d'ensemble", href: "/dashboard", icon: LayoutDashboard },
   { label: "Rendez-vous", href: "/dashboard/appointments", icon: Calendar },
+  { label: "Planning du jour", href: "/dashboard/planning", icon: ClipboardList },
   { label: "Patients", href: "/dashboard/patients", icon: UserSquare2 },
   { label: "Relances", href: "/dashboard/relances", icon: MessageSquareHeart },
   { label: "Praticiens", href: "/dashboard/practitioners", icon: Stethoscope },

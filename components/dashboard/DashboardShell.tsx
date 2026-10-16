@@ -154,7 +154,7 @@ export function DashboardShell({
       <motion.aside
         animate={{ width: collapsed ? 80 : 256 }}
         transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-        className="hidden shrink-0 flex-col overflow-hidden border-r border-border bg-surface-raised lg:flex"
+        className="hidden shrink-0 flex-col overflow-hidden border-r border-border bg-surface-raised lg:flex print:hidden"
       >
         <SidebarContent
           navItems={navItems}
@@ -213,7 +213,7 @@ export function DashboardShell({
       </AnimatePresence>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-surface-raised/95 backdrop-blur-sm px-4 sm:px-6 sticky top-0 z-30">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-surface-raised/95 backdrop-blur-sm px-4 sm:px-6 sticky top-0 z-30 print:hidden">
           <button
             type="button"
             onClick={toggleSidebar}

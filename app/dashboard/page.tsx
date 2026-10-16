@@ -8,6 +8,7 @@ import {
 import { useSession } from "@/lib/session";
 import { api, type DashboardSummary } from "@/lib/api";
 import { PendingGate } from "@/components/dashboard/PendingGate";
+import { statusConfig } from "@/lib/appointment-status";
 
 const currentYear = new Date().getFullYear();
 const YEARS = Array.from({ length: 4 }, (_, i) => currentYear - i);
@@ -137,33 +138,15 @@ export default function DashboardOverviewPage() {
   );
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  CONFIRMED: "bg-emerald-500",
-  PENDING: "bg-amber-400",
-  CANCELLED: "bg-red-400",
-  NO_SHOW: "bg-red-600",
-  RESCHEDULE_REQUESTED: "bg-orange-400",
-  COMPLETED: "bg-blue-500",
-  NO_RESPONSE: "bg-gray-400",
-};
-const STATUS_LABELS: Record<string, string> = {
-  CONFIRMED: "Confirmés",
-  PENDING: "En attente",
-  CANCELLED: "Annulés",
-  NO_SHOW: "Absents",
-  RESCHEDULE_REQUESTED: "À reprogrammer",
-  COMPLETED: "Terminés",
-  NO_RESPONSE: "Sans réponse",
-};
-
 function StatusBar({ status, count, total }: { status: string; count: number; total: number }) {
   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+  const cfg = statusConfig(status);
   return (
     <div className="flex items-center gap-3">
-      <span className="w-36 shrink-0 text-xs font-medium text-ink-muted">{STATUS_LABELS[status] ?? status}</span>
+      <span className="w-36 shrink-0 text-xs font-medium text-ink-muted">{cfg.label}</span>
       <div className="flex-1 rounded-full bg-surface h-2.5 overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all duration-700 ${STATUS_COLORS[status] ?? "bg-brand-500"}`}
+          className={`h-full rounded-full transition-all duration-700 ${cfg.bar}`}
           style={{ width: `${pct}%` }}
         />
       </div>
