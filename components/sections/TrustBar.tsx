@@ -97,7 +97,6 @@ function TrustCard({
   point: { title: string; description: string };
   meta: (typeof cards)[number];
 }) {
-  const { t } = useLocale();
   const [hovered, setHovered] = useState(false);
   const Icon = meta.icon;
 
@@ -177,17 +176,6 @@ function TrustCard({
               {point.description}
             </motion.p>
           </div>
-
-          {/* Badge "En savoir plus" apparu au hover */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={hovered ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-            transition={{ duration: 0.25, delay: 0.05 }}
-            className="flex items-center gap-1.5 text-xs font-semibold text-white/80"
-          >
-            <span className={`h-1 w-4 rounded-full bg-gradient-to-r ${meta.accent}`} />
-            {t("trust.badge", "Sécurisé & certifié")}
-          </motion.div>
 
           {/* Barre de progression bas */}
           <motion.div

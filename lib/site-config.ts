@@ -47,12 +47,13 @@ export const trustPoints = [
   {
     key: "api",
     title: "API WhatsApp Business (Meta)",
-    description: "Messagerie acheminée via un fournisseur BSP certifié Meta.",
+    description: "Messagerie via l'API WhatsApp Business de Meta.",
   },
   {
     key: "gdpr",
-    title: "Conforme RGPD & données de santé",
-    description: "Chiffrement au repos et en transit, consentement patient (opt-in).",
+    title: "Données de santé protégées",
+    description:
+      "Chiffrement au repos et en transit, accès par rôle, consentement du patient (opt-in) enregistré. Conçu pour respecter la loi camerounaise n° 2024/017.",
   },
   {
     key: "noCommitment",
@@ -245,9 +246,9 @@ export const faqItems = [
   },
   {
     key: "gdpr",
-    question: "Est-ce conforme au RGPD et aux données de santé ?",
+    question: "Comment les données des patients sont-elles protégées ?",
     answer:
-      "Oui. Les données patients sont chiffrées au repos et en transit (HTTPS), l'accès est contrôlé par rôle (secrétaire / praticien), et chaque envoi WhatsApp nécessite le consentement préalable (opt-in) du patient, condition imposée par Meta.",
+      "Ecotocare est conçu pour respecter la loi camerounaise n° 2024/017 relative à la protection des données à caractère personnel. Les données sont chiffrées au repos et en transit (HTTPS), l'accès est contrôlé par rôle (secrétaire, praticien) et chaque envoi WhatsApp repose sur le consentement préalable (opt-in) du patient, condition imposée par Meta. Détails dans notre politique de confidentialité.",
   },
   {
     key: "start",
@@ -265,7 +266,7 @@ export const faqItems = [
     key: "cost",
     question: "Quel est le coût des messages WhatsApp ?",
     answer:
-      "Le coût par message dépend du fournisseur BSP choisi et du volume envoyé ; il s'agit d'un coût récurrent distinct du forfait de développement, détaillé séparément selon la taille de votre cabinet.",
+      "Les messages WhatsApp sont facturés par Meta selon leur catégorie et le pays du destinataire. Ce coût dépend de votre volume d'envoi et il est détaillé selon la taille de votre cabinet lors de la démonstration.",
   },
   {
     key: "noResponse",
@@ -300,7 +301,7 @@ export const resources = [
     key: "whatsapp",
     title: "Comprendre WhatsApp Business API",
     excerpt:
-      "Templates validés par Meta, fournisseurs BSP, opt-in patient : le fonctionnement expliqué simplement.",
+      "Modèles de message validés par Meta, consentement patient (opt-in) : le fonctionnement expliqué simplement.",
     tag: "WhatsApp",
   },
 ] as const;
@@ -317,8 +318,8 @@ export const footerLinks = {
     { key: "contact", label: "Contact", href: "#contact" },
   ],
   legal: [
-    { key: "notice", label: "Mentions légales", href: "#" },
-    { key: "privacy", label: "Politique de confidentialité", href: "#" },
-    { key: "terms", label: "Conditions d'utilisation", href: "#" },
+    { key: "notice", label: "Mentions légales", href: "/mentions-legales" },
+    { key: "privacy", label: "Politique de confidentialité", href: "/confidentialite" },
+    { key: "terms", label: "Conditions d'utilisation", href: "/conditions" },
   ],
 } as const;

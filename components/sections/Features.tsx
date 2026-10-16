@@ -39,7 +39,7 @@ export function Features() {
           title={t("features.title", "Un outil pensé pour votre cabinet")}
           description={t(
             "features.description",
-            "Chaque fonctionnalité répond à un besoin concret du cahier des charges : moins de no-show, plus de patients réactivés, une équipe qui garde le contrôle."
+            "Chaque fonctionnalité répond à un besoin concret des cabinets : moins de rendez-vous manqués, plus de patients réactivés, une équipe qui garde le contrôle."
           )}
         />
 

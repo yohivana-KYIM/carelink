@@ -20,7 +20,7 @@ const points = [
     icon: MessageSquareText,
     title: "Un canal déjà ouvert",
     description:
-      "98% des patients consultent WhatsApp chaque jour, contre un SMS souvent ignoré ou un appel manqué.",
+      "WhatsApp est déjà l'application de messagerie que vos patients ouvrent chaque jour, contre un SMS souvent ignoré ou un appel manqué.",
   },
   {
     key: "point3",

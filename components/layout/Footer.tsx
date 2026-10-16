@@ -173,7 +173,7 @@ export function Footer() {
             <p>
               {t(
                 "footer.poweredBy",
-                "Solution développée par MarketYou · Messagerie via un fournisseur WhatsApp Business (BSP) certifié Meta."
+                "Solution développée par MarketYou · Messagerie via l'API WhatsApp Business de Meta."
               )}
             </p>
           </div>
