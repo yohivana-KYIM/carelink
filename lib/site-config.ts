@@ -16,10 +16,8 @@ export const siteConfig = {
   ],
   contactEmail: "contact@ecotocare.com",
   social: {
-    facebook: "https://www.facebook.com/",
-    instagram: "https://www.instagram.com/",
-    linkedin: "https://www.linkedin.com/",
-    x: "https://x.com/",
+    facebook: "https://www.facebook.com/share/19eQwa5T4u/?mibextid=wwXIfr",
+    linkedin: "https://www.linkedin.com/showcase/ecotocare/",
   },
 } as const;
 

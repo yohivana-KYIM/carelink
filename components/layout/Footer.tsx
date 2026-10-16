@@ -6,20 +6,13 @@ import { useRef, useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { FooterSignature } from "@/components/ui/FooterSignature";
-import {
-  FacebookIcon,
-  InstagramIcon,
-  LinkedinIcon,
-  XIcon,
-} from "@/components/ui/SocialIcons";
+import { FacebookIcon, LinkedinIcon } from "@/components/ui/SocialIcons";
 import { footerLinks, siteConfig } from "@/lib/site-config";
 import { api, ApiError } from "@/lib/api";
 import { useLocale } from "@/lib/i18n";
 
 const socialLinks = [
   { href: siteConfig.social.facebook, label: "Facebook", Icon: FacebookIcon },
-  { href: siteConfig.social.x, label: "X", Icon: XIcon },
-  { href: siteConfig.social.instagram, label: "Instagram", Icon: InstagramIcon },
   { href: siteConfig.social.linkedin, label: "LinkedIn", Icon: LinkedinIcon },
 ];
 
