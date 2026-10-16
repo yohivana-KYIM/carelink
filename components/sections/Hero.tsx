@@ -103,7 +103,7 @@ export function Hero() {
                   }}
                   className="text-sm font-medium text-ink sm:text-base"
                 >
-                  {item}
+                  {t(`hero.checklist.${index}`, item)}
                 </motion.span>
               </motion.li>
             ))}
