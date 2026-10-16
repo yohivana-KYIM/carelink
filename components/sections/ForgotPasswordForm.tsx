@@ -8,18 +8,20 @@ import { ArrowLeft, CheckCircle2, Loader2, Mail } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { siteConfig } from "@/lib/site-config";
 import { api } from "@/lib/api";
+import { useLocale } from "@/lib/i18n";
 
 type Status = "idle" | "loading" | "success" | "error";
 
 export function ForgotPasswordForm() {
+  const { t } = useLocale();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
-  const [errorMessage, setErrorMessage] = useState("Merci de renseigner un email valide.");
+  const [errorMessage, setErrorMessage] = useState(t("forgotPassword.error.invalidEmail", "Merci de renseigner un email valide."));
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!email.includes("@")) {
-      setErrorMessage("Merci de renseigner un email valide.");
+      setErrorMessage(t("forgotPassword.error.invalidEmail", "Merci de renseigner un email valide."));
       setStatus("error");
       return;
     }
@@ -31,7 +33,7 @@ export function ForgotPasswordForm() {
       await api.forgotPassword({ email });
       setStatus("success");
     } catch {
-      setErrorMessage("Impossible de contacter le serveur Ecotocare. Réessayez dans un instant.");
+      setErrorMessage(t("forgotPassword.error.serverError", "Impossible de contacter le serveur Ecotocare. Réessayez dans un instant."));
       setStatus("error");
     }
   }
@@ -42,7 +44,7 @@ export function ForgotPasswordForm() {
       <div className="relative hidden overflow-hidden lg:block">
         <Image
           src="/images/motpasse.png"
-          alt="Illustration mot de passe oublié"
+          alt={t("forgotPassword.imageAlt", "Illustration mot de passe oublié")}
           fill
           priority
           sizes="(min-width: 1024px) 55vw, 100vw"
@@ -75,7 +77,7 @@ export function ForgotPasswordForm() {
         <div className="absolute inset-x-0 bottom-0 p-10">
           <Reveal>
             <p className="max-w-sm text-balance text-2xl font-semibold leading-snug text-white">
-              Réinitialisez votre mot de passe en quelques secondes.
+              {t("forgotPassword.tagline", "Réinitialisez votre mot de passe en quelques secondes.")}
             </p>
           </Reveal>
         </div>
@@ -98,11 +100,10 @@ export function ForgotPasswordForm() {
 
             <div className="flex flex-col items-center gap-3 text-center">
               <h1 className="text-2xl font-semibold tracking-tight text-ink">
-                Mot de passe oublié
+                {t("forgotPassword.title", "Mot de passe oublié")}
               </h1>
               <p className="text-sm text-ink-muted">
-                Indiquez votre email professionnel, nous vous envoyons un
-                lien de réinitialisation.
+                {t("forgotPassword.subtitle", "Indiquez votre email professionnel, nous vous envoyons un lien de réinitialisation.")}
               </p>
             </div>
 
@@ -116,16 +117,16 @@ export function ForgotPasswordForm() {
                   <CheckCircle2 size={24} />
                 </span>
                 <p className="text-sm text-ink-muted">
-                  Si un compte existe pour <strong className="text-ink">{email}</strong>,
-                  un email avec un lien de réinitialisation vient de lui être
-                  envoyé.
+                  {t("forgotPassword.success.before", "Si un compte existe pour ")}
+                  <strong className="text-ink">{email}</strong>
+                  {t("forgotPassword.success.after", ", un email avec un lien de réinitialisation vient de lui être envoyé.")}
                 </p>
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} noValidate className="mt-8 flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
                   <label htmlFor="forgot-email" className="text-sm font-medium text-ink">
-                    Email professionnel
+                    {t("forgotPassword.emailLabel", "Email professionnel")}
                   </label>
                   <div className="relative">
                     <Mail
@@ -161,7 +162,7 @@ export function ForgotPasswordForm() {
                       <Loader2 size={16} />
                     </motion.span>
                   ) : null}
-                  {status === "loading" ? "Envoi..." : "Envoyer le lien"}
+                  {status === "loading" ? t("forgotPassword.submit.loading", "Envoi...") : t("forgotPassword.submit.default", "Envoyer le lien")}
                 </button>
 
                 {status === "error" ? (
@@ -177,7 +178,7 @@ export function ForgotPasswordForm() {
               className="mt-8 flex items-center justify-center gap-1.5 text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
             >
               <ArrowLeft size={14} />
-              Retour à la connexion
+              {t("forgotPassword.backToLogin", "Retour à la connexion")}
             </Link>
           </div>
         </Reveal>

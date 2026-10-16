@@ -11,10 +11,12 @@ import { siteConfig } from "@/lib/site-config";
 import { toast } from "react-hot-toast";
 import { api, ApiError } from "@/lib/api";
 import { saveSession } from "@/lib/auth-storage";
+import { useLocale } from "@/lib/i18n";
 
 type Status = "idle" | "loading" | "error" | "success";
 
 export function LoginForm() {
+  const { t } = useLocale();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,7 +31,7 @@ export function LoginForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!email.includes("@") || password.length < 1) {
-      setErrorMessage("Merci de renseigner un email valide et votre mot de passe.");
+      setErrorMessage(t("login.error.missingFields", "Merci de renseigner un email valide et votre mot de passe."));
       setStatus("error");
       return;
     }
@@ -41,15 +43,15 @@ export function LoginForm() {
         setChallengeId(result.challengeId);
         setStep("otp");
         setStatus("idle");
-        toast.success("Un code de connexion vous a été envoyé par email.");
+        toast.success(t("login.toast.otpSent", "Un code de connexion vous a été envoyé par email."));
         return;
       }
       saveSession(result.token, result.user, rememberMe);
       setStatus("success");
-      toast.success("Connexion réussie !");
+      toast.success(t("login.connected", "Connecté !"));
       router.push(result.user.role === "SUPERADMIN" ? "/admin" : "/dashboard");
     } catch (err) {
-      const msg = err instanceof ApiError ? err.message : "Impossible de se connecter au serveur Ecotocare.";
+      const msg = err instanceof ApiError ? err.message : t("login.error.genericConnect", "Impossible de se connecter au serveur Ecotocare.");
       setErrorMessage(msg);
       setStatus("error");
       toast.error(msg);
@@ -63,10 +65,10 @@ export function LoginForm() {
       const { token, user } = await api.verifyTwoFactor({ challengeId, code: otpCode, rememberMe });
       saveSession(token, user, rememberMe);
       setStatus("success");
-      toast.success("Connexion réussie !");
+      toast.success(t("login.connected", "Connecté !"));
       router.push(user.role === "SUPERADMIN" ? "/admin" : "/dashboard");
     } catch (err) {
-      const msg = err instanceof ApiError ? err.message : "Code invalide.";
+      const msg = err instanceof ApiError ? err.message : t("login.error.invalidCode", "Code invalide.");
       setErrorMessage(msg);
       setStatus("error");
       toast.error(msg);
@@ -99,8 +101,7 @@ export function LoginForm() {
         <div className="absolute inset-x-0 bottom-0 p-10">
           <Reveal>
             <p className="max-w-sm text-balance text-2xl font-semibold leading-snug text-white">
-              Vos rendez-vous et relances patients, suivis en un coup
-              d&apos;œil.
+              {t("login.tagline", "Vos rendez-vous et relances patients, suivis en un coup d'œil.")}
             </p>
           </Reveal>
         </div>
@@ -123,12 +124,12 @@ export function LoginForm() {
             </div>
             <div className="flex flex-col items-center gap-2 text-center">
               <h1 className="text-2xl font-semibold tracking-tight text-ink">
-                {step === "otp" ? "Vérification en 2 étapes" : "Connexion à votre espace"}
+                {step === "otp" ? t("login.otp.title", "Vérification en 2 étapes") : t("login.title", "Connexion à votre espace")}
               </h1>
               <p className="text-sm text-ink-muted">
                 {step === "otp"
-                  ? `Entrez le code à 6 chiffres envoyé à ${email}.`
-                  : "Accédez au tableau de bord de votre cabinet."}
+                  ? t("login.otp.subtitle", `Entrez le code à 6 chiffres envoyé à ${email}.`, { email })
+                  : t("login.subtitle", "Accédez au tableau de bord de votre cabinet.")}
               </p>
             </div>
 
@@ -136,7 +137,7 @@ export function LoginForm() {
               <form onSubmit={handleVerifyOtp} noValidate className="mt-8 flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
                   <label htmlFor="otp-code" className="text-sm font-medium text-ink">
-                    Code de connexion
+                    {t("login.otp.label", "Code de connexion")}
                   </label>
                   <div className="relative">
                     <ShieldCheck
@@ -175,7 +176,11 @@ export function LoginForm() {
                       <Loader2 size={16} />
                     </motion.span>
                   ) : null}
-                  {status === "loading" ? "Vérification..." : status === "success" ? "Connecté !" : "Vérifier le code"}
+                  {status === "loading"
+                    ? t("login.otp.verifying", "Vérification...")
+                    : status === "success"
+                      ? t("login.connected", "Connecté !")
+                      : t("login.otp.submit", "Vérifier le code")}
                 </button>
 
                 {status === "error" ? (
@@ -198,14 +203,14 @@ export function LoginForm() {
                   }}
                   className="text-center text-sm font-medium text-ink-muted hover:text-ink transition-colors"
                 >
-                  ← Retour à la connexion
+                  {t("login.otp.back", "← Retour à la connexion")}
                 </button>
               </form>
             ) : (
             <form onSubmit={handleSubmit} noValidate className="mt-8 flex flex-col gap-5">
               <div className="flex flex-col gap-2">
                 <label htmlFor="login-email" className="text-sm font-medium text-ink">
-                  Email professionnel
+                  {t("login.email.label", "Email professionnel")}
                 </label>
                 <div className="relative">
                   <Mail
@@ -230,13 +235,13 @@ export function LoginForm() {
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <label htmlFor="login-password" className="text-sm font-medium text-ink">
-                    Mot de passe
+                    {t("login.password.label", "Mot de passe")}
                   </label>
                   <Link
                     href="/forgot-password"
                     className="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
                   >
-                    Mot de passe oublié ?
+                    {t("login.password.forgot", "Mot de passe oublié ?")}
                   </Link>
                 </div>
                 <div className="relative">
@@ -274,7 +279,7 @@ export function LoginForm() {
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="size-4 rounded border-border text-brand-600 focus:ring-brand-500" 
                   />
-                  <span className="text-ink-muted group-hover:text-ink transition-colors">Se souvenir de moi</span>
+                  <span className="text-ink-muted group-hover:text-ink transition-colors">{t("login.rememberMe", "Se souvenir de moi")}</span>
                 </label>
               </div>
 
@@ -293,10 +298,10 @@ export function LoginForm() {
                   </motion.span>
                 ) : null}
                 {status === "loading"
-                  ? "Connexion..."
+                  ? t("login.submit.loading", "Connexion...")
                   : status === "success"
-                    ? "Connecté !"
-                    : "Se connecter"}
+                    ? t("login.connected", "Connecté !")
+                    : t("login.submit.default", "Se connecter")}
               </button>
 
               {status === "error" ? (
@@ -314,12 +319,12 @@ export function LoginForm() {
 
             {step === "credentials" && (
             <p className="mt-8 text-center text-sm text-ink-muted">
-              Pas encore de compte ?{" "}
+              {t("login.noAccount", "Pas encore de compte ?")}{" "}
               <Link
                 href="/signup"
                 className="font-semibold text-brand-600 hover:underline dark:text-brand-400"
               >
-                Créer un compte
+                {t("login.createAccount", "Créer un compte")}
               </Link>
             </p>
             )}
@@ -352,9 +357,10 @@ function GeometricDecorations() {
 }
 
 function LoginImageCarousel() {
+  const { t } = useLocale();
   const images = [
-    { src: "/images/login.jpeg", alt: "Illustration connexion Ecotocare" },
-    { src: "/images/suivez.png", alt: "Tableau de bord de suivi Ecotocare" },
+    { src: "/images/login.jpeg", alt: t("login.carousel.alt1", "Illustration connexion Ecotocare") },
+    { src: "/images/suivez.png", alt: t("login.carousel.alt2", "Tableau de bord de suivi Ecotocare") },
   ];
 
   const [index, setIndex] = useState(0);

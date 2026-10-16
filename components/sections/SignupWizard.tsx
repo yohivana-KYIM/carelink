@@ -12,6 +12,7 @@ import { api, ApiError } from "@/lib/api";
 import { saveSession } from "@/lib/auth-storage";
 import { PhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
+import { useLocale } from "@/lib/i18n";
 
 type FormData = {
   cabinetName: string;
@@ -38,14 +39,15 @@ const initialData: FormData = {
 };
 
 const STEPS = [
-  { title: "Votre cabinet" },
-  { title: "Vos informations" },
-  { title: "Sécurité" },
+  { key: "cabinet", title: "Votre cabinet" },
+  { key: "info", title: "Vos informations" },
+  { key: "security", title: "Sécurité" },
 ] as const;
 
 type Status = "idle" | "loading" | "success";
 
 export function SignupWizard() {
+  const { t } = useLocale();
   const [step, setStep] = useState(1);
   const [data, setData] = useState<FormData>(initialData);
   const [error, setError] = useState("");
@@ -59,23 +61,23 @@ export function SignupWizard() {
   function validateStep(current: number) {
     if (current === 1) {
       if (!data.cabinetName.trim() || !data.city.trim()) {
-        return "Merci de renseigner le nom du cabinet et la ville.";
+        return t("signup.error.step1", "Merci de renseigner le nom du cabinet et la ville.");
       }
     }
     if (current === 2) {
       if (!data.fullName.trim() || !data.email.includes("@")) {
-        return "Merci de renseigner votre nom et un email valide.";
+        return t("signup.error.step2", "Merci de renseigner votre nom et un email valide.");
       }
     }
     if (current === 3) {
       if (data.password.length < 8) {
-        return "Le mot de passe doit contenir au moins 8 caractères.";
+        return t("signup.error.passwordLength", "Le mot de passe doit contenir au moins 8 caractères.");
       }
       if (data.password !== data.confirmPassword) {
-        return "Les mots de passe ne correspondent pas.";
+        return t("signup.error.passwordMismatch", "Les mots de passe ne correspondent pas.");
       }
       if (!data.acceptTerms) {
-        return "Merci d'accepter les conditions d'utilisation.";
+        return t("signup.error.acceptTerms", "Merci d'accepter les conditions d'utilisation.");
       }
     }
     return "";
@@ -116,7 +118,7 @@ export function SignupWizard() {
       setStatus("success");
     } catch (err) {
       setError(
-        err instanceof ApiError ? err.message : "Impossible de créer le compte pour le moment."
+        err instanceof ApiError ? err.message : t("signup.error.generic", "Impossible de créer le compte pour le moment.")
       );
       setStatus("idle");
     }
@@ -141,10 +143,10 @@ export function SignupWizard() {
                 className="rounded-xl shadow-sm"
               />
               <h1 className="text-2xl font-semibold tracking-tight text-ink">
-                Créer votre compte {siteConfig.name}
+                {t("signup.title", "Créer votre compte {name}", { name: siteConfig.name })}
               </h1>
               <p className="text-sm text-ink-muted">
-                Trois étapes rapides pour préparer l&apos;espace de votre cabinet.
+                {t("signup.subtitle", "Trois étapes rapides pour préparer l'espace de votre cabinet.")}
               </p>
             </div>
 
@@ -165,23 +167,23 @@ export function SignupWizard() {
                         <>
                           <Field
                             id="cabinetName"
-                            label="Nom de l'établissement"
+                            label={t("signup.field.cabinetName", "Nom de l'établissement")}
                             value={data.cabinetName}
                             onChange={(v) => update("cabinetName", v)}
-                            placeholder="Centre de santé du Parc"
+                            placeholder={t("signup.field.cabinetName.placeholder", "Centre de santé du Parc")}
                             required
                           />
                           <Field
                             id="city"
-                            label="Ville"
+                            label={t("signup.field.city", "Ville")}
                             value={data.city}
                             onChange={(v) => update("city", v)}
-                            placeholder="Lyon"
+                            placeholder={t("signup.field.city.placeholder", "Lyon")}
                             required
                           />
                           <div className="flex flex-col gap-2">
                             <label htmlFor="practitioners" className="text-sm font-medium text-ink">
-                              Nombre de praticiens
+                              {t("signup.field.practitioners", "Nombre de praticiens")}
                             </label>
                             <select
                               id="practitioners"
@@ -203,23 +205,23 @@ export function SignupWizard() {
                         <>
                           <Field
                             id="fullName"
-                            label="Nom complet"
+                            label={t("signup.field.fullName", "Nom complet")}
                             value={data.fullName}
                             onChange={(v) => update("fullName", v)}
-                            placeholder="Dr. Amina Kader"
+                            placeholder={t("signup.field.fullName.placeholder", "Dr. Amina Kader")}
                             required
                           />
                           <Field
                             id="email"
-                            label="Email professionnel"
+                            label={t("signup.field.email", "Email professionnel")}
                             type="email"
                             value={data.email}
                             onChange={(v) => update("email", v)}
-                            placeholder="vous@etablissement-sante.fr"
+                            placeholder={t("signup.field.email.placeholder", "vous@etablissement-sante.fr")}
                             required
                           />
                           <div className="flex flex-col gap-2">
-                            <label className="text-sm font-medium text-ink">Téléphone (WhatsApp)</label>
+                            <label className="text-sm font-medium text-ink">{t("signup.field.phone", "Téléphone (WhatsApp)")}</label>
                             <div className="phone-input-container">
                               <PhoneInput
                                 defaultCountry="fr"
@@ -238,16 +240,16 @@ export function SignupWizard() {
                         <>
                           <Field
                             id="password"
-                            label="Mot de passe"
+                            label={t("signup.field.password", "Mot de passe")}
                             type="password"
                             value={data.password}
                             onChange={(v) => update("password", v)}
-                            placeholder="8 caractères minimum"
+                            placeholder={t("signup.field.password.placeholder", "8 caractères minimum")}
                             required
                           />
                           <Field
                             id="confirmPassword"
-                            label="Confirmer le mot de passe"
+                            label={t("signup.field.confirmPassword", "Confirmer le mot de passe")}
                             type="password"
                             value={data.confirmPassword}
                             onChange={(v) => update("confirmPassword", v)}
@@ -261,9 +263,7 @@ export function SignupWizard() {
                               onChange={(event) => update("acceptTerms", event.target.checked)}
                               className="mt-0.5 size-4 shrink-0 rounded border-border text-brand-600 focus:ring-brand-400"
                             />
-                            J&apos;accepte les conditions d&apos;utilisation et
-                            la politique de confidentialité de{" "}
-                            {siteConfig.name}.
+                            {t("signup.acceptTerms", "J'accepte les conditions d'utilisation et la politique de confidentialité de {name}.", { name: siteConfig.name })}
                           </label>
                         </>
                       ) : null}
@@ -288,7 +288,7 @@ export function SignupWizard() {
                         className="inline-flex items-center gap-1 rounded-full border border-border px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-brand-300"
                       >
                         <ChevronLeft size={16} />
-                        Retour
+                        {t("signup.back", "Retour")}
                       </button>
                     ) : null}
 
@@ -298,7 +298,7 @@ export function SignupWizard() {
                         onClick={goNext}
                         className="ml-auto inline-flex items-center justify-center rounded-full bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 active:scale-[0.97]"
                       >
-                        Suivant
+                        {t("signup.next", "Suivant")}
                       </button>
                     ) : (
                       <button
@@ -315,7 +315,7 @@ export function SignupWizard() {
                             <Loader2 size={16} />
                           </motion.span>
                         ) : null}
-                        {status === "loading" ? "Création..." : "Créer mon compte"}
+                        {status === "loading" ? t("signup.submit.loading", "Création...") : t("signup.submit.default", "Créer mon compte")}
                       </button>
                     )}
                   </div>
@@ -331,30 +331,35 @@ export function SignupWizard() {
                   <CheckCircle2 size={28} />
                 </span>
                 <h2 className="text-xl font-semibold text-ink">
-                  Compte créé !
+                  {t("signup.success.title", "Compte créé !")}
                 </h2>
                 <p className="max-w-sm text-sm leading-relaxed text-ink-muted">
-                  Merci {data.fullName || "à vous"} — le compte du{" "}
-                  {data.cabinetName || "cabinet"} est prêt. Vous pouvez dès à
-                  présent vous connecter à votre espace.
+                  {t(
+                    "signup.success.message",
+                    `Merci ${data.fullName || "à vous"} — le compte du ${data.cabinetName || "cabinet"} est prêt. Vous pouvez dès à présent vous connecter à votre espace.`,
+                    {
+                      fullName: data.fullName || t("signup.success.defaultName", "à vous"),
+                      cabinetName: data.cabinetName || t("signup.success.defaultCabinet", "cabinet"),
+                    }
+                  )}
                 </p>
                 <Link
                   href="/dashboard"
                   className="mt-2 text-sm font-semibold text-brand-600 hover:underline dark:text-brand-400"
                 >
-                  Accéder à mon espace
+                  {t("signup.success.cta", "Accéder à mon espace")}
                 </Link>
               </motion.div>
             )}
 
             {status !== "success" ? (
               <p className="mt-8 text-center text-sm text-ink-muted">
-                Déjà un compte ?{" "}
+                {t("signup.alreadyAccount", "Déjà un compte ?")}{" "}
                 <Link
                   href="/login"
                   className="font-semibold text-brand-600 hover:underline dark:text-brand-400"
                 >
-                  Se connecter
+                  {t("signup.login", "Se connecter")}
                 </Link>
               </p>
             ) : null}
@@ -372,7 +377,7 @@ export function SignupWizard() {
         />
         <Image
           src="/images/hero-patient.png"
-          alt="Illustration inscription Ecotocare"
+          alt={t("signup.imageAlt", "Illustration inscription Ecotocare")}
           fill
           sizes="50vw"
           className="object-contain"
@@ -404,7 +409,14 @@ function GeometricDecorations() {
   );
 }
 
+const STEP_TITLE_KEYS: Record<(typeof STEPS)[number]["key"], string> = {
+  cabinet: "signup.steps.cabinet",
+  info: "signup.steps.info",
+  security: "signup.steps.security",
+};
+
 function Stepper({ current }: { current: number }) {
+  const { t } = useLocale();
   return (
     <div className="mt-8 flex items-center">
       {STEPS.map((s, index) => {
@@ -412,7 +424,7 @@ function Stepper({ current }: { current: number }) {
         const isCompleted = stepNumber < current;
         const isActive = stepNumber === current;
         return (
-          <div key={s.title} className="flex flex-1 items-center last:flex-none">
+          <div key={s.key} className="flex flex-1 items-center last:flex-none">
             <div className="flex flex-col items-center gap-1.5">
               <span
                 className={`flex size-8 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
@@ -430,7 +442,7 @@ function Stepper({ current }: { current: number }) {
                   isActive ? "text-ink" : "text-ink-soft"
                 }`}
               >
-                {s.title}
+                {t(STEP_TITLE_KEYS[s.key], s.title)}
               </span>
             </div>
             {stepNumber < STEPS.length ? (
