@@ -214,6 +214,12 @@ const en: Record<string, string> = {
   "footer.links.faq": "FAQ",
   "footer.links.resources": "Resources",
   "footer.links.contact": "Contact",
+
+  // Contact page hero
+  "contactHero.badge": "Contact",
+  "contactHero.eyebrow": "Let's talk about your practice",
+  "contactHero.title": "Let's talk about your appointments and patient follow-ups",
+  "contactHero.description": "A question about {name}, a demo to schedule? Write to us below and our team will get back to you quickly.",
 };
 
 const dictionaries: Record<Locale, Record<string, string>> = { fr: {}, en };
