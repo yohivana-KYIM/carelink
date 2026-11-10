@@ -21,6 +21,7 @@ import {
   subWeeks,
 } from "date-fns";
 import { fr } from "date-fns/locale/fr";
+import { cabinetWallTimeToUtcIso } from "@/lib/cabinet-timezone";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
@@ -125,14 +126,10 @@ export default function PublicBookingPage() {
     }
     setSubmitting(true);
     try {
-      const [hours, minutes] = selectedTime.split(":").map(Number);
-      const scheduledAt = new Date(selectedDate);
-      scheduledAt.setHours(hours, minutes, 0, 0);
-
       await api.requestPublicAppointment(cabinet.id, {
         ...form,
         practitionerId: form.practitionerId || undefined,
-        scheduledAt: scheduledAt.toISOString(),
+        scheduledAt: cabinetWallTimeToUtcIso(selectedDate, selectedTime),
         patientId: patientId || undefined,
       });
       setSuccess(true);
