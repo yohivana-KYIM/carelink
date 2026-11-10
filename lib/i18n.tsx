@@ -189,7 +189,10 @@ const en: Record<string, string> = {
   "contact.sending": "Sending...",
   "contact.send": "Send message",
   "contact.success": "Thank you! We'll get back to you within 24 business hours.",
-  "contact.error": "Please fill in your name, a valid email, and a message.",
+  "contact.error.name": "Please enter your name.",
+  "contact.error.email": "Please enter a valid email.",
+  "contact.error.messageLength": "Your message must be at least 10 characters long.",
+  "contact.error.generic": "Could not send the message. Please try again shortly.",
 
   // Footer
   "footer.newsletter.title": "Follow {name} news",

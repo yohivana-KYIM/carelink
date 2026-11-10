@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { CheckCircle2, Loader2, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 import { siteConfig } from "@/lib/site-config";
 import { useLocale } from "@/lib/i18n";
 import { PhoneInput } from "react-international-phone";
@@ -37,6 +37,7 @@ const infoPoints = [
 export function ContactForm() {
   const { t } = useLocale();
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
   const [values, setValues] = useState({
     name: "",
     email: "",
@@ -57,7 +58,18 @@ export function ContactForm() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!values.name.trim() || !values.email.includes("@") || !values.message.trim()) {
+    if (!values.name.trim()) {
+      setErrorMessage(t("contact.error.name", "Merci de renseigner votre nom."));
+      setStatus("error");
+      return;
+    }
+    if (!values.email.includes("@")) {
+      setErrorMessage(t("contact.error.email", "Merci de renseigner un email valide."));
+      setStatus("error");
+      return;
+    }
+    if (values.message.trim().length < 10) {
+      setErrorMessage(t("contact.error.messageLength", "Votre message doit contenir au moins 10 caractères."));
       setStatus("error");
       return;
     }
@@ -74,7 +86,13 @@ export function ContactForm() {
       });
       setStatus("success");
       setValues({ name: "", email: "", clinic: "", phone: "", subject: "", message: "" });
-    } catch {
+    } catch (err) {
+      const fieldErrors = err instanceof ApiError ? (err.details as { fieldErrors?: Record<string, string[]> } | undefined)?.fieldErrors : undefined;
+      const firstFieldError = fieldErrors ? Object.values(fieldErrors).flat()[0] : undefined;
+      setErrorMessage(
+        firstFieldError ??
+          (err instanceof ApiError ? err.message : t("contact.error.generic", "Impossible d'envoyer le message. Réessayez dans un instant."))
+      );
       setStatus("error");
     }
   }
@@ -252,9 +270,7 @@ export function ContactForm() {
                 </motion.p>
               ) : null}
               {status === "error" ? (
-                <p className="font-medium text-red-600 dark:text-red-400">
-                  {t("contact.error", "Merci de renseigner votre nom, un email valide et un message.")}
-                </p>
+                <p className="font-medium text-red-600 dark:text-red-400">{errorMessage}</p>
               ) : null}
             </div>
           </form>
