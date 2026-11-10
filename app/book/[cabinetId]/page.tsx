@@ -3,7 +3,7 @@
 import { useEffect, useState, FormEvent, useCallback } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { CabinetTheme } from "@/components/providers/CabinetTheme";
-import { Loader2, CalendarCheck, Clock, User, Phone, Stethoscope, ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2, CalendarCheck, Clock, User, Phone, Stethoscope, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { api } from "@/lib/api";
 import Image from "next/image";
@@ -31,6 +31,7 @@ type PublicCabinet = {
   city: string | null;
   logoUrl?: string | null;
   primaryColor?: string | null;
+  whatsappPhoneNumber?: string | null;
   practitioners: { id: string; fullName: string }[];
 };
 
@@ -178,6 +179,19 @@ export default function PublicBookingPage() {
               ? "📱 Vous allez recevoir une confirmation sur WhatsApp. Le secrétariat vous contactera pour valider le créneau."
               : "Le secrétariat vous contactera pour valider le créneau."}
           </p>
+          {form.whatsappOptIn && cabinet.whatsappPhoneNumber && selectedDate && selectedTime ? (
+            <a
+              href={`https://wa.me/${cabinet.whatsappPhoneNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
+                `Bonjour, je viens de faire une demande de rendez-vous en ligne pour le ${format(selectedDate, "d MMMM", { locale: fr })} à ${selectedTime}. Merci de me confirmer !`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mb-6 flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
+            >
+              <MessageCircle size={16} />
+              Nous écrire sur WhatsApp pour accélérer la confirmation
+            </a>
+          ) : null}
           <button
             onClick={() => {
               setSuccess(false);
