@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useSession } from "@/lib/session";
-import { api, type Cabinet, type CabinetStatus, type PlatformStats } from "@/lib/api";
+import { api, ApiError, type Cabinet, type CabinetStatus, type PlatformStats } from "@/lib/api";
 
 const statusFilters: Array<{ label: string; value: CabinetStatus | "ALL" }> = [
   { label: "Tous", value: "ALL" },
@@ -76,10 +76,13 @@ export default function AdminCabinetsPage() {
     try {
       await api.adminApproveCabinet(token, id);
       toast.success("Cabinet approuvé avec succès");
-      await load();
     } catch (err) {
-      toast.error("Erreur lors de l'approbation du cabinet");
+      toast.error(err instanceof ApiError ? err.message : "Erreur lors de l'approbation du cabinet");
     } finally {
+      // Toujours resynchroniser avec le serveur, même en cas d'erreur : si
+      // seule une notification (email) a échoué après coup, le cabinet a
+      // quand même été approuvé en base et la liste/les stats doivent le refléter.
+      await load();
       setBusyId(null);
     }
   }
@@ -90,10 +93,10 @@ export default function AdminCabinetsPage() {
     try {
       await api.adminRejectCabinet(token, id);
       toast.success("Cabinet refusé");
-      await load();
     } catch (err) {
-      toast.error("Erreur lors du refus du cabinet");
+      toast.error(err instanceof ApiError ? err.message : "Erreur lors du refus du cabinet");
     } finally {
+      await load();
       setBusyId(null);
     }
   }
