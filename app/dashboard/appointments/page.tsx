@@ -85,9 +85,16 @@ function AppointmentsPageContent() {
   const [loading, setLoading] = useState(true);
 
   const statusFromUrl = searchParams.get("status");
+  // ?range=today|week (ex: lien depuis les cartes de la Vue d'ensemble) :
+  // ouvre directement le calendrier sur la bonne vue plutôt que la vue mois
+  // par défaut — tout est déjà chargé côté client, pas besoin d'un filtre
+  // de données séparé, juste de la bonne fenêtre de calendrier.
+  const rangeFromUrl = searchParams.get("range");
   const [viewMode, setViewMode] = useState<"calendar" | "list">(statusFromUrl ? "list" : "calendar");
   const [calendarDate, setCalendarDate] = useState(new Date());
-  const [calendarView, setCalendarView] = useState<View>(Views.MONTH);
+  const [calendarView, setCalendarView] = useState<View>(
+    rangeFromUrl === "today" ? Views.DAY : rangeFromUrl === "week" ? Views.WEEK : Views.MONTH
+  );
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [year, setYear] = useState("");

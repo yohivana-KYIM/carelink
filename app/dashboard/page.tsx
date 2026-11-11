@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   CalendarCheck, CalendarClock, Loader2, TrendingUp, Users,
   AlertTriangle, RefreshCw, BarChart2, FileText, ListFilter,
@@ -61,22 +62,23 @@ export default function DashboardOverviewPage() {
   if (cabinet && cabinet.status !== "ACTIVE") return <PendingGate cabinet={cabinet} />;
 
   const fixedStats = [
-    { icon: CalendarClock, label: "Aujourd'hui", value: summary?.todayCount ?? 0, colorIcon: "bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400", colorGlow: "from-brand-50/60 dark:from-brand-500/10" },
-    { icon: CalendarCheck, label: "Cette semaine", value: summary?.weekCount ?? 0, colorIcon: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400", colorGlow: "from-emerald-50/60 dark:from-emerald-500/10" },
+    { icon: CalendarClock, label: "Aujourd'hui", value: summary?.todayCount ?? 0, href: "/dashboard/planning", colorIcon: "bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400", colorGlow: "from-brand-50/60 dark:from-brand-500/10" },
+    { icon: CalendarCheck, label: "Cette semaine", value: summary?.weekCount ?? 0, href: "/dashboard/appointments?range=week", colorIcon: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400", colorGlow: "from-emerald-50/60 dark:from-emerald-500/10" },
   ];
 
   const periodStats = [
-    { icon: ListFilter, label: summary?.periodLabel ?? "Période", value: summary?.periodCount ?? 0, colorIcon: "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400", colorGlow: "from-indigo-50/60 dark:from-indigo-500/10" },
+    { icon: ListFilter, label: summary?.periodLabel ?? "Période", value: summary?.periodCount ?? 0, href: "/dashboard/appointments", colorIcon: "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400", colorGlow: "from-indigo-50/60 dark:from-indigo-500/10" },
     {
       icon: TrendingUp,
       label: "Taux de confirmation",
       value: summary?.confirmationRate != null ? `${Math.round(summary.confirmationRate * 100)}%` : "—",
+      href: "/dashboard/appointments?status=CONFIRMED",
       colorIcon: "bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400",
       colorGlow: "from-violet-50/60 dark:from-violet-500/10",
     },
-    { icon: Users, label: "Récupérés (relances)", value: summary?.recoveredByRelance ?? 0, colorIcon: "bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400", colorGlow: "from-sky-50/60 dark:from-sky-500/10" },
-    { icon: AlertTriangle, label: "No-shows", value: summary?.noShowCount ?? 0, colorIcon: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400", colorGlow: "from-amber-50/60 dark:from-amber-500/10" },
-    { icon: RefreshCw, label: "À reprogrammer", value: summary?.rescheduleCount ?? 0, colorIcon: "bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400", colorGlow: "from-orange-50/60 dark:from-orange-500/10" },
+    { icon: Users, label: "Récupérés (relances)", value: summary?.recoveredByRelance ?? 0, href: "/dashboard/relances", colorIcon: "bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400", colorGlow: "from-sky-50/60 dark:from-sky-500/10" },
+    { icon: AlertTriangle, label: "No-shows", value: summary?.noShowCount ?? 0, href: "/dashboard/appointments?status=NO_SHOW", colorIcon: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400", colorGlow: "from-amber-50/60 dark:from-amber-500/10" },
+    { icon: RefreshCw, label: "À reprogrammer", value: summary?.rescheduleCount ?? 0, href: "/dashboard/appointments?status=RESCHEDULE_REQUESTED", colorIcon: "bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400", colorGlow: "from-orange-50/60 dark:from-orange-500/10" },
   ];
 
   return (
@@ -162,8 +164,8 @@ export default function DashboardOverviewPage() {
         <>
           {/* Repères fixes, toujours "à l'instant" quelle que soit la période choisie */}
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {fixedStats.map(({ icon: Icon, label, value, colorIcon, colorGlow }) => (
-              <StatCard key={label} icon={Icon} label={label} value={value} colorIcon={colorIcon} colorGlow={colorGlow} />
+            {fixedStats.map(({ icon: Icon, label, value, href, colorIcon, colorGlow }) => (
+              <StatCard key={label} icon={Icon} label={label} value={value} href={href} colorIcon={colorIcon} colorGlow={colorGlow} />
             ))}
           </div>
 
@@ -174,8 +176,8 @@ export default function DashboardOverviewPage() {
               {practitionerId ? ` · ${practitioners.find((p) => p.id === practitionerId)?.fullName ?? ""}` : ""}
             </p>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-              {periodStats.map(({ icon: Icon, label, value, colorIcon, colorGlow }) => (
-                <StatCard key={label} icon={Icon} label={label} value={value} colorIcon={colorIcon} colorGlow={colorGlow} />
+              {periodStats.map(({ icon: Icon, label, value, href, colorIcon, colorGlow }) => (
+                <StatCard key={label} icon={Icon} label={label} value={value} href={href} colorIcon={colorIcon} colorGlow={colorGlow} />
               ))}
             </div>
           </div>
@@ -241,25 +243,33 @@ function StatCard({
   icon: Icon,
   label,
   value,
+  href,
   colorIcon,
   colorGlow,
 }: {
   icon: React.ComponentType<{ size?: number; className?: string }>;
   label: string;
   value: string | number;
+  href?: string;
   colorIcon: string;
   colorGlow: string;
 }) {
-  return (
-    <div className="group relative overflow-hidden flex flex-col gap-2 rounded-2xl border border-border bg-surface-raised p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-border">
+  const className = "group relative overflow-hidden flex flex-col gap-2 rounded-2xl border border-border bg-surface-raised p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-border";
+  const content = (
+    <>
       <div className={`pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br ${colorGlow} to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
       <span className={`relative flex size-9 items-center justify-center rounded-xl ${colorIcon} transition-transform duration-300 group-hover:scale-110`}>
         <Icon size={16} />
       </span>
       <p className="relative text-xl font-bold text-ink">{value}</p>
       <p className="relative text-xs text-ink-soft leading-tight">{label}</p>
-    </div>
+    </>
   );
+
+  if (href) {
+    return <Link href={href} className={className}>{content}</Link>;
+  }
+  return <div className={className}>{content}</div>;
 }
 
 function StatusBar({ status, count, total }: { status: string; count: number; total: number }) {
