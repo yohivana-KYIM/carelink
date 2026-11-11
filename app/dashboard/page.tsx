@@ -3,35 +3,70 @@
 import { useEffect, useState } from "react";
 import {
   CalendarCheck, CalendarClock, Loader2, TrendingUp, Users,
-  AlertTriangle, RefreshCw, BarChart2, FileText,
+  AlertTriangle, RefreshCw, BarChart2, FileText, ListFilter,
 } from "lucide-react";
 import { useSession } from "@/lib/session";
-import { api, type DashboardSummary } from "@/lib/api";
+import { api, type DashboardSummary, type DashboardPeriod, type Practitioner } from "@/lib/api";
 import { PendingGate } from "@/components/dashboard/PendingGate";
 import { statusConfig } from "@/lib/appointment-status";
 
 const currentYear = new Date().getFullYear();
 const YEARS = Array.from({ length: 4 }, (_, i) => currentYear - i);
 
+const PERIODS: Array<{ value: DashboardPeriod; label: string }> = [
+  { value: "today", label: "Aujourd'hui" },
+  { value: "week", label: "Cette semaine" },
+  { value: "month", label: "Ce mois-ci" },
+  { value: "year", label: "Cette année" },
+  { value: "all", label: "Tout" },
+  { value: "custom", label: "Période personnalisée" },
+];
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 export default function DashboardOverviewPage() {
   const { token, cabinet, user } = useSession();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [practitioners, setPractitioners] = useState<Practitioner[]>([]);
   const [loading, setLoading] = useState(true);
-  const [year, setYear] = useState<number | undefined>(undefined);
+
+  const [period, setPeriod] = useState<DashboardPeriod>("all");
+  const [year, setYear] = useState(currentYear);
+  const [dateFrom, setDateFrom] = useState(todayStr());
+  const [dateTo, setDateTo] = useState(todayStr());
+  const [practitionerId, setPractitionerId] = useState("");
+
+  useEffect(() => {
+    if (!token) return;
+    api.listPractitioners(token).then((r) => setPractitioners(r.practitioners)).catch(() => {});
+  }, [token]);
 
   useEffect(() => {
     if (!token || cabinet?.status !== "ACTIVE") { setLoading(false); return; }
     setLoading(true);
-    api.dashboardSummary(token, year ? { year } : {})
-      .then(r => setSummary(r.summary))
+    api
+      .dashboardSummary(token, {
+        period,
+        year: period === "year" ? year : undefined,
+        dateFrom: period === "custom" ? dateFrom : undefined,
+        dateTo: period === "custom" ? dateTo : undefined,
+        practitionerId: practitionerId || undefined,
+      })
+      .then((r) => setSummary(r.summary))
       .finally(() => setLoading(false));
-  }, [token, cabinet?.status, year]);
+  }, [token, cabinet?.status, period, year, dateFrom, dateTo, practitionerId]);
 
   if (cabinet && cabinet.status !== "ACTIVE") return <PendingGate cabinet={cabinet} />;
 
-  const stats = [
+  const fixedStats = [
     { icon: CalendarClock, label: "Aujourd'hui", value: summary?.todayCount ?? 0, colorIcon: "bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400", colorGlow: "from-brand-50/60 dark:from-brand-500/10" },
     { icon: CalendarCheck, label: "Cette semaine", value: summary?.weekCount ?? 0, colorIcon: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400", colorGlow: "from-emerald-50/60 dark:from-emerald-500/10" },
+  ];
+
+  const periodStats = [
+    { icon: ListFilter, label: summary?.periodLabel ?? "Période", value: summary?.periodCount ?? 0, colorIcon: "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400", colorGlow: "from-indigo-50/60 dark:from-indigo-500/10" },
     {
       icon: TrendingUp,
       label: "Taux de confirmation",
@@ -52,36 +87,97 @@ export default function DashboardOverviewPage() {
             Bonjour {user?.fullName?.split(" ")[0] ?? ""} 👋
           </h1>
           <p className="mt-1 text-sm text-ink-muted">
-            Aperçu de l'activité de {cabinet?.name ?? "votre cabinet"}.
+            Aperçu de l&apos;activité de {cabinet?.name ?? "votre cabinet"}.
           </p>
         </div>
-        {/* Filtre année */}
-        <select
-          value={year ?? ""}
-          onChange={e => setYear(e.target.value ? Number(e.target.value) : undefined)}
-          className="rounded-full border border-border bg-surface-raised px-4 py-2 text-sm text-ink focus:outline-none"
-        >
-          <option value="">Toutes les années</option>
-          {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-        </select>
+
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {practitioners.length > 0 ? (
+              <select
+                value={practitionerId}
+                onChange={(e) => setPractitionerId(e.target.value)}
+                className="rounded-full border border-border bg-surface-raised px-4 py-2 text-sm text-ink focus:outline-none"
+              >
+                <option value="">Tous les praticiens</option>
+                {practitioners.map((p) => (
+                  <option key={p.id} value={p.id}>{p.fullName}</option>
+                ))}
+              </select>
+            ) : null}
+
+            {period === "year" ? (
+              <select
+                value={year}
+                onChange={(e) => setYear(Number(e.target.value))}
+                className="rounded-full border border-border bg-surface-raised px-4 py-2 text-sm text-ink focus:outline-none"
+              >
+                {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
+              </select>
+            ) : null}
+
+            {period === "custom" ? (
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  max={dateTo}
+                  className="rounded-full border border-border bg-surface-raised px-3 py-2 text-sm text-ink focus:outline-none"
+                />
+                <span className="text-xs text-ink-soft">→</span>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  min={dateFrom}
+                  className="rounded-full border border-border bg-surface-raised px-3 py-2 text-sm text-ink focus:outline-none"
+                />
+              </div>
+            ) : null}
+          </div>
+
+          <div className="flex flex-wrap justify-end gap-1.5">
+            {PERIODS.map((p) => (
+              <button
+                key={p.value}
+                type="button"
+                onClick={() => setPeriod(p.value)}
+                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                  period === p.value
+                    ? "bg-brand-600 text-white"
+                    : "border border-border text-ink-muted hover:border-brand-300"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {loading ? (
         <div className="flex min-h-[30vh] items-center justify-center"><Loader2 className="animate-spin text-ink-soft" size={22} /></div>
       ) : (
         <>
-          {/* KPI grid */}
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {stats.map(({ icon: Icon, label, value, colorIcon, colorGlow }) => (
-              <div key={label} className="group relative overflow-hidden flex flex-col gap-2 rounded-2xl border border-border bg-surface-raised p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-border">
-                <div className={`pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br ${colorGlow} to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
-                <span className={`relative flex size-9 items-center justify-center rounded-xl ${colorIcon} transition-transform duration-300 group-hover:scale-110`}>
-                  <Icon size={16} />
-                </span>
-                <p className="relative text-xl font-bold text-ink">{value}</p>
-                <p className="relative text-xs text-ink-soft leading-tight">{label}</p>
-              </div>
+          {/* Repères fixes, toujours "à l'instant" quelle que soit la période choisie */}
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {fixedStats.map(({ icon: Icon, label, value, colorIcon, colorGlow }) => (
+              <StatCard key={label} icon={Icon} label={label} value={value} colorIcon={colorIcon} colorGlow={colorGlow} />
             ))}
+          </div>
+
+          {/* Statistiques scopées à la période sélectionnée */}
+          <div>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">
+              Statistiques pour : {summary?.periodLabel}
+              {practitionerId ? ` · ${practitioners.find((p) => p.id === practitionerId)?.fullName ?? ""}` : ""}
+            </p>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+              {periodStats.map(({ icon: Icon, label, value, colorIcon, colorGlow }) => (
+                <StatCard key={label} icon={Icon} label={label} value={value} colorIcon={colorIcon} colorGlow={colorGlow} />
+              ))}
+            </div>
           </div>
 
           {/* Alertes */}
@@ -104,7 +200,10 @@ export default function DashboardOverviewPage() {
                 <span className="flex size-8 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
                   <BarChart2 size={15} />
                 </span>
-                <h2 className="text-base font-semibold text-ink">Répartition par statut</h2>
+                <div>
+                  <h2 className="text-base font-semibold text-ink">Répartition par statut</h2>
+                  <p className="text-xs text-ink-soft">{summary.periodLabel}</p>
+                </div>
               </div>
               <div className="flex flex-col gap-3">
                 {summary.statusBreakdown.map(({ status, count }) => (
@@ -134,6 +233,31 @@ export default function DashboardOverviewPage() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  colorIcon,
+  colorGlow,
+}: {
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  label: string;
+  value: string | number;
+  colorIcon: string;
+  colorGlow: string;
+}) {
+  return (
+    <div className="group relative overflow-hidden flex flex-col gap-2 rounded-2xl border border-border bg-surface-raised p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-border">
+      <div className={`pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br ${colorGlow} to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
+      <span className={`relative flex size-9 items-center justify-center rounded-xl ${colorIcon} transition-transform duration-300 group-hover:scale-110`}>
+        <Icon size={16} />
+      </span>
+      <p className="relative text-xl font-bold text-ink">{value}</p>
+      <p className="relative text-xs text-ink-soft leading-tight">{label}</p>
     </div>
   );
 }

@@ -188,9 +188,13 @@ export type Appointment = {
   createdAt: string;
 };
 
+export type DashboardPeriod = "today" | "week" | "month" | "year" | "all" | "custom";
+
 export type DashboardSummary = {
   todayCount: number;
   weekCount: number;
+  periodCount: number;
+  periodLabel: string;
   noShowCount: number;
   rescheduleCount: number;
   confirmationRate: number | null;
@@ -320,9 +324,21 @@ export const api = {
     authed<{ user: SafeUser; cabinet: Cabinet | null }>(token, "/api/auth/me", { method: "PATCH", body: input }),
 
   // Dashboard
-  dashboardSummary: (token: string, filters?: { year?: number; practitionerId?: string }) => {
+  dashboardSummary: (
+    token: string,
+    filters?: {
+      period?: DashboardPeriod;
+      year?: number;
+      dateFrom?: string;
+      dateTo?: string;
+      practitionerId?: string;
+    }
+  ) => {
     const qs = new URLSearchParams();
+    if (filters?.period) qs.set("period", filters.period);
     if (filters?.year) qs.set("year", String(filters.year));
+    if (filters?.dateFrom) qs.set("dateFrom", filters.dateFrom);
+    if (filters?.dateTo) qs.set("dateTo", filters.dateTo);
     if (filters?.practitionerId) qs.set("practitionerId", filters.practitionerId);
     const q = qs.toString();
     return authed<{ summary: DashboardSummary }>(token, `/api/dashboard/summary${q ? `?${q}` : ""}`);
